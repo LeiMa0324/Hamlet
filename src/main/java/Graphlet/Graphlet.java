@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /***
- * 一个Graphlet有一个序列的events，同一个event type
- * 有一个输入的snapshots（hashmap）
+ * One Graphlet has a list of events
+ * 
  */
 @Data
 public abstract class Graphlet {
