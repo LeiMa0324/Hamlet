@@ -1,10 +1,10 @@
-package Graphlet;
+package Hamlet.Graphlet;
 
-import Event.Event;
-import Graph.Snapshot;
+import Hamlet.Event.Event;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 
 
@@ -17,10 +17,10 @@ import java.util.HashMap;
 @EqualsAndHashCode(callSuper = false)
 public class NonSharedGraphlet extends Graphlet{
 
-    private HashMap<Integer, Integer> countPerQueryHashMap;
+    private HashMap<Integer, BigInteger> countPerQueryHashMap;
     public NonSharedGraphlet(){
         super();
-        countPerQueryHashMap = new HashMap<Integer, Integer>();
+        countPerQueryHashMap = new HashMap<Integer, BigInteger>();
     }
 
     /**
@@ -35,10 +35,10 @@ public class NonSharedGraphlet extends Graphlet{
         //  like {<query1, A>: 5},{<query1, E>: 3}
         //
         if (countPerQueryHashMap.get(e.getEventType().getQid())==null){ //if e is the first event
-            countPerQueryHashMap.put(e.getEventType().getQid(),1);
+            countPerQueryHashMap.put(e.getEventType().getQid(),new BigInteger("1"));
         }else {
-            int count = countPerQueryHashMap.get(e.getEventType().getQid());
-            countPerQueryHashMap.put(e.getEventType().getQid(),count+1);
+            BigInteger count = countPerQueryHashMap.get(e.getEventType().getQid());
+            countPerQueryHashMap.put(e.getEventType().getQid(),count.add(new BigInteger("1")));
         }
     }
 

@@ -1,6 +1,7 @@
-package Event;
+package Hamlet.Event;
 
-import HamletTemplate.EventType;
+
+import Hamlet.Template.EventType;
 import lombok.Data;
 
 @Data
@@ -11,7 +12,7 @@ public class Event {
     private EventType eventType;
 
     /**
-     * take a line of record，convert it to a Event
+     * take a line of record，convert it to a Hamlet.Event
      * @param line line of record
      */
     public Event(String line){

@@ -1,16 +1,13 @@
-package Graphlet;
+package Hamlet.Graphlet;
 
-import Event.Event;
-import Graph.Snapshot;
-import HamletTemplate.EventType;
+import Hamlet.Event.Event;
 import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /***
- * One Graphlet has a list of events
- * 
+ * One Hamlet.Graphlet has a list of events
+ *
  */
 @Data
 public abstract class Graphlet {

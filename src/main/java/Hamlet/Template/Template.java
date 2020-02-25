@@ -1,6 +1,5 @@
-package HamletTemplate;
+package Hamlet.Template;
 
-import Event.Event;
 import lombok.Data;
 
 import java.util.*;
@@ -13,7 +12,7 @@ public class Template {
     private ArrayList<String> queries;
     private ArrayList<TemplateNode> NodeList;   //all Nodes in the Template
     private String SharedEvent;     //the Shared event type string common in all queries
-    private HashMap<String, EventType> strToEventTypeHashMap;   //can find a Event Type by a string
+    private HashMap<String, EventType> strToEventTypeHashMap;   //can find a Hamlet.Event Type by a string
 
     //
     public Template(ArrayList<String> queries) {
@@ -32,6 +31,7 @@ public class Template {
                 // TODO: 2020/2/21 only shared event has predecessor here.
                 if (events.get(i).equals(SharedEvent))
                 {
+                    et.setEventTypeStr(events.get(i).replace("+",""));
                     et.addpredEventTypes(eventTypeList.get(i-1));    //only has the immediate predecessor
                     et.setSelfPred(true);
                 }

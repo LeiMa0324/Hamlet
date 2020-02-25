@@ -1,12 +1,12 @@
-package Graphlet;
+package Hamlet.Graphlet;
 
-import Event.Event;
-import Graph.Snapshot;
-import HamletTemplate.EventType;
+import Hamlet.Event.Event;
+import Hamlet.Template.EventType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.HashMap;
+import java.math.BigInteger;
+
 /**
  * The graphlet of the shared events
  */
@@ -15,7 +15,7 @@ import java.util.HashMap;
 @EqualsAndHashCode(callSuper = true)
 public class SharedGraphlet extends Graphlet{
     EventType eventType;        // the event type of this graphlet
-    private int coeff;
+    private BigInteger coeff;
     public SharedGraphlet(){
         super();
 
@@ -23,7 +23,7 @@ public class SharedGraphlet extends Graphlet{
 
     /**
      * add an event to this shared graphlet
-     * @param e
+     * @param e a coming event
      */
     @Override
     public void addEvent(Event e){
@@ -57,9 +57,8 @@ public class SharedGraphlet extends Graphlet{
         for(int i=0;i<eventList.size();i++){
             coeff_per_event = inter_sum +1;
             inter_sum += coeff_per_event;
-            System.out.println(coeff_per_event+" ");
             coeff +=coeff_per_event;
         }
-        this.coeff = coeff;
+        this.coeff = new BigInteger(coeff+"") ;
     }
 }

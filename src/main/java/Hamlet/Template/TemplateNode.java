@@ -1,4 +1,4 @@
-package HamletTemplate;
+package Hamlet.Template;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,10 +10,10 @@ import java.util.HashMap;
 public class TemplateNode {
 
     private Integer nodeID;
-    private HashMap<Integer, EventType> qid_EventType_HashMap;     //Hash Map: {Query id: Event type}
+    private HashMap<Integer, EventType> qid_EventType_HashMap;     //Hash Map: {Query id: Hamlet.Event type}
     public boolean isShared;        //if this node is shared
 
-    TemplateNode(boolean isShared, Integer nodeID){
+    public TemplateNode(boolean isShared, Integer nodeID){
         this.isShared = isShared;
         this.nodeID = nodeID;
         qid_EventType_HashMap = new HashMap<Integer, EventType>();
@@ -22,9 +22,9 @@ public class TemplateNode {
     /**
      * add an event type to a node
      * @param qid the query id of the event type
-     * @param et  the Event Type instance
+     * @param et  the Hamlet.Event Type instance
      */
-    void addEventType(int qid, EventType et){
+    public void addEventType(int qid, EventType et){
         qid_EventType_HashMap.put(qid, et);
         et.setTemplateNode(this);
     }

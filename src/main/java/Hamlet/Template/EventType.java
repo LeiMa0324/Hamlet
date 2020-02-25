@@ -1,4 +1,4 @@
-package HamletTemplate;
+package Hamlet.Template;
 
 import lombok.Data;
 
@@ -27,7 +27,7 @@ public class EventType {
 
     @Override
     public String toString(){
-        return "qid:"+this.qid+". Event: "+EventTypeStr+". Pred Event Types:"+predEventTypes +". Self Pred: "+selfPred
+        return "qid:"+this.qid+". Hamlet.Event: "+EventTypeStr+". Pred Hamlet.Event Types:"+predEventTypes +". Self Pred: "+selfPred
                 +". TemplateNode:"+templateNode.getNodeID();
     }
 
