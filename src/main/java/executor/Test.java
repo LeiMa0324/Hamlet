@@ -24,18 +24,17 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Test {
 
 	public static void main(String[] args) throws FileNotFoundException {
-		String streamFile_format = "src/main/resources/Streams/GenStream_%d.txt";
+		String streamFile = "src/main/resources/Streams/GenStream_1000000.txt";
 		String queryFile = "src/main/resources/Queries/SampleQueries.txt";
-		String logFile = "latency.csv";
-		for (int i =100; i<1100;i+=100){
-			String streamFile = String.format(streamFile_format,i);
-			SingleRun(streamFile,queryFile, logFile,i);
+		String logFile = "throughput.csv";
+		for (int epw =200000; epw<600000;epw+=100000){		//200k-500k， 50k step
+			SingleRun(streamFile,queryFile, logFile,epw);
 		}
 
 
 	}
 
-	static void SingleRun(String streamFile, String queryFile,String logFile,int numofSnapshots){
+	static void SingleRun(String streamFile, String queryFile,String logFile,int epw){
 
 		ArrayList<String> queries = new ArrayList<String>();
 		//read query file
@@ -51,8 +50,7 @@ public class Test {
 		//Hamlet
 		System.out.println("===============================HAMLET====================================");
 		Template template = new Template(queries);
-		System.out.println(template.getNodeList());
-		Graph g = new Graph(template,streamFile);
+		Graph g = new Graph(template,streamFile, epw);	//epw==400k
 		long start =  System.currentTimeMillis();
 		g.run();
 		long end =  System.currentTimeMillis();
@@ -61,13 +59,13 @@ public class Test {
 
 
 		//GRETA
-		System.out.println("===============================GRETA====================================");
-		long gretaDuration = 0;
+//		System.out.println("===============================GRETA====================================");
+		long gretaDuration =0;
 		try {
 			CountDownLatch done = new CountDownLatch(1);
 			AtomicLong latency = new AtomicLong(0);
 			AtomicInteger memory = new AtomicInteger(0);
-			StreamPartitioner sp = new StreamPartitioner("gen", streamFile, 22004);
+			StreamPartitioner sp = new StreamPartitioner("gen", streamFile, epw);
 			Stream stream = sp.partition();
 			TransactionMQ TrS;        //虚类，所有的算法都implement这个虚类
 
@@ -84,11 +82,11 @@ public class Test {
 		} catch (InterruptedException e) { e.printStackTrace(); }
 
 		System.out.println("===============================Logging====================================");
-		logging(logFile,numofSnapshots, hamletDuration, gretaDuration);
+		logging(logFile,epw, hamletDuration, gretaDuration);
 
 	}
 
-	public static void logging(String outputFile,int numofSnapshots, long hamletDuration, long gretaDuration ) {
+	public static void logging(String outputFile,int epw, long hamletDuration, long gretaDuration ) {
 		// first create file object for file placed at location
 		// specified by filepath
 		File file = new File("output/"+outputFile);
@@ -97,10 +95,10 @@ public class Test {
 				file.createNewFile();
 				FileWriter outputfile = new FileWriter(file, true);
 				CSVWriter writer = new CSVWriter(outputfile);
-				String[] header = {"# of snapshot", "Hamlet", "Greta"};
+				String[] header = {"#epw", "Hamlet throughput", "Greta throughput"};
 				writer.writeNext(header);
 				//write the first line data
-				String[] data = {numofSnapshots+"", hamletDuration+"", gretaDuration+""};
+				String[] data = {epw+"", epw*1000/hamletDuration+"", epw*1000/gretaDuration+""};
 				writer.writeNext(data);
 				writer.close();
 			} catch (IOException e) {
@@ -113,7 +111,7 @@ public class Test {
 				// create CSVWriter object filewriter object as parameter
 				CSVWriter writer = new CSVWriter(outputfile);
 				// add data to csv
-				String[] data = {numofSnapshots+"", hamletDuration+"", gretaDuration+""};
+				String[] data = {epw+"", epw*1000/hamletDuration+"", epw*1000/gretaDuration+""};
 				writer.writeNext(data);
 				// closing writer connection
 				writer.close();

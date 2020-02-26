@@ -10,18 +10,18 @@ import java.util.Random;
 
 public class generator {
     public static void main(String[] agrs){
-        for (int i =100; i<1100;i+=100){
-            singleGenerator(i);
-        }
+        int numofevents = 1000000;
+        singleGenerator(numofevents);
+
 
     }
-    static void singleGenerator(int numofSnapshots){
-        String file_of_stream = String.format("src/main/resources/Streams/GenStream_%d.txt",numofSnapshots);
+    static void singleGenerator(int numofevents){
+        String file_of_stream = String.format("src/main/resources/Streams/GenStream_%d.txt",numofevents);
         try {
             File output_file = new File(file_of_stream);
             BufferedWriter output = new BufferedWriter(new FileWriter(output_file));
             int second_id = 0;
-            for (int j =0;j<numofSnapshots;j++){
+            for (int j =0;second_id< numofevents;j++){
                 //每一个snapshot random 3-5个A，2-4个C，10-20个B+
                 Random random = new Random();
                 int numofA = random.nextInt(3)+3;   //3-5个A

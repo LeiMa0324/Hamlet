@@ -35,7 +35,7 @@ public class Graph {
      *
      * @param tmp the Template
      */
-    public Graph(Template tmp, String streamFile) {
+    public Graph(Template tmp, String streamFile, int epw) {
         this.template = tmp;
         this.sharedG = new SharedGraphlet();
         this.nonsharedG = new NonSharedGraphlet();
@@ -45,10 +45,12 @@ public class Graph {
         this.finalCount = new HashMap<Integer, BigInteger>();
         try {    //load the stream into a list of events
             Scanner scanner = new Scanner(new File(streamFile));
-            while (scanner.hasNext()) {
+            int numofEvents = 0;
+            while (scanner.hasNext()&&numofEvents<epw) {
                 String line = scanner.nextLine();
                 Event e = new Event(line);
                 this.events.add(e);
+                numofEvents++;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,9 +76,9 @@ public class Graph {
                     break;
             }
         }
-        System.out.println("final snapshot is " + currentSnapShot);
+//        System.out.println("final snapshot is " + currentSnapShot);
         calculateFinalCount();
-        System.out.println("final count is" + finalCount);
+//        System.out.println("final count is" + finalCount);
 
     }
 
