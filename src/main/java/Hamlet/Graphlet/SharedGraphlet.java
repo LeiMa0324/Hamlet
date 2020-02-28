@@ -14,10 +14,12 @@ import java.math.BigInteger;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SharedGraphlet extends Graphlet{
-    EventType eventType;        // the event type of this graphlet
+    public final EventType eventType;        // the event type of this graphlet
     private BigInteger coeff;
-    public SharedGraphlet(){
+    public SharedGraphlet(EventType eventType){
         super();
+        this.eventType = eventType;
+        coeff = new BigInteger("0");
 
     }
 
@@ -30,7 +32,6 @@ public class SharedGraphlet extends Graphlet{
         if (this.eventList==null){
             e.setId(0);
             this.eventList.add(e);
-            this.eventType = e.getEventType();
         }
         else {
             e.setId(eventList.size());

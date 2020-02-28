@@ -7,6 +7,7 @@ import Greta.template.SingleQueryTemplate;
 import Greta.transaction.GretaMQ;
 import Greta.transaction.TransactionMQ;
 
+import Hamlet.Graph.Graph;
 import Hamlet.Template.EventType;
 import Hamlet.Template.Template;
 import com.opencsv.CSVWriter;
@@ -26,9 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Test {
 
 	public static void main(String[] args) throws FileNotFoundException {
-//		String streamFile = "src/main/resources/Streams/GenStream_1000000.txt";
+		String streamFile = "src/main/resources/Streams/ShortStream.txt";
 		String queryFile = "src/main/resources/Queries/SampleQueries.txt";
-//		String logFile = "throughput.csv";
+		String logFile = "throughput.csv";
 //		for (int epw =200000; epw<600000;epw+=100000){		//200k-500k， 50k step
 //			SingleRun(streamFile,queryFile, logFile,epw);
 //		}
@@ -47,32 +48,33 @@ public class Test {
 			System.out.println(tmp.getEventTypebyString(e).getTypes());
 		}
 //		System.out.println(tmp.toString());
+		SingleRun(streamFile, queryFile, logFile, 500000);
 
 
 	}
 
-//	static void SingleRun(String streamFile, String queryFile,String logFile,int epw){
-//
-//		ArrayList<String> queries = new ArrayList<String>();
-//		//read query file
-//		try {
-//			Scanner query_scanner = new Scanner(new File(queryFile));
-//			while (query_scanner.hasNextLine()) {
-//				queries.add(query_scanner.nextLine());
-//			}
-//			query_scanner.close();
-//		} catch(FileNotFoundException e) {e.printStackTrace();}
-//
-//
-//		//Hamlet
-//		System.out.println("===============================HAMLET====================================");
-//		Template template = new Template(queries);
-//		Graph g = new Graph(template,streamFile, epw);	//epw==400k
-//		long start =  System.currentTimeMillis();
-//		g.run();
-//		long end =  System.currentTimeMillis();
-//		long hamletDuration = end - start;
-//		System.out.println("Hamlet: duaration is "+hamletDuration);
+	static void SingleRun(String streamFile, String queryFile,String logFile,int epw){
+
+		ArrayList<String> queries = new ArrayList<String>();
+		//read query file
+		try {
+			Scanner query_scanner = new Scanner(new File(queryFile));
+			while (query_scanner.hasNextLine()) {
+				queries.add(query_scanner.nextLine());
+			}
+			query_scanner.close();
+		} catch(FileNotFoundException e) {e.printStackTrace();}
+
+
+		//Hamlet
+		System.out.println("===============================HAMLET====================================");
+		Template template = new Template(queries);
+		Graph g = new Graph(template,streamFile, epw);	//epw==400k
+		long start =  System.currentTimeMillis();
+		g.run();
+		long end =  System.currentTimeMillis();
+		long hamletDuration = end - start;
+		System.out.println("Hamlet: duaration is "+hamletDuration);
 //
 //
 //		//GRETA
@@ -101,7 +103,7 @@ public class Test {
 //		System.out.println("===============================Logging====================================");
 //		logging(logFile,epw, hamletDuration, gretaDuration);
 //
-//	}
+	}
 //
 //	public static void logging(String outputFile,int epw, long hamletDuration, long gretaDuration ) {
 //		// first create file object for file placed at location

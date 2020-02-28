@@ -34,7 +34,7 @@ public class Template {
                     eventTypeList.add(getEventTypebyString(e));        //maintain event type list
 
                 }else {     //if not exists
-                    EventType et = new EventType(e,e.equals(FindSharedEvents()));   //new an event type
+                    EventType et = new EventType(e,e.equals(FindSharedEvents()),qid);   //new an event type
                     et.addType(qid, type);          //set its type
                     MaintainPreds(et, qid, eventTypeList);   //maintain its predecessors
                     strToEventTypeHashMap.put(e, et);       //put it into hash map

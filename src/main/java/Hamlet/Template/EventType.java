@@ -2,20 +2,23 @@ package Hamlet.Template;
 
 import Hamlet.Event.Event;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
 public class EventType {
-    public String string;    // the actual event type string
+    public final String string;    // the actual event type string
     // 1: 'A', 2: 'C'
     private HashMap<Integer, ArrayList<EventType>> edges;     //follow the edge to find the predecessors
-    private boolean isShared;
-    private Integer Qid;
+    public final boolean isShared;
+    private ArrayList<Integer> qids;
     private HashMap<Integer, String> types;    //"START", "END", "REGULAR"
 
-    public EventType(String string, boolean isShared){
+    public EventType(String string, boolean isShared, int qid){
+        this.qids = new ArrayList<Integer>();
+        qids.add(qid);
         this.types = new HashMap<Integer, String>();
         this.string = string;
         this.isShared = isShared;
@@ -36,6 +39,9 @@ public class EventType {
         else {
             edges.get(qid).add(pred);
 
+        }
+        if (!qids.contains(qid)){
+            qids.add(qid);
         }
     }
     public ArrayList<EventType> getPreds(int qid){

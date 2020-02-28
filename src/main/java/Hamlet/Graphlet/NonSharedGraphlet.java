@@ -1,26 +1,33 @@
 package Hamlet.Graphlet;
 
 import Hamlet.Event.Event;
+import Hamlet.Template.EventType;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 
 
 /**
- * hold the count for all unshared events in all queries
- * qid=1: A, 10
- * qid=2: C, 5
+one unshared event type has one unshared graphlet
  */
+
 @Data
-@EqualsAndHashCode(callSuper = false)
 public class NonSharedGraphlet extends Graphlet{
 
-    private HashMap<Integer, BigInteger> countPerQueryHashMap;
-    public NonSharedGraphlet(){
+    public final EventType eventType;        // the event type of this graphlet
+    private HashMap<Integer, BigInteger> counts;
+    /**
+     * construct a unshared g with an event type
+     * @param eventType
+     */
+    public NonSharedGraphlet(EventType eventType){
         super();
-        countPerQueryHashMap = new HashMap<Integer, BigInteger>();
+        this.eventType = eventType;
+        counts = new HashMap<Integer, BigInteger>();
+        for (Integer q: eventType.getQids()){
+            counts.put(q,new BigInteger("0"));
+        }
     }
 
     /**
@@ -29,18 +36,16 @@ public class NonSharedGraphlet extends Graphlet{
      */
     @Override
     public void addEvent(Event e ){
-        // TODO: 2020/2/21 only support AB+,
-        //  If one query has multiple non shared event types，we need two keys in the hashmap
-        //  For query A,E,B+, we need HashMap
-        //  like {<query1, A>: 5},{<query1, E>: 3}
-        //
-        if (countPerQueryHashMap.get(e.getEventType().getQid())==null){ //if e is the first event
-            countPerQueryHashMap.put(e.getEventType().getQid(),new BigInteger("1"));
-        }else {
-            BigInteger count = countPerQueryHashMap.get(e.getEventType().getQid());
-            countPerQueryHashMap.put(e.getEventType().getQid(),count.add(new BigInteger("1")));
+        for (Integer q: e.eventType.getQids()){
+            BigInteger count = counts.get(q);
+            counts.put(q,count.add(new BigInteger("1")));
         }
+        System.out.println("=======================================");
+        System.out.println("incoming event"+e);;
+        System.out.println("count is"+counts);
     }
 
-
+    public boolean IsCompatibleOf(Event e){
+        return eventType.equals(e.eventType);
+    }
 }

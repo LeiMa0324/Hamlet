@@ -8,17 +8,18 @@ import lombok.Data;
 public class Event {
     private int id; //id in the graphlet
     private int sec;
-    private String eventString;
-    private EventType eventType;
+    public final String string;
+    public final EventType eventType;
 
     /**
      * take a line of record，convert it to a Hamlet.Event
      * @param line line of record
      */
-    public Event(String line){
+    public Event(String line, EventType et){
+        this.eventType = et;
         String[] record = line.split(",");
         this.sec = Integer.parseInt(record[0]);
-        this.eventString = record[1];
+        this.string = record[1];
     }
 
 }
