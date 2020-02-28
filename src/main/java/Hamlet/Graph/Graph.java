@@ -25,8 +25,7 @@ import java.util.Scanner;
 public class Graph {
     private Snapshot currentSnapShot;
     private final Template template;
-    private  SharedGraphlet sharedG;       //a list of shared G
-    private HashMap<String, NonSharedGraphlet> nonsharedGs;   //a list of non-shared G
+    private HashMap<String, Graphlet> Graphlets;   //a list of non-shared G
     private String currentGraphletFlag; //which graphlet it is on
     private ArrayList<Event> events;
     private HashMap<Integer, BigInteger> finalCount;
