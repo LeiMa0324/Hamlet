@@ -10,49 +10,65 @@ import java.util.*;
 @Data
 public class Template {
     private ArrayList<String> queries;
-    private ArrayList<TemplateNode> NodeList;   //all Nodes in the Template
     private String SharedEvent;     //the Shared event type string common in all queries
     private HashMap<String, EventType> strToEventTypeHashMap;   //can find a Hamlet.Event Type by a string
 
     //
     public Template(ArrayList<String> queries) {
         this.queries = queries;
-        NodeList = new ArrayList<TemplateNode>();
         strToEventTypeHashMap = new HashMap<String, EventType>();
         int qid = 1;
         SharedEvent = FindSharedEvents();
 
         for (String q:queries) {
-            List<String> events = Arrays.asList(q.split(","));
+            List<String> records = Arrays.asList(q.split(","));
             ArrayList<EventType> eventTypeList = new ArrayList<EventType>();    //an eventType list to find the predecessor
-            for(int i=0;i<events.size();i++){
-                EventType et = new EventType(qid, events.get(i));
-                //only add predecessor for shared event type
-                // TODO: 2020/2/21 only shared event has predecessor here.
-                if (events.get(i).equals(SharedEvent))
-                {
-                    et.setEventTypeStr(events.get(i).replace("+",""));
-                    et.addpredEventTypes(eventTypeList.get(i-1));    //only has the immediate predecessor
-                    et.setSelfPred(true);
-                }
-                eventTypeList.add(et);
+            for(int i=0;i<records.size();i++){
+                String e = records.get(i).replace("+","");
+                String type="";
+                type = i==0?"START":"REGULAR";
+                type = i==records.size()-1?"END":type;
+                if (eventTypeExists(e)){        //if event type exists
+                    getEventTypebyString(e).addType(qid,type);      //set its type
+                    MaintainPreds(getEventTypebyString(e),qid, eventTypeList);  //maintain its predecessors
+                    eventTypeList.add(getEventTypebyString(e));        //maintain event type list
 
-                if (NodeList.size()>i){
-                    NodeList.get(i).addEventType(qid, et);
+                }else {     //if not exists
+                    EventType et = new EventType(e,e.equals(FindSharedEvents()));   //new an event type
+                    et.addType(qid, type);          //set its type
+                    MaintainPreds(et, qid, eventTypeList);   //maintain its predecessors
+                    strToEventTypeHashMap.put(e, et);       //put it into hash map
+                    eventTypeList.add(et);       //maintain event type list
                 }
-                else {
-                    NodeList.add(new TemplateNode(events.get(i).equals(SharedEvent),i));
-                    NodeList.get(i).addEventType(qid, et);
-                }
-                //maintain string to event type Hash Map
-                strToEventTypeHashMap.put(et.getEventTypeStr(),et);
             }
             qid++;
         }
         }
 
+        private void MaintainPreds(EventType et, Integer qid,  ArrayList<EventType> eventTypeList){
+            if (et.isShared()){     //if et is a shared event type, add itself as a predecessor
+                et.addEdges(qid,et);
+            }
+
+            if (!et.getTypebyQid(qid).equals("START")){    // if e is not a start event type, find it's immediate predecessor
+                et.addEdges(qid,eventTypeList.get(eventTypeList.size()-1));    // add the immediate predecessor into the edge list
+            }
+
+        }
+
+    public EventType getEventTypebyString(String string){
+        return this.strToEventTypeHashMap.get(string);
+
+    }
+
+    public boolean eventTypeExists(String etString){
+        return strToEventTypeHashMap.keySet().contains(etString);
+    }
+
+    // TODO: 2020/2/27 自动检查substring而不是character 
+
     /**
-     *Find the shared part(with Kleenes) of several queries
+     *Find the shared part(with Kleene plus) of several queries
      * @return the shared event
      */
     private String FindSharedEvents(){
@@ -71,9 +87,10 @@ public class Template {
                 hasCommonEvent = false;
             }
         }
-        return hasCommonEvent?CommonEvent:null;
+        return hasCommonEvent?CommonEvent.replace("+",""):null;
 
     }
+
 
 
 }

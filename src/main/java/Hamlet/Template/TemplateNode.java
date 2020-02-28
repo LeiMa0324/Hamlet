@@ -26,7 +26,7 @@ public class TemplateNode {
      */
     public void addEventType(int qid, EventType et){
         qid_EventType_HashMap.put(qid, et);
-        et.setTemplateNode(this);
+//        et.setTemplateNode(this);
     }
 
 }
