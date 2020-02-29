@@ -16,10 +16,15 @@ import java.math.BigInteger;
 public class SharedGraphlet extends Graphlet{
     public final EventType eventType;        // the event type of this graphlet
     private BigInteger coeff;
-    public SharedGraphlet(EventType eventType){
+    private boolean calculated;
+
+    public SharedGraphlet(Event e){
         super();
-        this.eventType = eventType;
+        this.eventType = e.eventType;
         coeff = new BigInteger("0");
+        isShared = true;
+        this.calculated = false;
+        addEvent(e);
 
     }
 
@@ -37,6 +42,7 @@ public class SharedGraphlet extends Graphlet{
             e.setId(eventList.size());
             this.eventList.add(e);
         }
+        CalculateCoefficient();
 
     }
 
@@ -48,18 +54,30 @@ public class SharedGraphlet extends Graphlet{
     public boolean IsCompatibleOf(Event e){
         return this.eventType == null || this.eventType == e.getEventType();
     }
+
     /**
      * calculate coefficient, Fibonacci-like
      */
     public void  CalculateCoefficient(){
-        int inter_sum =0;
-        int coeff = 0;
-        int coeff_per_event =0;
-        for(int i=0;i<eventList.size();i++){
-            coeff_per_event = inter_sum +1;
-            inter_sum += coeff_per_event;
-            coeff +=coeff_per_event;
+
+        BigInteger temp_coeff = this.coeff.add(new BigInteger("1"));
+        this.coeff = this.coeff.add(temp_coeff);
+    }
+
+    /**
+     * set its active status by notification from graph
+     * @param object
+     */
+    @Override
+    public void notify(Object object){
+
+        String activeFlag = (String)object;
+        if (this.eventType.string.equals(activeFlag)){
+            this.isActive = true;
+        }else {
+            this.isActive = false;
+
         }
-        this.coeff = new BigInteger(coeff+"") ;
+
     }
 }

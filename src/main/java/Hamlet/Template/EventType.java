@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
+
 public class EventType {
     public final String string;    // the actual event type string
     // 1: 'A', 2: 'C'
@@ -15,6 +16,7 @@ public class EventType {
     public final boolean isShared;
     private ArrayList<Integer> qids;
     private HashMap<Integer, String> types;    //"START", "END", "REGULAR"
+
 
     public EventType(String string, boolean isShared, int qid){
         this.qids = new ArrayList<Integer>();
@@ -44,8 +46,22 @@ public class EventType {
             qids.add(qid);
         }
     }
-    public ArrayList<EventType> getPreds(int qid){
-        return edges.get(qid);
+
+    /**
+     * return the immediate predecessor for a given query
+     * @param qid
+     * @return
+     */
+    public EventType getPred(int qid){
+        int index=0;
+        for (EventType p: edges.get(qid)){
+            if (!p.equals(this)){
+                index = edges.get(qid).indexOf(p);
+
+            }
+
+        }
+        return edges.get(qid).get(index);
     }
 
     public void addType(int qid, String type){

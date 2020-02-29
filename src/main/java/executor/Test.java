@@ -33,20 +33,20 @@ public class Test {
 //		for (int epw =200000; epw<600000;epw+=100000){		//200k-500k， 50k step
 //			SingleRun(streamFile,queryFile, logFile,epw);
 //		}
-		ArrayList<String> queries = new ArrayList<String>();
-		//read query file
-		try {
-			Scanner query_scanner = new Scanner(new File(queryFile));
-			while (query_scanner.hasNextLine()) {
-				queries.add(query_scanner.nextLine());
-			}
-			query_scanner.close();
-		} catch(FileNotFoundException e) {e.printStackTrace();}
-		Template tmp = new Template(queries);
-		for (String e: tmp.getStrToEventTypeHashMap().keySet()){
-			System.out.println(tmp.getEventTypebyString(e).toString());
-			System.out.println(tmp.getEventTypebyString(e).getTypes());
-		}
+//		ArrayList<String> queries = new ArrayList<String>();
+//		//read query file
+//		try {
+//			Scanner query_scanner = new Scanner(new File(queryFile));
+//			while (query_scanner.hasNextLine()) {
+//				queries.add(query_scanner.nextLine());
+//			}
+//			query_scanner.close();
+//		} catch(FileNotFoundException e) {e.printStackTrace();}
+//		Template tmp = new Template(queries);
+//		for (String e: tmp.getStrToEventTypeHashMap().keySet()){
+//			System.out.println(tmp.getEventTypebyString(e).toString());
+//			System.out.println(tmp.getEventTypebyString(e).getTypes());
+//		}
 //		System.out.println(tmp.toString());
 		SingleRun(streamFile, queryFile, logFile, 500000);
 

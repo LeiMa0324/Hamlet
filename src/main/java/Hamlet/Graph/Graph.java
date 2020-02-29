@@ -4,7 +4,9 @@ import Hamlet.Event.Event;
 import Hamlet.Graphlet.Graphlet;
 import Hamlet.Graphlet.NonSharedGraphlet;
 import Hamlet.Graphlet.SharedGraphlet;
+import Hamlet.Template.EventType;
 import Hamlet.Template.Template;
+import Hamlet.Utils.*;
 import lombok.Data;
 
 import java.io.File;
@@ -15,18 +17,37 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * Hamlet.Graph maitains the curentsnapshot, the template, two graphlets(shared and non-shared)
- * and a state flag indicating the current graphlet.
- * When a coming event is consitent with the current graphlet(shared or not), call ExpandGraphlet .
- *  if it's not: call SwitchGraphlet
- * Only create a snapshot when a shared graphlet is newly created.
+ * Hamlet.Graph maitains:
+ *      the template
+ *      the curent snapshot
+ *      a hashmap of graphlets
+ *      a state flag activeFlag indicating the current graphlet
+ *      the last shared Graphlt for snapshot propagation
+ *      a list of events in the stream file
+ *      the final count
+ *
+ * When a coming event is
+ *      consistent with the current active graphlet(shared or not):
+ *           Expand Graphlet .
+ *      not consistent with the current active graphlet(shared or not):
+ *          new a graphlet, if the graphlet is shared:
+ *                                  1. find it's predecessor, update the snapshot
+ *                          if the graphlet is non-shared:
+ *                                  case1: from uninitiated state or another non-shared G to the non-shared G:
+ *                                      1. new a non-shared G
+ *                                  case2: from a shared G to this non-shared G
+ *                                      1. new a non-shared G
+ *                                      2. update the final cout
+ *
  */
 @Data
-public class Graph {
-    private Snapshot currentSnapShot;
+public class Graph implements Observable{
+    private ArrayList<Observer> observers = new ArrayList();    //observers
+    private Snapshot SnapShot;
     private final Template template;
-    private HashMap<String, Graphlet> Graphlets;   //a list of non-shared G
-    private String currentGraphletFlag; //which graphlet it is on
+    private HashMap<String, Graphlet> Graphlets;   //a list of Graphlets
+    private SharedGraphlet lastSharedG;
+    private String activeFlag; //the current active Graphlet
     private ArrayList<Event> events;
     private HashMap<Integer, BigInteger> finalCount;
 
@@ -37,13 +58,14 @@ public class Graph {
      * @param template the Template
      */
     public Graph(Template template, String streamFile, int epw) {
-        // TODO: 2020/2/28 同一个时间戳的事件没有predecessor关系
+        // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
         this.template = template;
-        this.nonsharedGs = new HashMap<String, NonSharedGraphlet>();
-        this.currentSnapShot = new Snapshot();
-        this.currentGraphletFlag = "";
+        this.Graphlets = new HashMap<String, Graphlet>();
+        this.SnapShot = new Snapshot();
+        this.activeFlag = "";
         this.events = new ArrayList<Event>();
         this.finalCount = new HashMap<Integer, BigInteger>();
+
         try {    //load the stream into a list of events
             Scanner scanner = new Scanner(new File(streamFile));
             int numofEvents = 0;
@@ -62,151 +84,150 @@ public class Graph {
     /**
      * run events
      */
-    //Todo flag指示某个graphlet
     public void run() {
         for (Event e : events) {
-//            e.setEventType(template.getEventTypebyString(e.getEventString()));
-            switch (currentGraphletFlag) {
-                case "":   //no graphlets
-                    if (e.eventType.isShared){
-                        newSharedGraphlet(e);
-                    }else {
-                        newNonsharedGraphlet(e);
-                    }
-                    break;
-                default:
-                    if (IsExpandingG(e)) {      //SWTICH G
-                        ExpandGraphlet(e);
-                    } else {
-                        SwitchGraphlet(e);
-                    }
-                    break;
-            }
-        }
-        System.out.println("final snapshot is " + currentSnapShot);
-        calculateFinalCount();
-        System.out.println("final count is" + finalCount);
-
-    }
-
-    /**
-     * check if the coming event is consistent with the current graphlet
-     *
-     * @param e the coming event
-     * @return true if e is expandable
-     */
-    public boolean IsExpandingG(Event e) {
-        return e.eventType.isShared && currentGraphletFlag == 1 || !e.getEventType().isShared && currentGraphletFlag == 0;
-    }
-
-    /**
-     * find the matched Graphlet for e and expand it.
-     *
-     * @param e the coming event
-     */
-    public void ExpandGraphlet(Event e) {   //expand the current graphlet
-        switch (currentGraphletFlag) {
-            case 0:
-                if (getGraphlet(e)==null){
-                    newNonsharedGraphlet(e);
-                }else {
-                    NonSharedGraphlet matchG = (NonSharedGraphlet) getGraphlet(e);
-                    matchG.addEvent(e);
-                    this.nonsharedGs.put(e.string,matchG);
+            if (Graphlets.get(e.string)==null||!Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
+            {
+                if (e.eventType.isShared){  //create a shared G
+                    updateSnapshot(e);       //update snapshot
+                    lastSharedG = (SharedGraphlet) newGraphlet(e);  //maitain the last shared G
+                    setActiveFlag(e.string);    //set the active flag
                 }
-                break;
-            case 1:
-                if (getGraphlet(e)==null){
-                    newSharedGraphlet(e);
-                }else {
-                    this.sharedG.addEvent(e);
+                else {      //create a non shared G
+                    if (activeFlag.equals("")||!Graphlets.get(activeFlag).isShared){     //uninitiated state or active is non-shared
+                        newGraphlet(e);
+                        setActiveFlag(e.string);
+                    }
+                    else{ //from shared to non-shared
+                        updateFinalCount();     //update final count
+                        newGraphlet(e);
+                        setActiveFlag(e.string);
+                    }
+
                 }
-                break;
+
+
+            }else {     //graphlet exists and is active
+                ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
+            }
+
+
         }
+        //if the last Graphet is the shared one, update final count again
+        updateFinalCount();
+
+        System.out.println("final counts is" + finalCount);
 
     }
 
     /**
-
-     *
-     * @param e the coming event
-     */
-    public void SwitchGraphlet(Event e) {
-        currentGraphletFlag = 1 - currentGraphletFlag;
-        if (currentGraphletFlag == 1) {    //from non shared to share, update the snaposhot
-            if (this.currentSnapShot.getSnapshotHashMap()!=null){
-                this.currentSnapShot = new Snapshot(this.currentSnapShot, this.sharedG.getCoeff(), this.nonsharedGs); //update the snapshot
-                System.out.println("snapshot is "+this.currentSnapShot);
-            }else {
-                // Todo hhhhh
-                this.currentSnapShot = new Snapshot(this.nonsharedGs);
-                System.out.println("snapshot is "+this.currentSnapShot);
-
-            }
-            newSharedGraphlet(e);
-        } else {      //from shared to non shared, every non-shared info is stored in the snapshot
-            this.sharedG.CalculateCoefficient();        //calculate the coeff of shared
-            newNonsharedGraphlet(e);     //new an non-shared G add it into the hashmap
-            updateFinalCount();         //update the final count
-        }
-    }
-
-    /**
-     * only update when finish a shared Pattern
-     * final count += final count + sum(coeff)*snapshot
-     */
-    public void updateFinalCount() {
-        for (int q : this.currentSnapShot.getSnapshotHashMap().keySet()) {
-            if (this.finalCount.get(q)==null){
-                this.finalCount.put(q, this.currentSnapShot.getSnapshotHashMap().get(q).multiply(sharedG.getCoeff()));
-
-            }
-            else {
-                this.finalCount.put(q, this.finalCount.get(q).add(this.currentSnapShot.getSnapshotHashMap().get(q).multiply(sharedG.getCoeff())));
-            }
-            //calculate final count
-        }
-    }
-        /**
-         * if ths shared is the last graphlet, final count += snapshot*(coeff+1)
-         * if the unshared is the last graphlet, final count stays unchanged
-         */
-    public void calculateFinalCount () {
-        this.sharedG.CalculateCoefficient();        //calculate the last shared graphlet's coefficeint
-        if (currentGraphletFlag == 1) {          // if end graphlet is shared, add the result into the final count
-            updateFinalCount();
-        }
-    }
-
-    /**
-     * find the correct graphlet for an event
+     * when a shared G is created, update the current snapshot
+     * for each query, find the pred G of this shared G, update snapshot according to query id
      * @param e
      */
-    public Graphlet getGraphlet(Event e){
-        if (e.eventType.isShared){      //search shared Gs
-            return sharedG;
-        }else {
-            return nonsharedGs.get(e.string);
+
+    public void updateSnapshot(Event e){
+
+        for (Integer qid: e.eventType.getQids()){
+            EventType pred = e.eventType.getPred(qid); //get the pred for one query
+            NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
+            if (lastSharedG==null){        // no snapshot before
+                this.SnapShot.update(predG, qid);
+            }else{
+                this.SnapShot.update(lastSharedG.getCoeff(),predG,qid);   //update snapshot
+
+            }
+
         }
+        System.out.println("snapshot updated:"+SnapShot);
+
+
     }
 
-    public void newSharedGraphlet(Event e){
-        this.sharedG = new SharedGraphlet(e.eventType);
-        sharedG.addEvent(e);
-        currentGraphletFlag = 1;
-    }
     /**
-     * create a new graphlet based on an event, and add it into corresponding hashmap
+     * expand the active graphlet
+     *
+     * @param e the coming event
+     */
+    public void ExpandGraphlet(Event e, Graphlet g) {   //expand the current graphlet
+        g.addEvent(e);
+
+    }
+
+
+    /**
+     * check if the last shared Graphlet is calculated into the final count
+     *  if not, calculate the final count by last shared Graphlet
+     */
+    /* update the final count when a shared Graphlet is finished
+     */
+    public void updateFinalCount() {
+
+        if (!lastSharedG.isCalculated()){
+            for (int q : this.SnapShot.getCounts().keySet()) {
+                if (!this.finalCount.keySet().contains(q)){
+                    this.finalCount.put(q, this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff()));
+
+                }
+                else {
+                    this.finalCount.put(q, this.finalCount.get(q).add(this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff())));
+                }
+
+            }
+            lastSharedG.setCalculated(true);
+        }
+
+    }
+
+
+
+    /**
+     * create a new graphlet based on an event, and add it into the Graphlets hashmap
      * @param e an incoming event
      */
-    public void newNonsharedGraphlet(Event e){
+    public Graphlet newGraphlet(Event e){
 
-        NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e.eventType);
-        nonsharedG.addEvent(e);
-        this.nonsharedGs.remove(e.string);
-        this.nonsharedGs.put(e.string, nonsharedG);
-        currentGraphletFlag = 0;
 
+        if (e.eventType.isShared){
+            SharedGraphlet sharedG = new SharedGraphlet(e);
+            Graphlets.put(e.string, sharedG);
+            register(sharedG);
+            return sharedG;
+
+        }else {
+            NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
+            Graphlets.put(e.string, nonsharedG);
+            register(nonsharedG);
+            return nonsharedG;
+        }
+
+
+    }
+
+    /**
+     * set the active flag, notify every graphlet
+     * @param active the active event string
+     */
+    public void setActiveFlag(String active){
+        this.activeFlag = active;
+        notifyObservers();
+    }
+
+    /**
+     * register for observers
+     * @param o Object to register
+     */
+    @Override
+    public void register(Observer o){
+        observers.add(o);
+    }
+
+    /**
+     * notify all graphlets when change the activeFlag
+     */
+    @Override
+    public void notifyObservers(){
+        observers.forEach(observer -> observer.notify(this.activeFlag));
     }
 
 }
