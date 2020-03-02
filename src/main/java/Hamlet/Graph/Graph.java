@@ -151,7 +151,6 @@ public class Graph implements Observable{
      */
     public void ExpandGraphlet(Event e, Graphlet g) {   //expand the current graphlet
         g.addEvent(e);
-
     }
 
 
