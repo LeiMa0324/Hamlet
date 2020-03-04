@@ -47,7 +47,7 @@ public class GretaMQ extends TransactionMQ {
 			
 			long start =  System.currentTimeMillis();
 			g.computeResults();
-//			graphs.add(g);
+//			graphs.add(hamletG);
 			long end =  System.currentTimeMillis();
 			long duration = end - start;
 //			System.out.println(duration);
@@ -56,7 +56,7 @@ public class GretaMQ extends TransactionMQ {
 			
 			qid++;
 			
-//			graphs.add(g);
+//			graphs.add(hamletG);
 		}
 		done.countDown();
 	}

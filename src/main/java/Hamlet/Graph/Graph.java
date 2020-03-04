@@ -18,7 +18,7 @@ import java.util.Scanner;
 
 /**
  * Hamlet.Graph maitains:
- *      the template
+ *      the hamletTemplate
  *      the curent snapshot
  *      a hashmap of graphlets
  *      a state flag activeFlag indicating the current graphlet
@@ -53,7 +53,7 @@ public class Graph implements Observable{
 
 
     /**
-     * construct Hamlet.Graph by template
+     * construct Hamlet.Graph by hamletTemplate
      *
      * @param template the Template
      */

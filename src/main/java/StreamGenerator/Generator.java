@@ -8,14 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
-//Todo 完成Generator
+
 //Todo run several preliminary tests to figure out a good range for the number of b's we evaluate.
 
 /**
  * SEQ pattern: A, E, C, F, B
  * every loop has the same number of A, E, C, F, we vary the number of Bs
  */
-public class generator {
+public class Generator {
     public static void main(String[] agrs){
         int numofevents = 1000000;      //fix the number of events in the stream file
         Random random = new Random();

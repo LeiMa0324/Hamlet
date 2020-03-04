@@ -14,7 +14,7 @@ public class Snapshot {
     private HashMap<Integer, BigInteger> counts;
 
     public Snapshot(){
-        this.counts = new HashMap<Integer, BigInteger>();
+        this.counts = new HashMap<>();
 
     }
 

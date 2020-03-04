@@ -10,13 +10,12 @@ import java.util.*;
 @Data
 public class Template {
     private ArrayList<String> queries;
-    private ArrayList<String> sharedEvents;     //the Shared event type string common in all queries
+    private ArrayList<String> sharedEvents;     //the Shared event types in all queries
     private HashMap<String, EventType> eventTypes;   //can find a Hamlet.Event Type by a string
 
-    //
     public Template(ArrayList<String> queries) {
         this.queries = queries;
-        this.eventTypes = new HashMap<String, EventType>();
+        this.eventTypes = new HashMap<>();
         this.sharedEvents = new ArrayList<>();
         int qid = 1;
         findSharedEvents();
@@ -46,6 +45,12 @@ public class Template {
         }
         }
 
+    /**
+     * find the predecessor of an event type
+     * @param et a given event type
+     * @param qid   a query id
+     * @param eventTypeList the event type list needed to be search
+     */
         private void MaintainPreds(EventType et, Integer qid,  ArrayList<EventType> eventTypeList){
             if (et.isShared()){     //if et is a shared event type, add itself as a predecessor
                 et.addEdges(qid,et);

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 
 /**
-one unshared event type has one unshared graphlet
+each unshared event type has an unshared graphlet
  */
 
 @Data
@@ -19,7 +19,7 @@ public class NonSharedGraphlet extends Graphlet{
     private HashMap<Integer, BigInteger> counts;
 
     /**
-     * construct a unshared g with an event
+     * construct a unshared hamletG with an event
      * @param e the incoming event
      */
     public NonSharedGraphlet(Event e){
@@ -54,12 +54,6 @@ public class NonSharedGraphlet extends Graphlet{
     public void notify(Object object){
 
         String activeFlag = (String)object;
-        if (this.eventType.string.equals(activeFlag)){
-            this.isActive = true;
-        }else {
-            this.isActive = false;
-
-        }
-
+        this.isActive = this.eventType.string.equals(activeFlag);
     }
 }

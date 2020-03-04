@@ -1,4 +1,4 @@
-package executor;
+package Executor;
 
 import Greta.event.Stream;
 import Greta.event.StreamPartitioner;
@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import com.opencsv.CSVWriter;
 
-import javax.naming.ldap.PagedResultsControl;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
@@ -23,24 +22,36 @@ import java.util.concurrent.atomic.AtomicLong;
 //import java.util.ArrayList;
 
 @Data
+/**
+ * Executor takes settings of the experiment to run hamlet and greta
+ */
 public class Executor {
+	/**
+	 * settings of experiment
+	 */
 	private String streamFile;
 	private String queryFile;
 	private String logFile;
-	private Template template;
-	private Graph g;
 	private ArrayList<String> queries;
 	private int epw;
+	/**
+	 * settings of hamlet
+	 */
+	private Template hamletTemplate;
+	private Graph hamletG;
+	/**
+	 * duration of each model
+	 */
 	private long hamletDuration;
 	private long gretaDuration;
 
-	public Executor(String streamFile, String queryFile, String logFile){
-		this.streamFile = "src/main/resources/Streams/SampleStream.txt";
-		this.queryFile = "src/main/resources/Queries/SampleQueries.txt";
-		this.logFile = "throughput.csv";
-		this.epw = 500000;
+	public Executor(String streamFile, String queryFile, String logFile, int epw){
+		this.streamFile = streamFile;
+		this.queryFile = queryFile;
+		this.logFile = logFile;
+		this.epw = epw;
+		this.queries = new ArrayList<>();
 
-		this.queries = new ArrayList<String>();
 		//read query file
 		try {
 			Scanner query_scanner = new Scanner(new File(queryFile));
@@ -56,19 +67,26 @@ public class Executor {
 
 	}
 
+	/**
+	 * a single run of Hamlet
+	 */
 	public void hamletRun(){
 
 		//Hamlet
 		System.out.println("===============================HAMLET====================================");
-		this.template = new Template(queries);
-		this.g = new Graph(template,streamFile, epw);	//epw==400k
+		this.hamletTemplate = new Template(queries);
+		this.hamletG = new Graph(hamletTemplate,streamFile, epw);	//epw==400k
 		long start =  System.currentTimeMillis();
-		g.run();
+		hamletG.run();
 		long end =  System.currentTimeMillis();
 		hamletDuration = end - start;
 		System.out.println("Hamlet: duaration is "+hamletDuration);
 
 	}
+
+	/**
+	 * a single run of Greta
+	 */
 
 	public void gretaRun(){
 
@@ -97,6 +115,9 @@ public class Executor {
 
 	}
 
+	/**
+	 * logging
+	 */
 	public void logging() {
 
 		System.out.println("===============================Logging====================================");

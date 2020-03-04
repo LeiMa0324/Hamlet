@@ -26,7 +26,7 @@ public class PrefixMQ extends TransactionMQ{
 		super(d, time);
 		stream = str;
 		
-		// build template
+		// build hamletTemplate
 		template = new SingleQueryTemplate(queries.get(0));
 		
 		numQueries = queries.size();
@@ -39,7 +39,7 @@ public class PrefixMQ extends TransactionMQ{
 		memory = mem;
 		stream = str;
 		
-		// build template
+		// build hamletTemplate
 		template = new SingleQueryTemplate(pattern);
 		
 		numQueries = num;

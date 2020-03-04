@@ -55,7 +55,7 @@ public class Template {
 				e_type = e_type.substring(0, plus);
 			}
 			
-			// Add vertex to template
+			// Add vertex to hamletTemplate
 			this.addVertex(e_type);
 			EventType_old vertexE = Vertices.get(e_type);
 			vertexE.add2Query(numQueries+"");

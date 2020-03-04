@@ -23,7 +23,7 @@ public abstract class Graphlet implements Observer {
     public boolean isActive;
 
     public Graphlet(){
-        this.eventList = new ArrayList<Event>();
+        this.eventList = new ArrayList<>();
     }
 
     public abstract void addEvent(Event e);

@@ -21,6 +21,9 @@ public class TemplateTest {
 
     }
 
+    /**
+     * test the shared events finding method
+     */
     @Test
     public void findSharedEvents_test(){
         ArrayList<String> res = new ArrayList<>();

@@ -25,7 +25,7 @@ public class MultiQueryTemplate {
 	}
 	
 	private void addPattern(String P, int qid) {
-//		System.out.println("Adding " + P + " to template.");
+//		System.out.println("Adding " + P + " to hamletTemplate.");
 		String[] subseq = P.split(",");
 		for (int i=0; i < subseq.length; i++) {
 			boolean kleene = false;
