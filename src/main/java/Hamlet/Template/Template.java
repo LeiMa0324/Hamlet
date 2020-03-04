@@ -5,7 +5,13 @@ import lombok.Data;
 import java.util.*;
 
 /**
- * Template is consisted of a list of Event Types
+ * Template reads the query files and
+ * 1. find the shared event types in all queries, mark them as shared
+ * 2. generate an Event Type instance when meets a new Event Type
+ * 3. for event type et:
+ *      for each query et is in:
+ *          3.1 Maintain its predecessors by looking at the previous event type in the query, if with +, then it's self-predecessor
+ *          3.2 maintain its type
  */
 @Data
 public class Template {
@@ -73,7 +79,6 @@ public class Template {
 
     /**
      *Find the shared events(with Kleene plus) of several queries
-     *
      */
     private void findSharedEvents(){
         String firstQuery = queries.get(0);

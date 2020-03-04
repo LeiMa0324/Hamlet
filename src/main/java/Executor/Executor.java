@@ -63,6 +63,9 @@ public class Executor {
 
 	}
 
+	/**
+	 * run hamlet, greta and log
+	 */
 	public void run(){
 		hamletRun();
 		gretaRun();

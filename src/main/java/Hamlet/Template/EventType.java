@@ -8,7 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
-
+/**
+ * Event type store the information about an event type
+ * edges: the edge between this event type and its predecessors, can query by qid
+ * isShared: if this event type is shared
+ * qids: the queries it belongs to
+ * type: the types is has, for each query
+ */
 public class EventType {
     public final String string;    // the actual event type string
     // 1: 'A', 2: 'C'
@@ -40,7 +46,6 @@ public class EventType {
         }
         else {
             edges.get(qid).add(pred);
-
         }
         if (!qids.contains(qid)){
             qids.add(qid);

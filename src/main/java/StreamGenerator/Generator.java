@@ -9,17 +9,13 @@ import java.io.IOException;
 import java.util.Random;
 
 
-//Todo run several preliminary tests to figure out a good range for the number of b's we evaluate.
-
 /**
- * SEQ pattern: A, E, C, F, B
- * every loop has the same number of A, E, C, F, we vary the number of Bs
+ * every loop has the same number of 1-14, we vary the number of 2
  */
 public class Generator {
     public static void main(String[] agrs){
         int numofevents = 1000000;      //fix the number of events in the stream file
         Random random = new Random();
-        //Todo: dummy events 50, epw 50k, # of Bs:20-40, step 5
         int numofunShared = random.nextInt(3)+3;   //a fixed random number of unshared events
         for (int numofShared = 15; numofShared<41;numofShared+=5){      //vary number of Bs for each stream file
             singleGenerator(numofevents,numofShared, numofunShared);

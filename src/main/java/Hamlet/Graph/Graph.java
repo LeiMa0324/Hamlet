@@ -19,10 +19,10 @@ import java.util.Scanner;
 /**
  * Hamlet.Graph maitains:
  *      the hamletTemplate
- *      the curent snapshot
+ *      the current snapshot
  *      a hashmap of graphlets
  *      a state flag activeFlag indicating the current graphlet
- *      the last shared Graphlt for snapshot propagation
+ *      the last shared Graphlet for snapshot propagation
  *      a list of events in the stream file
  *      the final count
  *
@@ -37,7 +37,7 @@ import java.util.Scanner;
  *                                      1. new a non-shared G
  *                                  case2: from a shared G to this non-shared G
  *                                      1. new a non-shared G
- *                                      2. update the final cout
+ *                                      2. update the final count
  *
  */
 @Data
@@ -146,7 +146,6 @@ public class Graph implements Observable{
 
     /**
      * expand the active graphlet
-     *
      * @param e the coming event
      */
     public void ExpandGraphlet(Event e, Graphlet g) {   //expand the current graphlet
@@ -166,12 +165,10 @@ public class Graph implements Observable{
             for (int q : this.SnapShot.getCounts().keySet()) {
                 if (!this.finalCount.keySet().contains(q)){
                     this.finalCount.put(q, this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff()));
-
                 }
                 else {
                     this.finalCount.put(q, this.finalCount.get(q).add(this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff())));
                 }
-
             }
             lastSharedG.setCalculated(true);
         }
@@ -185,22 +182,17 @@ public class Graph implements Observable{
      * @param e an incoming event
      */
     public Graphlet newGraphlet(Event e){
-
-
         if (e.eventType.isShared){
             SharedGraphlet sharedG = new SharedGraphlet(e);
             Graphlets.put(e.string, sharedG);
             register(sharedG);
             return sharedG;
-
         }else {
             NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
             Graphlets.put(e.string, nonsharedG);
             register(nonsharedG);
             return nonsharedG;
         }
-
-
     }
 
     /**
