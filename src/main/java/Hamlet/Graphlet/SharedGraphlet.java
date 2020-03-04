@@ -9,6 +9,12 @@ import java.math.BigInteger;
 
 /**
  * The graphlet of the shared events
+ *  Maintains:
+ *  1. is this shared
+ *  2. the event type of this graphlet
+ *  3. the current coefficient
+ *  4. has this graphlet been calculated into the final count
+ *
  */
 
 @Data

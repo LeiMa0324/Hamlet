@@ -21,10 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 //import java.util.ArrayList;
 
-@Data
+
 /**
  * Executor takes settings of the experiment to run hamlet and greta once
  */
+@Data
 public class Executor {
 	/**
 	 * settings of experiment

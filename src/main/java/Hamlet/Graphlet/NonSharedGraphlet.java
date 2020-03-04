@@ -11,6 +11,10 @@ import java.util.HashMap;
 
 /**
 each unshared event type has an unshared graphlet
+ Maintains:
+ 1. is this shared
+ 2. the event type of this graphlet
+ 3. the counts for each query
  */
 
 @Data
@@ -43,7 +47,7 @@ public class NonSharedGraphlet extends Graphlet{
     public void addEvent(Event e){
         for (Integer q: e.eventType.getQids()){
             BigInteger count = counts.get(q);
-            counts.put(q,count.add(new BigInteger("1")));
+            counts.put(q,count.add(new BigInteger("1")));   //increment the count for this query
         }
 
     }

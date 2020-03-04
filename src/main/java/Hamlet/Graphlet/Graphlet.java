@@ -15,7 +15,6 @@ import java.util.ArrayList;
  *
  */
 
-
 public abstract class Graphlet implements Observer {
 
     ArrayList<Event> eventList;     // event list

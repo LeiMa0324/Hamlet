@@ -54,7 +54,6 @@ public class Graph implements Observable{
 
     /**
      * construct Hamlet.Graph by hamletTemplate
-     *
      * @param template the Template
      */
     public Graph(Template template, String streamFile, int epw) {
@@ -82,7 +81,7 @@ public class Graph implements Observable{
     }
 
     /**
-     * run events
+     * run when reading events from the stream
      */
     public void run() {
         for (Event e : events) {
@@ -103,21 +102,15 @@ public class Graph implements Observable{
                             newGraphlet(e);
                             setActiveFlag(e.string);
                         }
-
                     }
-
-
                 } else {     //graphlet exists and is active
                     ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
                 }
             }
-
         }
         //if the last Graphet is the shared one, update final count again
         updateFinalCount();
-
 //        System.out.println("final counts is" + finalCount);
-
     }
 
     /**
