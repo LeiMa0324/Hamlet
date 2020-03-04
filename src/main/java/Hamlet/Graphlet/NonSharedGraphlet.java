@@ -3,6 +3,7 @@ package Hamlet.Graphlet;
 import Hamlet.Event.Event;
 import Hamlet.Template.EventType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ each unshared event type has an unshared graphlet
  */
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class NonSharedGraphlet extends Graphlet{
 
     public final EventType eventType;        // the event type of this graphlet

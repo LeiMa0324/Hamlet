@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 @Data
 /**
- * Executor takes settings of the experiment to run hamlet and greta
+ * Executor takes settings of the experiment to run hamlet and greta once
  */
 public class Executor {
 	/**
@@ -61,21 +61,21 @@ public class Executor {
 			query_scanner.close();
 		} catch(FileNotFoundException e) {e.printStackTrace();}
 
-		hamletRun();
-//		gretaRun();
-//		logging();
-
 	}
 
+	public void run(){
+		hamletRun();
+		gretaRun();
+		logging();
+	}
 	/**
 	 * a single run of Hamlet
 	 */
 	public void hamletRun(){
 
 		//Hamlet
-		System.out.println("===============================HAMLET====================================");
 		this.hamletTemplate = new Template(queries);
-		this.hamletG = new Graph(hamletTemplate,streamFile, epw);	//epw==400k
+		this.hamletG = new Graph(hamletTemplate,streamFile, epw);
 		long start =  System.currentTimeMillis();
 		hamletG.run();
 		long end =  System.currentTimeMillis();
@@ -90,7 +90,6 @@ public class Executor {
 
 	public void gretaRun(){
 
-		System.out.println("===============================GRETA====================================");
 		this.gretaDuration =0;
 		try {
 			CountDownLatch done = new CountDownLatch(1);
@@ -120,7 +119,6 @@ public class Executor {
 	 */
 	public void logging() {
 
-		System.out.println("===============================Logging====================================");
 		File file = new File("output/"+logFile);
 
 		try {

@@ -86,37 +86,37 @@ public class Graph implements Observable{
      */
     public void run() {
         for (Event e : events) {
-            if (Graphlets.get(e.string)==null||!Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
-            {
-                if (e.eventType.isShared){  //create a shared G
-                    updateSnapshot(e);       //update snapshot
-                    lastSharedG = (SharedGraphlet) newGraphlet(e);  //maitain the last shared G
-                    setActiveFlag(e.string);    //set the active flag
-                }
-                else {      //create a non shared G
-                    if (activeFlag.equals("")||!Graphlets.get(activeFlag).isShared){     //uninitiated state or active is non-shared
-                        newGraphlet(e);
-                        setActiveFlag(e.string);
+            //if e is in the template
+            if (template.eventTypeExists(e.string)) {
+                if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
+                {
+                    if (e.eventType.isShared) {  //create a shared G
+                        updateSnapshot(e);       //update snapshot
+                        lastSharedG = (SharedGraphlet) newGraphlet(e);  //maitain the last shared G
+                        setActiveFlag(e.string);    //set the active flag
+                    } else {      //create a non shared G
+                        if (activeFlag.equals("") || !Graphlets.get(activeFlag).isShared) {     //uninitiated state or active is non-shared
+                            newGraphlet(e);
+                            setActiveFlag(e.string);
+                        } else { //from shared to non-shared
+                            updateFinalCount();     //update final count
+                            newGraphlet(e);
+                            setActiveFlag(e.string);
+                        }
+
                     }
-                    else{ //from shared to non-shared
-                        updateFinalCount();     //update final count
-                        newGraphlet(e);
-                        setActiveFlag(e.string);
-                    }
 
+
+                } else {     //graphlet exists and is active
+                    ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
                 }
-
-
-            }else {     //graphlet exists and is active
-                ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
             }
-
 
         }
         //if the last Graphet is the shared one, update final count again
         updateFinalCount();
 
-        System.out.println("final counts is" + finalCount);
+//        System.out.println("final counts is" + finalCount);
 
     }
 
@@ -139,7 +139,7 @@ public class Graph implements Observable{
             }
 
         }
-        System.out.println("snapshot updated:"+SnapShot);
+//        System.out.println("snapshot updated:"+SnapShot);
 
 
     }
