@@ -5,20 +5,21 @@ import lombok.Data;
 import java.util.*;
 
 /**
- * Template is consisted of a list of Template Nodes
+ * Template is consisted of a list of Event Types
  */
 @Data
 public class Template {
     private ArrayList<String> queries;
-    private String SharedEvent;     //the Shared event type string common in all queries
-    private HashMap<String, EventType> strToEventTypeHashMap;   //can find a Hamlet.Event Type by a string
+    private ArrayList<String> sharedEvents;     //the Shared event type string common in all queries
+    private HashMap<String, EventType> eventTypes;   //can find a Hamlet.Event Type by a string
 
     //
     public Template(ArrayList<String> queries) {
         this.queries = queries;
-        strToEventTypeHashMap = new HashMap<String, EventType>();
+        this.eventTypes = new HashMap<String, EventType>();
+        this.sharedEvents = new ArrayList<>();
         int qid = 1;
-        SharedEvent = FindSharedEvents();
+        findSharedEvents();
 
         for (String q:queries) {
             List<String> records = Arrays.asList(q.split(","));
@@ -34,10 +35,10 @@ public class Template {
                     eventTypeList.add(getEventTypebyString(e));        //maintain event type list
 
                 }else {     //if not exists
-                    EventType et = new EventType(e,e.equals(FindSharedEvents()),qid);   //new an event type
+                    EventType et = new EventType(e,sharedEvents.contains(e),qid);   //new an event type
                     et.addType(qid, type);          //set its type
                     MaintainPreds(et, qid, eventTypeList);   //maintain its predecessors
-                    strToEventTypeHashMap.put(e, et);       //put it into hash map
+                    eventTypes.put(e, et);       //put it into hash map
                     eventTypeList.add(et);       //maintain event type list
                 }
             }
@@ -57,40 +58,40 @@ public class Template {
         }
 
     public EventType getEventTypebyString(String string){
-        return this.strToEventTypeHashMap.get(string);
+        return this.eventTypes.get(string);
 
     }
 
     public boolean eventTypeExists(String etString){
-        return strToEventTypeHashMap.keySet().contains(etString);
+        return eventTypes.keySet().contains(etString);
     }
-
-    // TODO: 2020/2/27 自动检查substring而不是character 
 
     /**
-     *Find the shared part(with Kleene plus) of several queries
-     * @return the shared event
+     *Find the shared events(with Kleene plus) of several queries
+     *
      */
-    private String FindSharedEvents(){
+    private void findSharedEvents(){
         String firstQuery = queries.get(0);
         String[] events_firstQuery = firstQuery.split(",");
-        String CommonEvent = null;
-        for (String e: events_firstQuery){
+        ArrayList<String> candidates = new ArrayList<>();
+        for (String e: events_firstQuery){  //如果第一个字符串含有+，则加入candidates
             if (e.contains("+")){
-                CommonEvent = e;
+                candidates.add(e);
             }
         }
-        boolean hasCommonEvent = true;
-        for (String q: queries){
+        for (String c: candidates){
+            boolean shared= true;
+            for (String q: queries){
             String[] events = q.split(",");
-            if (!Arrays.asList(events).contains(CommonEvent)){
-                hasCommonEvent = false;
+                if (!Arrays.asList(events).contains(c)){
+                    shared=false;
+                }
+            }
+            if (shared){
+                this.sharedEvents.add(c.replace("+",""));
             }
         }
-        return hasCommonEvent?CommonEvent.replace("+",""):null;
 
     }
-
-
 
 }
