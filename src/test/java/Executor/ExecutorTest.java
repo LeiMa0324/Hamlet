@@ -17,7 +17,7 @@ public class ExecutorTest {
     public void Example_Test(){     //
         String streamFile = "src/main/resources/Streams/SampleStream.txt";
         String queryFile = "src/main/resources/Queries/SampleQueries.txt";
-        String logFile = "throughput.csv";
+        String logFile = "test_throughput.csv";
         int epw = 500000;
         Executor executor = new Executor(streamFile, queryFile, logFile, epw);
         HashMap<Integer, BigInteger> expectedSnapshots = new HashMap<>();

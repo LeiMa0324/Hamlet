@@ -7,7 +7,7 @@ group 'leima.com'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
-mainClassName ='executor.Test'
+mainClassName ='Executor.Executor'
 
 repositories {
     mavenCentral()
@@ -24,4 +24,7 @@ dependencies {
 }
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
+}
+test {
+    useJUnitPlatform()
 }

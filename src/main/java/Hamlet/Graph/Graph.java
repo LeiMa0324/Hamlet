@@ -40,6 +40,7 @@ import java.util.Scanner;
  *                                      2. update the final count
  *
  */
+//Todo: store every event
 @Data
 public class Graph implements Observable{
     private ArrayList<Observer> observers = new ArrayList();    //observers
