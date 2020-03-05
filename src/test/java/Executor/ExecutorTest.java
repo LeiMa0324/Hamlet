@@ -23,6 +23,7 @@ public class ExecutorTest {
         HashMap<Integer, BigInteger> expectedSnapshots = new HashMap<>();
         expectedSnapshots.put(1,new BigInteger("34"));
         expectedSnapshots.put(2,new BigInteger("19"));
+        executor.hamletRun();       //run the hamlet
         assertEquals(executor.getHamletG().getSnapShot().getCounts(),expectedSnapshots);
 
         HashMap<Integer, BigInteger> expectedFinalCounts= new HashMap<>();
