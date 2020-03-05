@@ -31,7 +31,7 @@ public class Generator {
             int second_id = 0;
             for (int j =0;second_id< numofevents;j++){
 
-                //Generate 15 unshared event types, each event type has numofunshared consecutive events
+                //Generate 14 unshared event types, each event type has numofunshared consecutive events
                 for (int e = 1;e<15;e++){
                     if (e==2){
                         continue;

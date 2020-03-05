@@ -40,7 +40,6 @@ import java.util.Scanner;
  *                                      2. update the final count
  *
  */
-//Todo: store every event
 @Data
 public class Graph implements Observable{
     private ArrayList<Observer> observers = new ArrayList();    //observers
@@ -59,6 +58,9 @@ public class Graph implements Observable{
      */
     public Graph(Template template, String streamFile, int epw) {
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
+        // TODO: store every event in a list
+        // TODO: LOGGER
+        // TODO: latency, memory
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
         this.SnapShot = new Snapshot();
@@ -86,7 +88,7 @@ public class Graph implements Observable{
      */
     public void run() {
         for (Event e : events) {
-            //if e is in the template
+            //if e is in the template, ignore all dummy events
             if (template.eventTypeExists(e.string)) {
                 if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
                 {
@@ -111,7 +113,7 @@ public class Graph implements Observable{
         }
         //if the last Graphet is the shared one, update final count again
         updateFinalCount();
-//        System.out.println("final counts is" + finalCount);
+        System.out.println("final counts is" + finalCount);
     }
 
     /**
@@ -124,6 +126,7 @@ public class Graph implements Observable{
 
         for (Integer qid: e.eventType.getQids()){
             EventType pred = e.eventType.getPred(qid); //get the pred for one query
+            //TODO: add isCalculated to graphlet, to indicate if this graphlet is calculated into a snapshot
             NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
             if (lastSharedG==null){        // no snapshot before
                 this.SnapShot.update(predG, qid);
@@ -133,8 +136,7 @@ public class Graph implements Observable{
             }
 
         }
-//        System.out.println("snapshot updated:"+SnapShot);
-
+        System.out.println("snapshot updated:"+SnapShot);
 
     }
 

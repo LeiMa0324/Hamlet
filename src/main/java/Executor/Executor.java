@@ -69,8 +69,8 @@ public class Executor {
 	 */
 	public void run(){
 		hamletRun();
-		gretaRun();
-		logging();
+//		gretaRun();
+//		logging();
 	}
 	/**
 	 * a single run of Hamlet

@@ -29,6 +29,4 @@ public abstract class Graphlet implements Observer {
     public abstract boolean IsCompatibleOf(Event e);
     public abstract void notify(Object object);
 
-
-
 }
