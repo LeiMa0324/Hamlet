@@ -18,6 +18,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     compile group: 'com.opencsv', name: 'opencsv', version: '3.7'
+// https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile group: 'org.apache.lucene', name: 'lucene-core', version: '6.6.1'
+//Thanks for using https://jar-download.com
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

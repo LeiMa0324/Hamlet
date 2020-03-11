@@ -20,6 +20,7 @@ public abstract class Graphlet implements Observer {
     ArrayList<Event> eventList;     // event list
     public boolean isShared;
     public boolean isActive;
+    public boolean isCalculated;
 
     public Graphlet(){
         this.eventList = new ArrayList<>();

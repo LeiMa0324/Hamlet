@@ -59,6 +59,7 @@ public class GretaMQ extends TransactionMQ {
 //			graphs.add(hamletG);
 		}
 		done.countDown();
+
 	}
 
 }

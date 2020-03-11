@@ -39,6 +39,15 @@ import java.util.Scanner;
  *                                      1. new a non-shared G
  *                                      2. update the final count
  *
+ * Updates:
+ *         store every event in a list
+ *         output latency, throughput, memory at the same time
+ *              problem: java automatically collects garbage, the current memory calculation sometimes doesn't make sense（unstable result）
+ *              how to compare greta with hamlet
+ *         finish query generator
+ * Questions:
+ *          how to compare the memory of greta and hamlet
+ *          Trend count computation implementation?
  */
 @Data
 public class Graph implements Observable{
@@ -57,10 +66,9 @@ public class Graph implements Observable{
      * @param template the Template
      */
     public Graph(Template template, String streamFile, int epw) {
+
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
-        // TODO: store every event in a list
         // TODO: LOGGER
-        // TODO: latency, memory
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
         this.SnapShot = new Snapshot();
@@ -113,7 +121,8 @@ public class Graph implements Observable{
         }
         //if the last Graphet is the shared one, update final count again
         updateFinalCount();
-        System.out.println("final counts is" + finalCount);
+//        System.out.println("final counts is" + finalCount);
+
     }
 
     /**
@@ -128,15 +137,19 @@ public class Graph implements Observable{
             EventType pred = e.eventType.getPred(qid); //get the pred for one query
             //TODO: add isCalculated to graphlet, to indicate if this graphlet is calculated into a snapshot
             NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
-            if (lastSharedG==null){        // no snapshot before
-                this.SnapShot.update(predG, qid);
-            }else{
-                this.SnapShot.update(lastSharedG.getCoeff(),predG,qid);   //update snapshot
+            if (!predG.isCalculated){
+                if (lastSharedG==null){        // no snapshot before
+                    this.SnapShot.update(predG, qid);
+                }else{
+                    this.SnapShot.update(lastSharedG.getCoeff(),predG,qid);   //update snapshot
 
+                }
+                predG.isCalculated = true;
             }
 
+
         }
-        System.out.println("snapshot updated:"+SnapShot);
+//        System.out.println("snapshot updated:"+SnapShot);
 
     }
 

@@ -36,6 +36,7 @@ public class NonSharedGraphlet extends Graphlet{
             counts.put(q,new BigInteger("0"));
         }
         isShared = false;
+        isCalculated = false;
         addEvent(e);
     }
 

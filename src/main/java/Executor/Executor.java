@@ -13,8 +13,11 @@ import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import com.opencsv.CSVWriter;
+import org.apache.commons.io.FileUtils;
+import org.apache.lucene.util.RamUsageEstimator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,7 +35,9 @@ public class Executor {
 	 */
 	private String streamFile;
 	private String queryFile;
-	private String logFile;
+	private String throuputFile;
+	private String latencyFile;
+	private String memoryFile;
 	private ArrayList<String> queries;
 	private int epw;
 	/**
@@ -41,15 +46,19 @@ public class Executor {
 	private Template hamletTemplate;
 	private Graph hamletG;
 	/**
-	 * duration of each model
+	 * latency, memory of each model
 	 */
-	private long hamletDuration;
-	private long gretaDuration;
+	private long hamletLatency;
+	private long gretaLatency;
+	private long hamletMemory;
+	private long gretaMemory;
 
-	public Executor(String streamFile, String queryFile, String logFile, int epw){
+	public Executor(String streamFile, String queryFile,  int epw, String throuputFile, String latencyFile, String memoryFile){
 		this.streamFile = streamFile;
 		this.queryFile = queryFile;
-		this.logFile = logFile;
+		this.throuputFile = throuputFile;
+		this.latencyFile = latencyFile;
+		this.memoryFile = memoryFile;
 		this.epw = epw;
 		this.queries = new ArrayList<>();
 
@@ -62,15 +71,49 @@ public class Executor {
 			query_scanner.close();
 		} catch(FileNotFoundException e) {e.printStackTrace();}
 
+
 	}
 
 	/**
 	 * run hamlet, greta and log
 	 */
 	public void run(){
-		hamletRun();
-//		gretaRun();
-//		logging();
+
+		long memory1, memory2, memory3, memory4;
+		Runtime gfg = Runtime.getRuntime();
+
+		gfg.gc();		//garbage collection
+		memory1 = gfg.freeMemory();		//calculate free memory
+		hamletRun();		//run hamlet
+		memory2 = gfg.freeMemory();		//calculate free memory after hamlet
+
+		hamletMemory = memory1 - memory2;
+		System.out.println("Hamlet: latency "+ hamletLatency);
+		System.out.println("Hamlet: memory " + hamletMemory);
+		String readableHamletMemory = FileUtils.byteCountToDisplaySize(hamletMemory);
+		System.out.println("Hamlet: readable memory " + readableHamletMemory);
+
+
+		gfg.gc();
+
+		memory3 = gfg.freeMemory();
+		gretaRun();
+		memory4 = gfg.freeMemory();
+
+		gretaMemory = memory3 - memory4;
+		System.out.println("Greta: latency "+gretaLatency);
+		System.out.println("Greta: byte memory " + gretaMemory);
+		String readableGretaMemory = FileUtils.byteCountToDisplaySize(gretaMemory);
+		System.out.println("Greta: readable memory " + readableGretaMemory);
+
+		gfg.gc();
+
+
+		logging("thru");
+		logging("lat");
+		logging("mem");
+
+
 	}
 	/**
 	 * a single run of Hamlet
@@ -82,9 +125,9 @@ public class Executor {
 		this.hamletG = new Graph(hamletTemplate,streamFile, epw);
 		long start =  System.currentTimeMillis();
 		hamletG.run();
+
 		long end =  System.currentTimeMillis();
-		hamletDuration = end - start;
-		System.out.println("Hamlet: duaration is "+hamletDuration);
+		hamletLatency = end - start;
 
 	}
 
@@ -94,7 +137,7 @@ public class Executor {
 
 	public void gretaRun(){
 
-		this.gretaDuration =0;
+		this.gretaLatency =0;
 		try {
 			CountDownLatch done = new CountDownLatch(1);
 			AtomicLong latency = new AtomicLong(0);
@@ -111,8 +154,7 @@ public class Executor {
 			}
 			TrS.run();
 			done.await();
-			System.out.println("GRETA: duaration is "+latency.get());
-			this.gretaDuration = latency.get();
+			this.gretaLatency = latency.get();
 
 		} catch (InterruptedException e) { e.printStackTrace(); }
 
@@ -121,24 +163,58 @@ public class Executor {
 	/**
 	 * logging
 	 */
-	public void logging() {
+	public void logging(String choice) {
+		String filename = "";
+		String[] header = new String[3];
+		String[] data = new String[3];
+		switch (choice){
+			case "thru":
+				filename = throuputFile;
+				header[0]= "epw";
+				header[1]= "Hamlet throughput";
+				header[2]= "Greta throughput";
+				data[0] = epw+"";
+				data[1] = epw*1000/ hamletLatency +"";
+				data[2] = epw*1000/ gretaLatency +"";
 
-		File file = new File("output/"+logFile);
+				break;
+			case "lat":
+				filename = latencyFile;
+				header[0]= "epw";
+				header[1]= "Hamlet latency";
+				header[2]= "Greta latency";
+				data[0] = epw+"";
+				data[1] = hamletLatency +"";
+				data[2] = gretaLatency +"";
+				break;
+			case "mem":
+				filename = memoryFile;
+				header[0]= "epw";
+				header[1]= "Hamlet memory";
+				header[2]= "Greta memory";
+				data[0] = epw+"";
+				data[1] = hamletMemory+"";
+				data[2] = gretaMemory +"";
+				break;
+		}
+		File file = new File("output/"+ filename);
+
 
 		try {
 			if(!file.exists()){
 				file.createNewFile();
 				FileWriter outputfile = new FileWriter(file, true);
 				CSVWriter writer = new CSVWriter(outputfile);
-				String[] header = {"#epw", "Hamlet throughput", "Greta throughput"};
 				writer.writeNext(header);
+				writer.close();
 			}
-			FileWriter outputfile = new FileWriter(file, true);
-			CSVWriter writer = new CSVWriter(outputfile);
+			FileWriter fileWriter = new FileWriter(file, true);
+			CSVWriter writer = new CSVWriter(fileWriter);
 			//write the data
-			String[] data = {epw+"", epw*1000/hamletDuration+"", epw*1000/gretaDuration+""};
 			writer.writeNext(data);
 			writer.close();
+
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
