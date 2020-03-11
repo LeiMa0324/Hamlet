@@ -59,7 +59,7 @@ public class Generator {
      * @param querynum how many queries needs to be generated
      * @param queryLength   the length of the queries
      */
-
+    //TODO: may vary query length in one workload
     static void queryGenerator(int querynum, int queryLength){
         String file_of_query = String.format("src/main/resources/Queries/GenQueries_%d.txt",queryLength);
         try{
@@ -70,6 +70,7 @@ public class Generator {
                 StringBuilder q = new StringBuilder();
                 for (int l =0;l<queryLength-1;l++){
                     Random random = new Random();
+                    //TODO: make sure no repeat
                     int randomUnshared = random.nextInt(15);
                     while(randomUnshared==2){
                         randomUnshared = random.nextInt(15);
@@ -80,9 +81,7 @@ public class Generator {
                 q.append("2+\n");
                 output.append(q.toString());
             }
-
             output.close();
-
         }catch (IOException e) { e.printStackTrace(); }
 
 

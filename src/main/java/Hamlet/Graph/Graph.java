@@ -40,14 +40,21 @@ import java.util.Scanner;
  *                                      2. update the final count
  *
  * Updates:
- *         store every event in a list
- *         output latency, throughput, memory at the same time
+ *         1. store every event in a list
+ *         2. output latency, throughput, memory at the same time
  *              problem: java automatically collects garbage, the current memory calculation sometimes doesn't make sense（unstable result）
  *              how to compare greta with hamlet
- *         finish query generator
+ *              unshared event* constant+shared event* constant+ snapshots*constant ?
+ *         3. finish query generator
+ *
+ *
  * Questions:
- *          how to compare the memory of greta and hamlet
- *          Trend count computation implementation?
+ *          1. how to compare the memory of greta and hamlet
+ *          2. Trend count computation implementation is about predicates, right?
+ *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
+ *          event type is not considered.
+ *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
+ *          5. cannot process non-shared kleenes
  */
 @Data
 public class Graph implements Observable{
@@ -68,6 +75,9 @@ public class Graph implements Observable{
     public Graph(Template template, String streamFile, int epw) {
 
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
+        // TODO: count final count when a "END" event arrives
+        // TODO: counter of number of valid events
+        // TODO: graphlet info printing
         // TODO: LOGGER
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
@@ -121,8 +131,7 @@ public class Graph implements Observable{
         }
         //if the last Graphet is the shared one, update final count again
         updateFinalCount();
-//        System.out.println("final counts is" + finalCount);
-
+        System.out.println("final counts is" + finalCount);
     }
 
     /**
@@ -135,7 +144,6 @@ public class Graph implements Observable{
 
         for (Integer qid: e.eventType.getQids()){
             EventType pred = e.eventType.getPred(qid); //get the pred for one query
-            //TODO: add isCalculated to graphlet, to indicate if this graphlet is calculated into a snapshot
             NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
             if (!predG.isCalculated){
                 if (lastSharedG==null){        // no snapshot before
@@ -146,8 +154,6 @@ public class Graph implements Observable{
                 }
                 predG.isCalculated = true;
             }
-
-
         }
 //        System.out.println("snapshot updated:"+SnapShot);
 
@@ -181,9 +187,7 @@ public class Graph implements Observable{
             }
             lastSharedG.setCalculated(true);
         }
-
     }
-
 
 
     /**
