@@ -12,12 +12,12 @@ import java.util.Random;
  */
 public class Generator {
     public static void main(String[] agrs){
-//        int numofevents = 1000000;      //fix the number of events in the stream file
-//        Random random = new Random();
-//        int numofunShared = random.nextInt(3)+3;   //a fixed random number of unshared events
-//        for (int numofShared = 15; numofShared<41;numofShared+=5){      //vary number of Bs for each stream file
-//            singleStreamGenerator(numofevents,numofShared, numofunShared);
-//        }
+        int numofevents = 1000000;      //fix the number of events in the stream file
+        Random random = new Random();
+        int numofunShared = random.nextInt(3)+3;   //a fixed random number of unshared events
+        for (int numofShared = 15; numofShared<41;numofShared+=5){      //vary number of Bs for each stream file
+            singleStreamGenerator(numofevents,numofShared, numofunShared);
+        }
 
         queryGenerator(3,3);
 

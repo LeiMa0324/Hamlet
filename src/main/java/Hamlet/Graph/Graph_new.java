@@ -6,7 +6,8 @@ import Hamlet.Graphlet.NonSharedGraphlet;
 import Hamlet.Graphlet.SharedGraphlet;
 import Hamlet.Template.EventType;
 import Hamlet.Template.Template;
-import Hamlet.Utils.*;
+import Hamlet.Utils.Observable;
+import Hamlet.Utils.Observer;
 import lombok.Data;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * Hamlet.Graph maintains:
+ * Hamlet.Graph maitains:
  *      the hamletTemplate
  *      the current snapshot
  *      a hashmap of graphlets
@@ -49,18 +50,15 @@ import java.util.Scanner;
  *
  *
  * Questions:
- *          1. how to compare the memory of greta and hamlet（）
- *          2. Trend count computation implementation is about predicates, right? YES
+ *          1. how to compare the memory of greta and hamlet
+ *          2. Trend count computation implementation is about predicates, right?
  *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
- *          event type is not considered.( working on )
- *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries. OK for now
- *          5. cannot process non-shared kleenes(ok to keep it)
- *              A,B+
- *
-
+ *          event type is not considered.
+ *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
+ *          5. cannot process non-shared kleenes
  */
 @Data
-public class Graph implements Observable{
+public class Graph_new implements Observable{
     private ArrayList<Observer> observers = new ArrayList();    //observers
     private Snapshot SnapShot;
     private final Template template;
@@ -69,28 +67,20 @@ public class Graph implements Observable{
     private String activeFlag; //the current active Graphlet
     private ArrayList<Event> events;
     private HashMap<Integer, BigInteger> finalCount;
-
+    private Integer eventCounter;
+    private long memory;
 
     /**
      * construct Hamlet.Graph by hamletTemplate
      * @param template the Template
      */
-    public Graph(Template template, String streamFile, int epw) {
+    public Graph_new(Template template, String streamFile, int epw) {
 
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
-        // TODO: counter of number of valid events
-        // TODO: graphlet info printing, how events in the graphlet, summary in the console
-        // TODO: LOGGER
-
         // TODO: count final count when a "END" event arrives
-
-        // list: 1. 改final count的计算逻辑
-        //       2. charts of l,m,t for three query workload
-        //       2. graphlet info
-        //       3. logger
-        //       4. query template(certain shape of bs)
-
-
+        // TODO: counter of number of valid events
+        // TODO: graphlet info printing
+        // TODO: LOGGER
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
         this.SnapShot = new Snapshot();
@@ -120,6 +110,7 @@ public class Graph implements Observable{
         for (Event e : events) {
             //if e is in the template, ignore all dummy events
             if (template.eventTypeExists(e.string)) {
+                this.eventCounter ++;
                 if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
                 {
                     if (e.eventType.isShared) {  //create a shared G
@@ -218,6 +209,15 @@ public class Graph implements Observable{
             register(nonsharedG);
             return nonsharedG;
         }
+    }
+
+    /**
+     * # of relevant event*12 + snapshot* constant
+     * no
+     */
+    //TODO: calculate snapshot's memory
+    private void memoryCalculate(){
+        memory = this.eventCounter*12;
     }
 
     /**
