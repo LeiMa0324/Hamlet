@@ -4,7 +4,7 @@ import Greta.event.Stream;
 import Greta.event.StreamPartitioner;
 import Greta.template.SingleQueryTemplate;
 import Greta.transaction.*;
-import Hamlet.Graph.Graph;
+import Hamlet.Graph.*;
 import Hamlet.Template.Template;
 import lombok.Data;
 
@@ -14,10 +14,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import com.opencsv.CSVWriter;
 import org.apache.commons.io.FileUtils;
-import org.apache.lucene.util.RamUsageEstimator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;

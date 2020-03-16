@@ -6,7 +6,8 @@ import Hamlet.Graphlet.NonSharedGraphlet;
 import Hamlet.Graphlet.SharedGraphlet;
 import Hamlet.Template.EventType;
 import Hamlet.Template.Template;
-import Hamlet.Utils.*;
+import Hamlet.Utils.Observable;
+import Hamlet.Utils.Observer;
 import lombok.Data;
 
 import java.io.File;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 /**
- * Hamlet.Graph maintains:
+ * Hamlet.Graph maitains:
  *      the hamletTemplate
  *      the current snapshot
  *      a hashmap of graphlets
@@ -39,25 +40,17 @@ import java.util.Scanner;
  *                                      1. new a non-shared G
  *                                      2. update the final count
  *
- * Updates:
- *         1. store every event in a list
- *         2. output latency, throughput, memory at the same time
- *              problem: java automatically collects garbage, the current memory calculation sometimes doesn't make sense（unstable result）
- *              how to compare greta with hamlet
- *              unshared event* constant+shared event* constant+ snapshots*constant ?
- *         3. finish query generator
- *
+ * 3.19 Updates:
+            counter of number of valid events
+            final count is updated when a END event arrives
  *
  * Questions:
- *          1. how to compare the memory of greta and hamlet（）
- *          2. Trend count computation implementation is about predicates, right? YES
+ *          1. how to compare the memory of greta and hamlet
+ *          2. Trend count computation implementation is about predicates, right?
  *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
- *          event type is not considered.( working on )
- *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries. OK for now
- *          5. cannot process non-shared kleenes(ok to keep it)
- *              A,B+
- *
-
+ *          event type is not considered.
+ *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
+ *          5. cannot process non-shared kleenes
  */
 @Data
 public class Graph implements Observable{
@@ -69,7 +62,8 @@ public class Graph implements Observable{
     private String activeFlag; //the current active Graphlet
     private ArrayList<Event> events;
     private HashMap<Integer, BigInteger> finalCount;
-
+    private Integer eventCounter;
+    private long memory;
 
     /**
      * construct Hamlet.Graph by hamletTemplate
@@ -78,18 +72,8 @@ public class Graph implements Observable{
     public Graph(Template template, String streamFile, int epw) {
 
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
-        // TODO: counter of number of valid events
         // TODO: graphlet info printing, how events in the graphlet, summary in the console
         // TODO: LOGGER
-
-        // TODO: count final count when a "END" event arrives
-
-        // list: 1. 改final count的计算逻辑
-        //       2. charts of l,m,t for three query workload
-        //       2. graphlet info
-        //       3. logger
-        //       4. query template(certain shape of bs)
-
 
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
@@ -97,6 +81,7 @@ public class Graph implements Observable{
         this.activeFlag = "";
         this.events = new ArrayList<Event>();
         this.finalCount = new HashMap<Integer, BigInteger>();
+        this.eventCounter = 0;
 
         try {    //load the stream into a list of events
             Scanner scanner = new Scanner(new File(streamFile));
@@ -119,30 +104,36 @@ public class Graph implements Observable{
     public void run() {
         for (Event e : events) {
             //if e is in the template, ignore all dummy events
-            if (template.eventTypeExists(e.string)) {
-                if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
-                {
-                    if (e.eventType.isShared) {  //create a shared G
-                        updateSnapshot(e);       //update snapshot
-                        lastSharedG = (SharedGraphlet) newGraphlet(e);  //maitain the last shared G
-                        setActiveFlag(e.string);    //set the active flag
-                    } else {      //create a non shared G
-                        if (activeFlag.equals("") || !Graphlets.get(activeFlag).isShared) {     //uninitiated state or active is non-shared
-                            newGraphlet(e);
-                            setActiveFlag(e.string);
-                        } else { //from shared to non-shared
-                            updateFinalCount();     //update final count
-                            newGraphlet(e);
-                            setActiveFlag(e.string);
-                        }
-                    }
-                } else {     //graphlet exists and is active
-                    ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
+            if (!template.eventTypeExists(e.string)) {
+                continue;
+            }
+            /**
+             * Graphlet maintainance
+            */
+            this.eventCounter ++;
+            if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
+            {
+                if (e.eventType.isShared) {  //create a shared G
+                    updateSnapshot(e);       //update snapshot
+                    lastSharedG = (SharedGraphlet) newGraphlet(e);  //maintain the last shared G
+                    setActiveFlag(e.string);    //set the active flag
+
+                } else {      //create a non shared G
+                    newGraphlet(e);
+                    setActiveFlag(e.string);
                 }
             }
+            else {     //graphlet exists and is active
+                ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
+            }
+            /**
+             * Maintain e.count
+             * update final count for "END" event
+             */
+            updateFinalCount(e);
         }
-        //if the last Graphet is the shared one, update final count again
-        updateFinalCount();
+
+        memoryCalculate();
         System.out.println("final counts is" + finalCount);
     }
 
@@ -162,7 +153,6 @@ public class Graph implements Observable{
                     this.SnapShot.update(predG, qid);
                 }else{
                     this.SnapShot.update(lastSharedG.getCoeff(),predG,qid);   //update snapshot
-
                 }
                 predG.isCalculated = true;
             }
@@ -181,24 +171,29 @@ public class Graph implements Observable{
 
 
     /**
-     * check if the last shared Graphlet is calculated into the final count
-     *  if not, calculate the final count by last shared Graphlet
+     * update the final count when an end event arrives
      */
-    /* update the final count when a shared Graphlet is finished
-     */
-    public void updateFinalCount() {
 
-        if (!lastSharedG.isCalculated()){
-            for (int q : this.SnapShot.getCounts().keySet()) {
-                if (!this.finalCount.keySet().contains(q)){
-                    this.finalCount.put(q, this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff()));
-                }
-                else {
-                    this.finalCount.put(q, this.finalCount.get(q).add(this.SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff())));
-                }
-            }
-            lastSharedG.setCalculated(true);
+    public boolean updateFinalCount(Event e) {
+        if (e.getEndQueries().isEmpty()){
+            return false;
         }
+
+        for (Integer q: e.getEndQueries()){     //for all queries that end with E
+            if (e.eventType.isShared){      // if e is a shared event(with kleene)
+                e.updateCount(q, SnapShot.getCounts().get(q).multiply(e.getCoeff()));  //e.count = snapshot*e.coeff
+                if (!this.finalCount.keySet().contains(q)){     //if final count is empty for this query
+                    this.finalCount.put(q, e.getCount().get(q));    //final count = e.count
+                }else {
+                    finalCount.put(q, finalCount.get(q).add(e.getCount().get(q)));       //increment final count
+                }
+            }else {
+                //TODO: Assume that end event is the immediate successor of shared events
+                e.updateCount(q, SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff()));
+                finalCount.put(q, finalCount.get(q).add(e.getCount().get(q)));      //update the final count
+            }
+        }
+        return true;
     }
 
 
@@ -218,6 +213,16 @@ public class Graph implements Observable{
             register(nonsharedG);
             return nonsharedG;
         }
+    }
+
+    /**
+     * # of relevant event*12 + snapshot* constant
+     * no
+     */
+    //TODO: calculate snapshot's memory
+    private void memoryCalculate(){
+        memory = this.eventCounter*12;
+        System.out.println("memory is:"+ memory+"");
     }
 
     /**

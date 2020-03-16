@@ -36,6 +36,7 @@ public class SharedGraphlet extends Graphlet{
 
     /**
      * add an event to this shared graphlet
+     * Maintain it's count if e is an end event
      * @param e a coming event
      */
     @Override
@@ -48,6 +49,7 @@ public class SharedGraphlet extends Graphlet{
             e.setId(eventList.size());
             this.eventList.add(e);
         }
+        e.setCoeff(coeff.add(new BigInteger("1")));
         CalculateCoefficient();
 
     }

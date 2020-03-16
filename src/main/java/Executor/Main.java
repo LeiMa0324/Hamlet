@@ -19,7 +19,7 @@ public class Main {
         int epw = 50000;
 
         for (int numofShared = 15; numofShared<41;numofShared+=5){
-            System.out.println("number of Bs: "+numofShared);
+            System.out.println("====================number of Bs: "+numofShared+"====================");
             String streamFile = String.format("src/main/resources/Streams/GenStream_%d.txt",numofShared);
             String thruFile = String.format("throughput_%d.csv",numofShared);
             String latFile = String.format("latency_%d.csv",numofShared);
