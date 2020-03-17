@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Hamlet.Graph maitains:
  *      the hamletTemplate
@@ -43,14 +46,11 @@ import java.util.Scanner;
  * 3.19 Updates:
             counter of number of valid events
             final count is updated when a END event arrives
+            logger slowed down the running time by a lot, printing is better but also slows down.
  *
  * Questions:
- *          1. how to compare the memory of greta and hamlet
- *          2. Trend count computation implementation is about predicates, right?
- *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
- *          event type is not considered.
- *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
- *          5. cannot process non-shared kleenes
+ *      memory = #of relevant events *12+ 12* number of queries(a snapshot's size, but actually the count is in BigInteger which is much larger than 12)
+ *
  */
 @Data
 public class Graph implements Observable{
@@ -64,16 +64,15 @@ public class Graph implements Observable{
     private HashMap<Integer, BigInteger> finalCount;
     private Integer eventCounter;
     private long memory;
+    private boolean openMsg;
 
     /**
      * construct Hamlet.Graph by hamletTemplate
      * @param template the Template
      */
-    public Graph(Template template, String streamFile, int epw) {
+    public Graph(Template template, String streamFile, int epw, boolean openMsg) {
 
         // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
-        // TODO: graphlet info printing, how events in the graphlet, summary in the console
-        // TODO: LOGGER
 
         this.template = template;
         this.Graphlets = new HashMap<String, Graphlet>();
@@ -82,13 +81,17 @@ public class Graph implements Observable{
         this.events = new ArrayList<Event>();
         this.finalCount = new HashMap<Integer, BigInteger>();
         this.eventCounter = 0;
-
+        this.openMsg = openMsg;
         try {    //load the stream into a list of events
             Scanner scanner = new Scanner(new File(streamFile));
             int numofEvents = 0;
             while (scanner.hasNext()&&numofEvents<epw) {
                 String line = scanner.nextLine();
                 String[] record = line.split(",");
+                //if e is in the template, ignore all dummy events
+                if (!template.eventTypeExists(record[1])) {
+                    continue;
+                }
                 Event e = new Event(line, template.getEventTypebyString(record[1]));
                 this.events.add(e);
                 numofEvents++;
@@ -103,38 +106,55 @@ public class Graph implements Observable{
      */
     public void run() {
         for (Event e : events) {
-            //if e is in the template, ignore all dummy events
-            if (!template.eventTypeExists(e.string)) {
-                continue;
-            }
+
             /**
              * Graphlet maintainance
             */
             this.eventCounter ++;
+            StringBuilder msg = new StringBuilder(String.format("\n============================ Coming event: %s ============================\n\n", e.string));
+
             if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
             {
                 if (e.eventType.isShared) {  //create a shared G
                     updateSnapshot(e);       //update snapshot
-                    lastSharedG = (SharedGraphlet) newGraphlet(e);  //maintain the last shared G
+                    SharedGraphlet sharedG = new SharedGraphlet(e);
+                    lastSharedG = sharedG;  //maintain the last shared G
+
+                    Graphlets.put(e.string, sharedG);
+                    register(sharedG);
+
+                    msg.append("\n..Creating new shared Graphlet...\n\n"+sharedG.toString());
+                    msg.append("\n\n***************** SNAP SHOT UPDATE *****************\n\n");
+                    msg.append(this.SnapShot);
+
                     setActiveFlag(e.string);    //set the active flag
 
                 } else {      //create a non shared G
-                    newGraphlet(e);
+                    NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
+                    Graphlets.put(e.string, nonsharedG);
+                    register(nonsharedG);
+                    msg.append("...Creating new non-shared Graphlet...\n\n"+nonsharedG.toString());
+
                     setActiveFlag(e.string);
                 }
+
+
             }
             else {     //graphlet exists and is active
-                ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
+                ExpandGraphlet(e, Graphlets.get(activeFlag),  msg);   //expand the active graphlet
             }
             /**
              * Maintain e.count
              * update final count for "END" event
              */
-            updateFinalCount(e);
-        }
+            updateFinalCount(e, msg);
 
+            if (openMsg){
+                System.out.println(msg);
+
+            }
+        }
         memoryCalculate();
-        System.out.println("final counts is" + finalCount);
     }
 
     /**
@@ -157,7 +177,6 @@ public class Graph implements Observable{
                 predG.isCalculated = true;
             }
         }
-//        System.out.println("snapshot updated:"+SnapShot);
 
     }
 
@@ -165,8 +184,10 @@ public class Graph implements Observable{
      * expand the active graphlet
      * @param e the coming event
      */
-    public void ExpandGraphlet(Event e, Graphlet g) {   //expand the current graphlet
+    public void ExpandGraphlet(Event e, Graphlet g, StringBuilder msg) {   //expand the current graphlet
         g.addEvent(e);
+        msg.append("..Expanding current active Graphlet...\n\n"+g.toString());
+
     }
 
 
@@ -174,7 +195,7 @@ public class Graph implements Observable{
      * update the final count when an end event arrives
      */
 
-    public boolean updateFinalCount(Event e) {
+    public boolean updateFinalCount(Event e, StringBuilder msg) {
         if (e.getEndQueries().isEmpty()){
             return false;
         }
@@ -193,27 +214,11 @@ public class Graph implements Observable{
                 finalCount.put(q, finalCount.get(q).add(e.getCount().get(q)));      //update the final count
             }
         }
+        msg.append("\n\n***************** UPDATE FINAL COUNT *****************\n\n"+e.string+" is an END event, final count will be updated\n");
+
         return true;
     }
 
-
-    /**
-     * create a new graphlet based on an event, and add it into the Graphlets hashmap
-     * @param e an incoming event
-     */
-    public Graphlet newGraphlet(Event e){
-        if (e.eventType.isShared){
-            SharedGraphlet sharedG = new SharedGraphlet(e);
-            Graphlets.put(e.string, sharedG);
-            register(sharedG);
-            return sharedG;
-        }else {
-            NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
-            Graphlets.put(e.string, nonsharedG);
-            register(nonsharedG);
-            return nonsharedG;
-        }
-    }
 
     /**
      * # of relevant event*12 + snapshot* constant
@@ -221,8 +226,7 @@ public class Graph implements Observable{
      */
     //TODO: calculate snapshot's memory
     private void memoryCalculate(){
-        memory = this.eventCounter*12;
-        System.out.println("memory is:"+ memory+"");
+        memory = this.eventCounter*12 + 12*template.getQueries().size();
     }
 
     /**

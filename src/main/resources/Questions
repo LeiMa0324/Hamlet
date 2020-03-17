@@ -1,0 +1,7 @@
+ * Questions:
+ *          1. how to compare the memory of greta and hamlet
+ *          2. Trend count computation implementation is about predicates, right?
+ *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
+ *          event type is not considered.
+ *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
+ *          5. cannot process non-shared kleenes

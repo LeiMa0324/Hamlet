@@ -2,6 +2,7 @@ package Hamlet.Template;
 
 import lombok.Data;
 
+
 import java.util.*;
 
 /**
@@ -49,6 +50,17 @@ public class Template {
             }
             qid++;
         }
+//
+//        StringBuilder msg = new StringBuilder("\n======================= TEMPLATE INFO =======================\nQueries:\n");
+//        for (String q: queries){
+//            msg.append(q+"\n");
+//        }
+//        msg.append("\nEvent Types:\n");
+//        for (String s: eventTypes.keySet()){
+//            msg.append(eventTypes.get(s)+"\n");
+//        }
+//
+//        System.out.println(msg);
         }
 
     /**

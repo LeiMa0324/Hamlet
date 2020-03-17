@@ -79,9 +79,9 @@ public class EventType {
     }
     @Override
     public String toString(){
-        StringBuilder strbuilder = new StringBuilder( "Event Type info:\n   String:"+string+"\n"+"   isShared: "+isShared+"\n");
+        StringBuilder strbuilder = new StringBuilder( "   Event type string: "+string+"\n"+"   isShared: "+isShared+"\n");
         for (Integer qid: edges.keySet()){
-            strbuilder.append(" qid: "+qid +", type:" +types.get(qid)+ ", pred: ");
+            strbuilder.append("   qid: "+qid +", type: " +types.get(qid)+ ", pred: ");
             for (EventType p: edges.get(qid)){
                 strbuilder.append(p.string+", ");
             }

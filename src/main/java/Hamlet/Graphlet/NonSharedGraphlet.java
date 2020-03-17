@@ -63,4 +63,18 @@ public class NonSharedGraphlet extends Graphlet{
         String activeFlag = (String)object;
         this.isActive = this.eventType.string.equals(activeFlag);
     }
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder("***************** GRAPHLET INFO *****************\n\n");
+        stringBuilder.append( String.format("%-18s %-5s", "Event Type: ", eventType.string));
+
+        stringBuilder.append(String.format("\n%-18s %-5s", "Is shared: ", "No"));
+        stringBuilder.append("\nCounts:");
+        for (Integer q: counts.keySet()){
+            stringBuilder.append(String.format("\n%23s %-5s", "qid: ", q+","));
+            stringBuilder.append("count: "+ counts.get(q));
+        }
+        return stringBuilder.toString();
+    }
 }

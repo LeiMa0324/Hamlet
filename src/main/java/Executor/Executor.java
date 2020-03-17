@@ -20,6 +20,7 @@ import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
 //import java.util.ArrayList;
 
 
@@ -51,7 +52,7 @@ public class Executor {
 	private long hamletMemory;
 	private long gretaMemory;
 
-	public Executor(String streamFile, String queryFile,  int epw, String throuputFile, String latencyFile, String memoryFile){
+	public Executor(String streamFile, String queryFile,  int epw, String throuputFile, String latencyFile, String memoryFile, boolean openMsg){
 		this.streamFile = streamFile;
 		this.queryFile = queryFile;
 		this.throuputFile = throuputFile;
@@ -59,7 +60,6 @@ public class Executor {
 		this.memoryFile = memoryFile;
 		this.epw = epw;
 		this.queries = new ArrayList<>();
-
 		//read query file
 		try {
 			Scanner query_scanner = new Scanner(new File(queryFile));
@@ -70,6 +70,10 @@ public class Executor {
 		} catch(FileNotFoundException e) {e.printStackTrace();}
 
 
+		//Hamlet
+		this.hamletTemplate = new Template(queries);
+		this.hamletG = new Graph(hamletTemplate,streamFile, epw, openMsg);
+
 	}
 
 	/**
@@ -77,34 +81,15 @@ public class Executor {
 	 */
 	public void run(){
 
-		long memory1, memory2, memory3, memory4;
-		Runtime gfg = Runtime.getRuntime();
-
-		gfg.gc();		//garbage collection
-		memory1 = gfg.freeMemory();		//calculate free memory
-		hamletRun();		//run hamlet
-		memory2 = gfg.freeMemory();		//calculate free memory after hamlet
-
-		hamletMemory = memory1 - memory2;
-		System.out.println("Hamlet: latency "+ hamletLatency);
-		System.out.println("Hamlet: memory " + hamletMemory);
-		String readableHamletMemory = FileUtils.byteCountToDisplaySize(hamletMemory);
-		System.out.println("Hamlet: readable memory " + readableHamletMemory);
+	    hamletRun();		//run hamlet
+		System.out.println("Hamlet latency: "+ hamletLatency);
+		System.out.println("Hamlet Memory: "+ hamletMemory);
 
 
-		gfg.gc();
-
-		memory3 = gfg.freeMemory();
 		gretaRun();
-		memory4 = gfg.freeMemory();
+		System.out.println("Greta latency: "+ gretaLatency);
+		System.out.println("Greta Memory: "+ gretaMemory);
 
-		gretaMemory = memory3 - memory4;
-		System.out.println("Greta: latency "+gretaLatency);
-		System.out.println("Greta: byte memory " + gretaMemory);
-		String readableGretaMemory = FileUtils.byteCountToDisplaySize(gretaMemory);
-		System.out.println("Greta: readable memory " + readableGretaMemory);
-
-		gfg.gc();
 
 
 		logging("thru");
@@ -118,14 +103,15 @@ public class Executor {
 	 */
 	public void hamletRun(){
 
-		//Hamlet
-		this.hamletTemplate = new Template(queries);
-		this.hamletG = new Graph(hamletTemplate,streamFile, epw);
+
+
 		long start =  System.currentTimeMillis();
 		hamletG.run();
 
 		long end =  System.currentTimeMillis();
 		hamletLatency = end - start;
+		hamletMemory = hamletG.getMemory();
+
 
 	}
 
@@ -153,8 +139,10 @@ public class Executor {
 			TrS.run();
 			done.await();
 			this.gretaLatency = latency.get();
+			this.gretaMemory = ((GretaMQ) TrS).memory.longValue();
 
 		} catch (InterruptedException e) { e.printStackTrace(); }
+
 
 	}
 
@@ -175,6 +163,7 @@ public class Executor {
 				data[1] = epw*1000/ hamletLatency +"";
 				data[2] = epw*1000/ gretaLatency +"";
 
+
 				break;
 			case "lat":
 				filename = latencyFile;
@@ -184,6 +173,7 @@ public class Executor {
 				data[0] = epw+"";
 				data[1] = hamletLatency +"";
 				data[2] = gretaLatency +"";
+
 				break;
 			case "mem":
 				filename = memoryFile;
@@ -193,6 +183,7 @@ public class Executor {
 				data[0] = epw+"";
 				data[1] = hamletMemory+"";
 				data[2] = gretaMemory +"";
+
 				break;
 		}
 		File file = new File("output/"+ filename);
@@ -218,4 +209,6 @@ public class Executor {
 		}
 
 	}
+
+
 }

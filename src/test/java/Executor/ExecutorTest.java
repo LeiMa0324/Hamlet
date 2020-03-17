@@ -5,6 +5,8 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.logging.Level;
+
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +23,7 @@ public class ExecutorTest {
         String latFile = "test_latency.csv";
         String memFile = "test_memory.csv";
         int epw = 500000;
-        Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile);
+        Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile, true);
         HashMap<Integer, BigInteger> expectedSnapshots = new HashMap<>();
         expectedSnapshots.put(1,new BigInteger("34"));
         expectedSnapshots.put(2,new BigInteger("19"));

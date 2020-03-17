@@ -1,13 +1,21 @@
 package Executor;
 
 import java.util.ArrayList;
+import java.util.logging.Level;
+
 
 /**
  * Each static method is one experiment
  */
 public class Main {
     public static void main(String[] args){
-        varyEventsPerWindow();
+
+//        varyEventsPerWindow();
+
+
+
+
+
     }
 
     /**
@@ -25,7 +33,7 @@ public class Main {
             String latFile = String.format("latency_%d.csv",numofShared);
             String memFile = String.format("memory_%d.csv",numofShared);
 
-            Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile);
+            Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile,false);
             executor.run();
         }
     }
@@ -43,7 +51,7 @@ public class Main {
             String thruFile = "throughput_epw.csv";
             String latFile = "latency_epw.csv";
             String memFile = "memory_epw.csv";
-            Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile);
+            Executor executor = new Executor(streamFile, queryFile, epw, thruFile, latFile, memFile, false);
             executor.run();
 
         }

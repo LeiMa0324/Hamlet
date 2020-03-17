@@ -88,4 +88,15 @@ public class SharedGraphlet extends Graphlet{
         }
 
     }
+
+    @Override
+    public String toString(){
+        StringBuilder stringBuilder = new StringBuilder("***************** GRAPHLET INFO *****************\n\n");
+        stringBuilder.append(String.format("%-18s %-5s", "Event Type: ", eventType.string));
+        stringBuilder.append(String.format("\n%-18s %-5s", "Is shared: ", "Yes"));
+        stringBuilder.append(String.format("\n%-18s %-5s", "Counts: ", eventList.size()));
+        stringBuilder.append(String.format("\n%-18s %-5s", "Sum of coeffs: ", coeff));
+
+        return stringBuilder.toString();
+    }
 }
