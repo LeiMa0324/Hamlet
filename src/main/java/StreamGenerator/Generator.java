@@ -9,7 +9,9 @@ import java.util.Random;
 public class Generator {
     public static void main(String[] agrs){
 
-        generateStream_vary_sharedNum();
+//        generateStream_vary_sharedNum();
+        // generate 10 queries, each has the length of 6 and the shared event is at position 2
+        generateWorkload(10, 6, 2);
 
     }
 
@@ -33,10 +35,8 @@ public class Generator {
     /**
      * generate a workload
      */
-    static void generateWorkload(){
-        int num = 10;
-        int length = 5;
-        int sharedPos = 3;
+    static void generateWorkload(int num, int length, int sharedPos){
+
         String queryFile = String.format("src/main/resources/Queries/Workload_pos_%d.txt",sharedPos);
 
         WorkloadTemplate workload = new WorkloadTemplate(num, length,  sharedPos,  queryFile);

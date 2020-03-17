@@ -5,6 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Control the size of the stream and the number of shared events in one graphlet
+ *
+ * all unshared events has the same number unsharedNum in one graphlet
+ * shared events has the number sharedNum in one graphlet
+ */
 public class StreamTemplate {
     private int length;
     private int unsharedNum;

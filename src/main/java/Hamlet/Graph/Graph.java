@@ -47,6 +47,7 @@ import java.util.logging.Logger;
             counter of number of valid events
             final count is updated when a END event arrives
             logger slowed down the running time by a lot, printing is better but also slows down.
+            query and stream template is finished.
  *
  * Questions:
  *      memory = #of relevant events *12+ 12* number of queries(a snapshot's size, but actually the count is in BigInteger which is much larger than 12)
