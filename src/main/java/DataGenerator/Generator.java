@@ -1,4 +1,4 @@
-package StreamGenerator;
+package DataGenerator;
 
 import java.util.Random;
 

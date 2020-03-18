@@ -46,7 +46,7 @@ import java.util.logging.Logger;
  * 3.19 Updates:
             counter of number of valid events
             final count is updated when a END event arrives
-            logger slowed down the running time by a lot, printing is better but also slows down.
+            logger slowed down the running time by a lot, printing is better but also slows down（a lot of toString() are called）
             query and stream template is finished.
  *
  * Questions:
@@ -225,7 +225,6 @@ public class Graph implements Observable{
      * # of relevant event*12 + snapshot* constant
      * no
      */
-    //TODO: calculate snapshot's memory
     private void memoryCalculate(){
         memory = this.eventCounter*12 + 12*template.getQueries().size();
     }
