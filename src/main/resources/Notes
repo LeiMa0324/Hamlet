@@ -1,0 +1,21 @@
+ * Questions:
+ *          1. how to compare the memory of greta and hamlet
+ *          2. Trend count computation implementation is about predicates, right?
+ *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
+ *          event type is not considered.
+ *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
+ *          5. cannot process non-shared kleenes
+
+
+
+        //TODO: default number of quries, 20
+        //TODO: test with my queries, 但是短一点的stream，比较hamlet与greta是否一致
+
+
+        // TODO: add experiment of number of queries(lat, memory, throughput), compare shraon, greta, hamlet, MCEP.
+        // using synthetic data，到底用Allison的data，改hamlet，还是改sharon,MCEP, 用我的stream/workload
+
+        //TODO:  then real-dataset，compare stock dataset with physical, choose a better one, can use a subset of original data,
+        //        //  find a best stream in the data stream
+        // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
+        // TODO: DEBS dataset
