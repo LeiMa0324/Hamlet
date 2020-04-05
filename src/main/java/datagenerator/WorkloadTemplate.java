@@ -6,6 +6,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -16,16 +17,23 @@ import java.util.Random;
 public class WorkloadTemplate {
     private String query;
     private String queryFile;
-    private int num;
-    private int length;
+    private int num;        //number of queries
+    private int length;     // the length of each query
     private int sharedPos;
+    private int sharedE;
+    private int eventBound;     // the largest event type
+    private boolean randomLength;       //open the random length
 
-    public WorkloadTemplate(int num,int length, int sharedPos, String queryFile){
+    public WorkloadTemplate(int num,int length, int eventBound, int sharedPos, String queryFile, int sharedE, boolean randomLength){
         this.query = "";
         this.num = num;
         this.queryFile = queryFile;
         this.length = length;
         this.sharedPos = sharedPos; //start from 1
+        this.sharedE = sharedE;
+        this.eventBound = eventBound;
+        this.randomLength = randomLength;
+
 
     }
 
@@ -33,15 +41,21 @@ public class WorkloadTemplate {
         try{
             File output_file = new File(this.queryFile);
             BufferedWriter output = new BufferedWriter(new FileWriter(output_file));
-
+            //for each query
             for (int i=0;i<this.num;i++){
 
                 int lastEvent = 0;
-
+                Random rand = new Random();
+                int randLength = rand.nextInt(8)+3;    // length vary from 3-10
+                int length = randomLength?randLength:this.length;
+                ArrayList<Integer> existedEvents = new ArrayList<>();
+                // for the length of this query
                 for (int l =0;l<length;l++){
+
                     if (l ==sharedPos){
-                        output.append(",2+");
-                        lastEvent =2;
+                        output.append(","+sharedE+"+");
+                        lastEvent =sharedE;
+                        existedEvents.add(sharedE);
                         if (l ==length-1){
                             output.append("\n");
                         }
@@ -49,10 +63,12 @@ public class WorkloadTemplate {
                     }
 
                     Random random = new Random();
-                    int randomUnshared = random.nextInt(14)+1;
-                    while(randomUnshared == lastEvent||randomUnshared == 2){
-                        randomUnshared = random.nextInt(14)+1;
+                    int randomUnshared = random.nextInt(eventBound)+1;
+                    //regenerate an event if it's consecutive| it's shared event| it existed in the query already
+                    while(randomUnshared == lastEvent||randomUnshared == sharedE||existedEvents.contains(randomUnshared)){
+                        randomUnshared = random.nextInt(eventBound)+1;
                     }
+                    existedEvents.add(randomUnshared);
                     lastEvent = randomUnshared;
                     String tmp = l==0?randomUnshared+"":","+randomUnshared;
                     output.append(tmp);

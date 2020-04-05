@@ -5,10 +5,12 @@ import baselines.commons.event.StreamPartitioner;
 import baselines.commons.templates.SingleQueryTemplate;
 import baselines.greta.GretaMQ;
 import baselines.commons.transactions.TransactionMQ;
+//import baselines.sharon.newSharon;
+import baselines.newsharon.newSharon;
+import baselines.sharon.Sharon;
 import hamlet.graph.*;
 import hamlet.template.Template;
 import lombok.Data;
-import baselines.sharon.Sharon;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -52,10 +54,12 @@ public class Executor {
 	private long hamletLatency;
 	private long gretaLatency;
 	private long sharonLatency;
+	private long mcepLatency;
 
 	private long hamletMemory;
 	private long gretaMemory;
 	private long sharonMemory;
+	private long mcepMemory;
 
 	public Executor(String streamFile, String queryFile,  int epw, boolean openMsg){
 		this.streamFile = streamFile;
@@ -76,25 +80,26 @@ public class Executor {
 		this.hamletTemplate = new Template(queries);
 		this.hamletG = new Graph(hamletTemplate,streamFile, epw, openMsg);
 
+		this.sharonLatency = -1;
+		this.mcepLatency = -1;
+		this.sharonMemory = -1;
+		this.mcepMemory = -1;
+
 	}
 
 	/**
 	 * run hamlet, greta and log
 	 */
-	public void run(){
+	public void run(boolean isBaseline){
 
 	    hamletRun();		//run hamlet
-		System.out.println("Hamlet latency: "+ hamletLatency);
-		System.out.println("Hamlet Memory: "+ hamletMemory);
+		gretaRun();			//run greta
+		if (isBaseline){
+			sharonRun();	//run sharon
+			mcepRun();	//run mcep
 
+		}
 
-		gretaRun();
-		System.out.println("Greta latency: "+ gretaLatency);
-		System.out.println("Greta Memory: "+ gretaMemory);
-
-		sharonRun();
-		System.out.println("Sharon latency: "+ sharonLatency);
-		System.out.println("Sharon Memory: "+ sharonMemory);
 
 	}
 	/**
@@ -107,7 +112,11 @@ public class Executor {
 
 		long end =  System.currentTimeMillis();
 		hamletLatency = end - start;
+		hamletG.memoryCalculate();
 		hamletMemory = hamletG.getMemory();
+
+		System.out.println("Hamlet latency: "+ hamletLatency);
+		System.out.println("Hamlet Memory: "+ hamletMemory);
 
 	}
 
@@ -137,6 +146,8 @@ public class Executor {
 			done.await();
 			this.gretaLatency = latency.get();
 			this.gretaMemory = ((GretaMQ) TrS).memory.longValue();
+			System.out.println("Greta latency: "+ gretaLatency);
+			System.out.println("Greta Memory: "+ gretaMemory);
 
 		} catch (InterruptedException e) { e.printStackTrace(); }
 
@@ -159,8 +170,24 @@ public class Executor {
 				done.await();
 				sharonLatency += latency.get();
 				sharonMemory +=memory.get();
+
 			}
+
+			System.out.println("newSharon latency: "+ sharonLatency);
+			System.out.println("newSharon Memory: "+ sharonMemory);
 
 		}catch (InterruptedException e) { e.printStackTrace(); }
 
-}}
+
+	}
+
+
+
+	public void mcepRun(){
+
+		//TODO: add MCEP
+		System.out.println("MCEP latency: "+ mcepLatency);
+		System.out.println("MCEP Memory: "+ mcepMemory);
+
+	}
+}

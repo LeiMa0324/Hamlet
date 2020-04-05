@@ -1,5 +1,7 @@
 package baselines.sharon;
 
+import baselines.commons.templates.SharonType;
+import baselines.commons.transactions.TransactionMQ;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import baselines.commons.transactions.TransactionMQ;
 
 public class Sharon extends TransactionMQ {
     /**
-     * Sharon 以B的指数级增长，所以B越多,memroy 爆炸
+     * newSharon 以B的指数级增长，所以B越多,memroy 爆炸
      * 要跑只能在较少的epw内跑
      */
     public Stream stream;
@@ -35,10 +37,11 @@ public class Sharon extends TransactionMQ {
         memory = mem;
 
         // build prefix counters
-        ArrayList<String> seqQueries = flattenQueries(pattern);
+        ArrayList<String> seqQueries = flatten(pattern);
         allQueries = new ArrayList<HashMap<Integer, ArrayList<SharonType>>>();
 
         for (String q : seqQueries) {
+            //generate a hashmap by each flattened query
             allQueries.add(generatePrefixCtrs(q));
         }
 
@@ -56,53 +59,41 @@ public class Sharon extends TransactionMQ {
      * @return
      */
 
-    public ArrayList<String> flattenQueries(String P) {
-        ArrayList<String> Q = new ArrayList<String>();
+    public ArrayList<String> flatten(String P) {
+        ArrayList<String> flattenQueies = new ArrayList<String>();
         String[] query = P.split(",");
-        ArrayList<String> types = new ArrayList<String>();
         HashMap<String, ArrayList<String>> flatTypes = new HashMap<String, ArrayList<String>>();
+        int frequency = 0;
 
-        //遍历query中所有event type
-        for (int i = 0; i < query.length; i++) {
-            String type = query[i].substring(0, 1);
-            ArrayList<String> repTypes = new ArrayList<String>();
-            repTypes.add(type + ",");
+        // find kleene and find the frequency of the kleene event
+        for (String et:query){
+            if (et.endsWith("+")){
+                frequency = stream.generateRates(Integer.parseInt(et.replace("+","")));
+            }
+        }
+        //form the flattened queries
+        for (int i=1; i<frequency+1;i++){
+            StringBuilder flattenQuery = new StringBuilder();
+            for (String et:query){
+                if (!et.endsWith("+")){
+                    flattenQuery.append(et+",");
 
-            //如果event type包含+
-            if (query[i].endsWith("+")) {
-                //计算stream中包含type的个数
-                int R = stream.generateRates(Integer.parseInt(type));
-                for (int j=1; j<R; j++) {
-                    repTypes.add(repTypes.get(j-1).concat(type + ","));
+                }else {
+                    for (int j=0;j<i;j++){
+                        flattenQuery.append(et.replace("+","")+",");
+                    }
                 }
             }
-
-            types.add(type);
-            flatTypes.put(type, repTypes);
+            flattenQueies.add(flattenQuery.toString());
         }
 
-        Q.add(types.get(0) + ",");
-        int numPrefix = 1;
+        return flattenQueies;
 
-        for (int i=1; i<types.size(); i++) {
-            ArrayList<String> repTypes = flatTypes.get(types.get(i));
-            int nextNumPrefix = 0;
-
-            for (int j=0; j<numPrefix; j++) {
-                for (String s : repTypes) {
-                    Q.add(Q.get(0).concat(s));
-                    nextNumPrefix++;
-                }
-                Q.remove(0);
-            }
-
-            numPrefix = nextNumPrefix;
-        }
-
-        return Q;
     }
 
     public HashMap<Integer, ArrayList<SharonType>> generatePrefixCtrs(String pattern) {
+
+        //event type: newSharon Type list
         HashMap<Integer, ArrayList<SharonType>> prefix_counters = new HashMap<Integer, ArrayList<SharonType>>();
         String[] types = pattern.split(",");
 
@@ -147,10 +138,10 @@ public class Sharon extends TransactionMQ {
             ConcurrentLinkedQueue<Event> events = stream.substreams.get(substream_id);
             BigInteger count = computeResults(events);
 
-            // print final counts
+            // print final interCounts
             for (int i=0; i<numQueries; i++) {
                 final_counts[i] = new BigInteger(count + "");
-				System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
+                System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
             }
 
             long end =  System.currentTimeMillis();
@@ -172,6 +163,8 @@ public class Sharon extends TransactionMQ {
 
     public BigInteger computeResults (ConcurrentLinkedQueue<Event> events) {
 
+        BigInteger retCount = new BigInteger("0");
+
         // Set up final counters
         ArrayList<BigInteger> counts_per_substream = new ArrayList<BigInteger>();
         for (int i=0; i<allQueries.size(); i++) {
@@ -188,32 +181,37 @@ public class Sharon extends TransactionMQ {
 //			System.out.println("--------------" + event.id + " TYPE: " + type);
 
             for (int i=0; i<allQueries.size(); i++) {
+
+                //一个event进来，对于每一个Sharon Type进行计算
                 if (allQueries.get(i).containsKey(type)) {
-                    for (SharonType prefix_counter : allQueries.get(i).get(type)) {
+
+                    for (SharonType sharonType : allQueries.get(i).get(type)) {
 
                         // if necessary, update current second
-                        if (time > prefix_counter.current_second) {
-                            prefix_counter.updateTime(time);
+                        if (time > sharonType.current_second) {
+                            sharonType.updateTime(time);    //保存上一次的计数
                         }
 
                         // START or UPD event
-                        if (prefix_counter.isSTART) {
-                            prefix_counter.current_second_count = prefix_counter.current_second_count.add(new BigInteger("1"));
+                        if (sharonType.isSTART) {
+                            //start event type current +1
+                            sharonType.current_second_count = sharonType.current_second_count.add(new BigInteger("1"));
                         } else {
-                            SharonType predecessor = prefix_counter.predecessor;
+                            SharonType predecessor = sharonType.predecessor;
                             if (time > predecessor.current_second) {
                                 predecessor.updateTime(time);
                             }
 
                             //Share part
-                            prefix_counter.current_second_count = prefix_counter.current_second_count.add(predecessor.previous_second_count);
+                            sharonType.current_second_count = sharonType.current_second_count.add(predecessor.previous_second_count);
                         }
 
 //						System.out.println(prefix_counter.current_second_count);
 
                         // TRIG event
-                        if (prefix_counter.isTRIG) {
-                            counts_per_substream.set(i, prefix_counter.current_second_count);
+                        if (sharonType.isTRIG) {
+                            counts_per_substream.set(i, sharonType.current_second_count);
+//                            retCount = retCount.add(prefix_counter.current_second_count);
                         }
                     }
                 }
@@ -228,7 +226,6 @@ public class Sharon extends TransactionMQ {
             }
         }
 
-        BigInteger retCount = new BigInteger("0");
         for (BigInteger fqCount : counts_per_substream) {
             retCount = retCount.add(fqCount);
         }

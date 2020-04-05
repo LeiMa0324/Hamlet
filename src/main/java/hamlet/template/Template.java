@@ -19,11 +19,13 @@ public class Template {
     private ArrayList<String> queries;
     private ArrayList<String> sharedEvents;     //the Shared event types in all queries
     private HashMap<String, EventType> eventTypes;   //can find a Hamlet.Event Type by a string
+    private ArrayList<String> startEvents;
 
     public Template(ArrayList<String> queries) {
         this.queries = queries;
         this.eventTypes = new HashMap<>();
         this.sharedEvents = new ArrayList<>();
+        this.startEvents = new ArrayList<>();
         int qid = 1;
         findSharedEvents();
 
@@ -34,19 +36,31 @@ public class Template {
                 String e = records.get(i).replace("+","");
                 String type="";
                 type = i==0?"START":"REGULAR";
+                if (type.equals("START")){
+                    startEvents.add(e);
+                }
 
                 type = i==records.size()-1?"END":type;
                 if (eventTypeExists(e)){        //if event type exists
                     EventType et = getEventTypebyString(e);      //set its type
-                    et.addType(qid,type);
+                    et.addType(qid,type);       //set end queries
+                    if (type.equals("END")){
+                        et.addEndQuery(qid);
+
+                    }
                     et = maintainPreds(et,qid, eventTypeList);  //maintain its predecessors
                     eventTypeList.add(et);        //maintain event type list
                     eventTypes.put(e, et);
 
 
+
                 }else {     //if not exists
                     EventType et = new EventType(e,sharedEvents.contains(e),qid);   //new an event type
                     et.addType(qid, type);          //set its type
+                    if (type.equals("END")){ //set end queries
+                        et.addEndQuery(qid);
+
+                    }
                     maintainPreds(et, qid, eventTypeList);   //maintain its predecessors
                     eventTypes.put(e, et);       //put it into hash map
                     eventTypeList.add(et);       //maintain event type list

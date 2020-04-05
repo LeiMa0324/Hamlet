@@ -62,10 +62,10 @@ public class PrefixMQ extends TransactionMQ{
 			Graph graph = new Graph();
 			graph = graph.getCompleteGraph(events, template);
 			
-			// print final counts
+			// print final interCounts
 			for (int i=0; i<numQueries; i++) {
 				final_counts[i] = new BigInteger(graph.final_count + "");
-//				System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with counts " + final_counts[i]);
+//				System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with interCounts " + final_counts[i]);
 			}
 			
 			memory.set(memory.get() + graph.nodeNumber * 12);

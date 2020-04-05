@@ -48,9 +48,9 @@ public class Greta extends Transaction {
 		graph = graph.getCompleteGraph(events, query);
 
 //			latency.set(latency.get() + (int) (0.01*graph.weight));
-//			counts = counts.add(new BigInteger(graph.final_count + ""));
+//			interCounts = interCounts.add(new BigInteger(graph.final_count + ""));
 
-//			System.out.println("Query id: " + id + " Substream id: " +  " with counts " + graph.final_count);
+//			System.out.println("Query id: " + id + " Substream id: " +  " with interCounts " + graph.final_count);
 		finalcount = graph.final_count;
 		memory.set(memory.get() + graph.nodeNumber * 12);
 	}

@@ -1,11 +1,13 @@
 package hamlet.graphlet;
 
 import hamlet.event.Event;
+import hamlet.graph.Snapshot;
 import hamlet.template.EventType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 
 /**
  * The graphlet of the shared events
@@ -20,9 +22,9 @@ import java.math.BigInteger;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SharedGraphlet extends Graphlet{
-    public final EventType eventType;        // the event type of this graphlet
     private BigInteger coeff;
     private boolean calculated;
+
 
     public SharedGraphlet(Event e){
         super();
@@ -30,6 +32,9 @@ public class SharedGraphlet extends Graphlet{
         coeff = new BigInteger("0");
         isShared = true;
         this.calculated = false;
+        for (Integer q: eventType.getQids()){
+            interCounts.put(q,new BigInteger("0"));
+        }
         addEvent(e);
 
     }
@@ -49,8 +54,17 @@ public class SharedGraphlet extends Graphlet{
             e.setId(eventList.size());
             this.eventList.add(e);
         }
-        e.setCoeff(coeff.add(new BigInteger("1")));
         CalculateCoefficient();
+
+    }
+
+
+    public void updateCounts(Snapshot snapshot){
+        if (!snapshot.getCounts().isEmpty()){
+            for (Integer q: eventType.getQids()){
+                interCounts.put(q, snapshot.getCounts().get(q).multiply(coeff));
+            }
+        }
 
     }
 
@@ -86,6 +100,7 @@ public class SharedGraphlet extends Graphlet{
 
     @Override
     public void finishNotify(Object object){
+
 
     }
 

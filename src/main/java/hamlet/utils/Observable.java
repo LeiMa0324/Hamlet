@@ -12,7 +12,7 @@ public interface Observable {
          * Notify observers of change
          */
         void notifyObservers();
-        void finishingLastNotify();
+        void finishingNonshared();
     }
 
 

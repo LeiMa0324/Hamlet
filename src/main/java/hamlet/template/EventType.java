@@ -22,6 +22,7 @@ public class EventType {
     private ArrayList<Integer> qids;
     private HashMap<Integer, String> types;    //"START", "END", "REGULAR"
     private ArrayList<Integer> startqids;
+    private ArrayList<Integer> endQueries;
 
 
     public EventType(String string, boolean isShared, int qid){
@@ -32,6 +33,8 @@ public class EventType {
         this.isShared = isShared;
         this.edges = new HashMap<Integer, ArrayList<EventType>>();
         this.startqids = new ArrayList<>();
+        this.endQueries = new ArrayList<>();
+
     }
 
     /**
@@ -79,6 +82,14 @@ public class EventType {
         if (!qids.contains(qid)){
             qids.add(qid);
         }
+    }
+
+    /**
+     * find the queries that this event type end with
+     */
+    public void addEndQuery(Integer q){
+        this.endQueries.add(q);
+
     }
 
     public String getTypebyQid(Integer qid){

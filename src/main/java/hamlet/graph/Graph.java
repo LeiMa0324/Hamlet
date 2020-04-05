@@ -41,9 +41,9 @@ public class Graph implements Observable{
     private String activeFlag; //the current active Graphlet
     private ArrayList<Event> events;
     private HashMap<Integer, BigInteger> finalCount;
-    private Integer eventCounter;
     private long memory;
     private boolean openMsg;
+    private HashMap<String, Integer> eventCounts;
 
     /**
      * construct Hamlet.Graph by hamletTemplate
@@ -56,9 +56,13 @@ public class Graph implements Observable{
         this.activeFlag = "";
         this.events = new ArrayList<Event>();
         this.finalCount = new HashMap<Integer, BigInteger>();
-        this.eventCounter = 0;
         this.openMsg = openMsg;
-        loadStream(streamFile, epw);
+        loadStream(streamFile, epw);    //仅load relevant events
+        this.eventCounts = new HashMap<>();
+        for (int q=1; q<= template.getQueries().size();q++){
+            finalCount.put(q, new BigInteger("0"));
+        }
+
 
     }
 
@@ -67,15 +71,20 @@ public class Graph implements Observable{
      */
     public void run() {
         for (Event e : events) {
+            Integer c = eventCounts.keySet().contains(e.string)?eventCounts.get(e.string):0;
+            eventCounts.put(e.string, c+1);
 
             /**
              * Graphlet maintainance
             */
-            this.eventCounter ++;
 
             if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
             {
-                finishingLastNotify();
+                // update the count for the active graphlet when it's finished
+                finishingGraphlet();
+
+
+                //initiate new graphlet
                 if (e.eventType.isShared) {  //create a shared G
                     updateSnapshot(e);       //update snapshot
                     SharedGraphlet sharedG = new SharedGraphlet(e);
@@ -88,20 +97,6 @@ public class Graph implements Observable{
                 } else {      //create a non shared G
                     NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
 
-                    //找到predG
-                    HashMap<Integer, BigInteger> predcounts = new HashMap<>();
-                    for (Integer qid: nonsharedG.eventType.getQids()){
-                        EventType pred = e.eventType.getPred(qid); //get the pred for one query
-                        if (pred!=null){
-                            NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
-                            BigInteger predcount = (predG ==null)?new BigInteger("0"):predG.getCounts().get(qid);
-                            predcounts.put(qid, predcount);
-                        }else {
-                            predcounts.put(qid, new BigInteger("0"));
-                        }
-
-                    }
-                    nonsharedG.setPredCounts(predcounts);
                     Graphlets.put(e.string, nonsharedG);
                     register(nonsharedG);
                     setActiveFlag(e.string);
@@ -114,10 +109,10 @@ public class Graph implements Observable{
              * Maintain e.count
              * update final count for "END" event
              */
-            updateFinalCount(e );
 
         }
-        memoryCalculate();
+        finishingGraphlet();
+
         if (openMsg){
             System.out.println("hamlet final count: "+finalCount);
         }
@@ -127,20 +122,85 @@ public class Graph implements Observable{
         try {    //load the stream into a list of events
             Scanner scanner = new Scanner(new File(streamFile));
             int numofEvents = 0;
+            boolean isStarted = false;
+
             while (scanner.hasNext()&&numofEvents<epw) {
                 String line = scanner.nextLine();
                 String[] record = line.split(",");
+                numofEvents++;
+
                 //if e is in the template, ignore all dummy events
                 if (!template.eventTypeExists(record[1])) {
                     continue;
                 }
-                Event e = new Event(line, template.getEventTypebyString(record[1]));
-                this.events.add(e);
-                numofEvents++;
+                if (!isStarted){
+                    if (template.getStartEvents().contains(record[1])){
+                        isStarted = true;
+                    }
+                    else {
+                        continue;
+                    }
+                }
+                if (isStarted){
+                    Event e = new Event(line, template.getEventTypebyString(record[1]));
+                    this.events.add(e);
+                }
+
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean finishingGraphlet(){
+
+        if (Graphlets.isEmpty()){
+            return false;
+        }
+        // update shared G' count, based on snapshot
+        if (Graphlets.get(activeFlag).isShared){
+            SharedGraphlet shared = (SharedGraphlet) Graphlets.get(activeFlag);
+            // for all queries that shared event in, update the count
+            shared.updateCounts(SnapShot);
+
+        }else {
+            // update non shared G's count, based on the pred G's count
+            NonSharedGraphlet nonsharedG = (NonSharedGraphlet)Graphlets.get(activeFlag);
+
+            HashMap<Integer, BigInteger> predcounts = new HashMap<>();
+
+            for (Integer qid: nonsharedG.eventType.getQids()){
+                EventType pred = nonsharedG.eventType.getPred(qid); //get the pred for one query
+                if (pred!=null){
+                    //todo: 如果predG.intercount不为0，则代表已经开始计数，如果为0，则该query还未开始计数
+                    //找到predG, update non-shared G's predcounts
+                    Graphlet predG = Graphlets.get(nonsharedG.eventType.getPred(qid).string);
+                    BigInteger predcount = new BigInteger("0");
+                    // if predG appeared before
+                    if (!(predG==null)&&!predG.interCounts.get(qid).equals(new BigInteger("0"))){
+                        if (predG.isShared){
+                            //TODO: match 所有的kleene，即使中间有其他的数\依旧有问题，要找到5,4,1+,6，在4以后的1的个数作为power，而不是所有的1
+                            predcount = new BigInteger("2").pow(eventCounts.get(pred.string)).add(new BigInteger("-1"));
+                        }else {
+                            predcount = new BigInteger(eventCounts.get(pred.string)+"");
+                        }
+                    }
+
+                    predcounts.put(qid, predcount);
+                }else {
+                    predcounts.put(qid, new BigInteger("0"));
+                }
+
+            }
+            nonsharedG.setPredInterCounts(predcounts);
+
+            // update the count for non-shared graphlet
+            finishingNonshared();
+        }
+
+        updateFinalCount();  //update final count
+        return true;
+
     }
 
     /**
@@ -155,6 +215,11 @@ public class Graph implements Observable{
 
             EventType pred = e.eventType.getPred(qid); //get the pred for one query
             NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
+            //if no pred graphlet it's 0
+            if (predG==null){
+                this.SnapShot.getCounts().put(qid, new BigInteger("0"));
+
+            }
 
             if (predG!=null&&!predG.getIsCalculated().get(qid)){
                 if (lastSharedG==null){        // no snapshot before
@@ -178,41 +243,40 @@ public class Graph implements Observable{
 
     }
 
-
     /**
-     * update the final count when an end event arrives
+     * final count = active Graphlet's intCount
+     * @return
      */
+    public boolean updateFinalCount(){
+        Graphlet activeG = Graphlets.get(activeFlag);
 
-    public boolean updateFinalCount(Event e) {
-        if (e.getEndQueries().isEmpty()){
+        if (activeG.eventType.getEndQueries().isEmpty()){
             return false;
         }
 
-        for (Integer q: e.getEndQueries()){     //for all queries that end with E
-            if (e.eventType.isShared){      // if e is a shared event(with kleene)
-                e.updateCount(q, SnapShot.getCounts().get(q).multiply(e.getCoeff()));  //e.count = snapshot*e.coeff
-                if (!this.finalCount.keySet().contains(q)){     //if final count is empty for this query
-                    this.finalCount.put(q, e.getCount().get(q));    //final count = e.count
-                }else {
-                    finalCount.put(q, finalCount.get(q).add(e.getCount().get(q)));       //increment final count
-                }
-            }else {
-                //TODO: Assume that end event is the immediate successor of shared events
-                e.updateCount(q, SnapShot.getCounts().get(q).multiply(lastSharedG.getCoeff()));
-                finalCount.put(q, finalCount.get(q).add(e.getCount().get(q)));      //update the final count
-            }
+        for (Integer q: activeG.eventType.getEndQueries()){
+            BigInteger previousCount = this.finalCount.keySet().contains(q)?this.finalCount.get(q):new BigInteger("0");
+            this.finalCount.put(q, previousCount.add(activeG.interCounts.get(q))); // pass the inter count of active G to final count
         }
-
         return true;
+
     }
+
 
 
     /**
      * # of relevant event*12 + snapshot* constant
      * no
      */
-    private void memoryCalculate(){
-        memory = this.eventCounter*12 + 12*template.getQueries().size();
+    public void memoryCalculate(){
+        for (Event e: events){
+            if (e.eventType.isShared){
+                memory +=12;
+            }else {
+                memory += e.eventType.getQids().size()*12;
+            }
+        }
+        memory +=12*template.getQueries().size();
     }
 
     /**
@@ -224,7 +288,7 @@ public class Graph implements Observable{
         notifyObservers();
     }
 
-    public void finishingLastNotify(){
+    public void finishingNonshared(){
         observers.forEach(observer -> observer.finishNotify(this.activeFlag));
 
     }

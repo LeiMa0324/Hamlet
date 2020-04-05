@@ -9,15 +9,15 @@ import java.math.BigInteger;
 import java.util.HashMap;
 
 /**
- * Snapshot only maintains a hashmap for counts in each query
+ * Snapshot only maintains a hashmap for interCounts in each query
  * two kinds of updates:
- *      1. if this is the first snapshot this Graph has, snapshot <- unshared graphlet's counts
+ *      1. if this is the first snapshot this Graph has, snapshot <- unshared graphlet's interCounts
  *      2. if this is not the first snapshot, new snapshot = old snapshot*coeff + predecessors'
- *      .counts
+ *      .interCounts
  */
 @Data
 public class Snapshot {
-    // qid: counts
+    // qid: interCounts
     private HashMap<Integer, BigInteger> counts;
 
     public Snapshot(){
@@ -26,15 +26,17 @@ public class Snapshot {
     }
 
     /**
-     * for certain qid, update the counts in the snapshot with the shared Graphlet and the non-shared Graphlet
+     * for certain qid, update the interCounts in the snapshot with the shared Graphlet and the non-shared Graphlet
      * @param coeff the coefficient from the shared Graphlet
      * @param predG a pred Graphlet of query qid
      * @param qid   the given query id
      */
     public void update(BigInteger coeff, NonSharedGraphlet predG, Integer qid){
-        BigInteger old_count = this.counts.get(qid);
+        if (!counts.isEmpty()){
+            BigInteger old_count = this.counts.get(qid);
+            this.counts.put(qid,old_count.multiply(coeff.add(new BigInteger("1"))).add(predG.interCounts.get(qid)));
+        }
 
-        this.counts.put(qid,old_count.multiply(coeff.add(new BigInteger("1"))).add(predG.getCounts().get(qid)));
     }
 
     /**
@@ -45,7 +47,7 @@ public class Snapshot {
      */
     public void update(NonSharedGraphlet predG, Integer qid){
 
-        this.counts.put(qid,predG.getCounts().get(qid));
+        this.counts.put(qid,predG.interCounts.get(qid));
     }
 }
 

@@ -72,7 +72,7 @@ public class Graph {
 			Node new_node = new Node(event);
 			int newEdges = 0;
 			
-			// Connect this event to all previous compatible events and compute the counts of this node
+			// Connect this event to all previous compatible events and compute the interCounts of this node
 			List<Integer> predecessorTypes = query.getPredecessors(type);
 			
 			for (Integer prType : predecessorTypes) {
@@ -99,7 +99,7 @@ public class Graph {
 				nodes_in_current_second.nodes_per_second.add(new_node);		
 				nodeNumber++;
 			
-				// Update the final counts
+				// Update the final interCounts
 				if (query.isEndType(event.type)) {
 					final_count = final_count.add(new BigInteger(new_node.count+""));
 				}

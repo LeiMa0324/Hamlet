@@ -14,18 +14,17 @@ each unshared event type has an unshared graphlet
  Maintains:
  1. is this shared
  2. the event type of this graphlet
- 3. the counts for each query
+ 3. the interCounts for each query
  */
 
 @Data
 @EqualsAndHashCode(callSuper=false)
 public class NonSharedGraphlet extends Graphlet{
 
-    public final EventType eventType;        // the event type of this graphlet
     private Integer eventNum;
-    private HashMap<Integer, BigInteger> counts;
+    private HashMap<Integer, BigInteger> predInterCounts;    //intermediate final interCounts of the pred graphlet
     public HashMap<Integer, Boolean> isCalculated;
-    private HashMap<Integer, BigInteger> predCounts;
+
 
 
     /**
@@ -35,10 +34,10 @@ public class NonSharedGraphlet extends Graphlet{
     public NonSharedGraphlet(Event e){
         super();
         this.eventType = e.eventType;
-        this.counts = new HashMap<Integer, BigInteger>();
-        this.predCounts = new HashMap<>();
+        this.interCounts = new HashMap<Integer, BigInteger>();
+        this.predInterCounts = new HashMap<>();
         for (Integer q: eventType.getQids()){
-            counts.put(q,new BigInteger("0"));
+            interCounts.put(q,new BigInteger("0"));
         }
         this.isShared = false;
         this.eventNum = new Integer(0);
@@ -50,15 +49,18 @@ public class NonSharedGraphlet extends Graphlet{
         addEvent(e);
     }
 
+    /**
+     * update the count for this graphlet when switching graphlet
+     */
     public void updateCounts(){
         //for start type, count = num of events
         for (Integer qid: eventType.getQids()){
             if (eventType.getTypebyQid(qid).equals("START")){
-                counts.put(qid, new BigInteger(eventNum+""));
+                interCounts.put(qid, new BigInteger(eventNum+""));
 
             }else {
                 // not start type, count = pred count* event number
-                counts.put(qid, predCounts.get(qid).multiply(new BigInteger(eventNum+"")));
+                interCounts.put(qid, predInterCounts.get(qid).multiply(new BigInteger(eventNum+"")));
             }
         }
     }
@@ -99,9 +101,9 @@ public class NonSharedGraphlet extends Graphlet{
 
         stringBuilder.append(String.format("\n%-18s %-5s", "Is shared: ", "No"));
         stringBuilder.append("\nCounts:");
-        for (Integer q: counts.keySet()){
+        for (Integer q: interCounts.keySet()){
             stringBuilder.append(String.format("\n%23s %-5s", "qid: ", q+","));
-            stringBuilder.append("count: "+ counts.get(q));
+            stringBuilder.append("count: "+ interCounts.get(q));
         }
         return stringBuilder.toString();
     }
