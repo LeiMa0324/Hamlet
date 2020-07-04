@@ -141,7 +141,6 @@ public class Sharon extends TransactionMQ {
             // print final interCounts
             for (int i=0; i<numQueries; i++) {
                 final_counts[i] = new BigInteger(count + "");
-                System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
             }
 
             long end =  System.currentTimeMillis();

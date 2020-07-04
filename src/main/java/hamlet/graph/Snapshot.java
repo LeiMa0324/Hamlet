@@ -49,5 +49,18 @@ public class Snapshot {
 
         this.counts.put(qid,predG.interCounts.get(qid));
     }
+
+    /**
+     * create a snapshot in the shared graphlet
+     *
+     * @param qid   the given query id
+     */
+    public void updatewithPredicate(BigInteger coeff,Integer qid){
+
+        BigInteger old_count = this.counts.get(qid);
+        //for first snap shot = coeff
+        old_count = old_count.equals(new BigInteger("0"))?coeff:old_count;
+        this.counts.put(qid,old_count.multiply(coeff.add(new BigInteger("1"))));
+    }
 }
 

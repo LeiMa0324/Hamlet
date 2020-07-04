@@ -2,12 +2,12 @@ package hamlet.graphlet;
 
 import hamlet.event.Event;
 import hamlet.graph.Snapshot;
-import hamlet.template.EventType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * The graphlet of the shared events
@@ -20,10 +20,11 @@ import java.util.HashMap;
  */
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class SharedGraphlet extends Graphlet{
-    private BigInteger coeff;
-    private boolean calculated;
+     BigInteger coeff;
+     boolean calculated;
 
 
     public SharedGraphlet(Event e){
@@ -58,15 +59,33 @@ public class SharedGraphlet extends Graphlet{
 
     }
 
+    public void addEvents(ArrayList<Event> batch){
+        this.eventList.addAll(batch);
+        this.coeff = new BigInteger("2").pow(eventList.size()).subtract(new BigInteger("1"));
+    }
 
+    /***
+     * update the intermediate counts when finishing this graphlet，
+     * called by finishingGraphlet
+     * @param snapshot
+     */
     public void updateCounts(Snapshot snapshot){
+
         if (!snapshot.getCounts().isEmpty()){
             for (Integer q: eventType.getQids()){
+                // if the shared event is the start event, inter count = coeff
+                if (eventType.getTypes().get(q).equals("START")||eventType.getTypes().get(q).equals("START|END")){
+                    interCounts.put(q, coeff);
+                }else {
+                    //if not stat event, inter count = snapshot * coeff
                 interCounts.put(q, snapshot.getCounts().get(q).multiply(coeff));
+                }
             }
         }
 
     }
+
+
 
     /**
      * return true when event can be added to this graphlet
@@ -100,8 +119,6 @@ public class SharedGraphlet extends Graphlet{
 
     @Override
     public void finishNotify(Object object){
-
-
     }
 
     @Override

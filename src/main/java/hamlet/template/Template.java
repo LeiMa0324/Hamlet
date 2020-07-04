@@ -1,5 +1,6 @@
 package hamlet.template;
 
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.Data;
 
 
@@ -35,16 +36,25 @@ public class Template {
             for(int i=0;i<records.size();i++){
                 String e = records.get(i).replace("+","");
                 String type="";
-                type = i==0?"START":"REGULAR";
-                if (type.equals("START")){
+                //if length is 1, stat is end
+                if (i==0&&records.size()==1){
+                    type = "START|END";
                     startEvents.add(e);
+
+                }
+                else {
+                    type = i == 0 ? "START" : "REGULAR";
+                    if (type.equals("START")) {
+                        startEvents.add(e);
+                    }
+
+                    type = i == records.size() - 1 ? "END" : type;
                 }
 
-                type = i==records.size()-1?"END":type;
                 if (eventTypeExists(e)){        //if event type exists
                     EventType et = getEventTypebyString(e);      //set its type
                     et.addType(qid,type);       //set end queries
-                    if (type.equals("END")){
+                    if (type.equals("END")||type.equals("START|END")){
                         et.addEndQuery(qid);
 
                     }
@@ -57,7 +67,7 @@ public class Template {
                 }else {     //if not exists
                     EventType et = new EventType(e,sharedEvents.contains(e),qid);   //new an event type
                     et.addType(qid, type);          //set its type
-                    if (type.equals("END")){ //set end queries
+                    if (type.equals("END")||type.equals("START|END")){ //set end queries
                         et.addEndQuery(qid);
 
                     }
@@ -69,16 +79,6 @@ public class Template {
             qid++;
         }
 
-//        StringBuilder msg = new StringBuilder("\n======================= TEMPLATE INFO =======================\nQueries:\n");
-//        for (String q: queries){
-//            msg.append(q+"\n");
-//        }
-//        msg.append("\nEvent Types:\n");
-//        for (String s: eventTypes.keySet()){
-//            msg.append(eventTypes.get(s)+"\n");
-//        }
-//
-//        System.out.println(msg);
         }
 
     /**
@@ -92,7 +92,7 @@ public class Template {
                 et.addEdges(qid,et);
             }
 
-            if (!et.getTypebyQid(qid).equals("START")){    // if e is not a start event type, find it's immediate predecessor
+            if (!et.getTypebyQid(qid).equals("START")&&(!et.getTypebyQid(qid).equals("START|END"))){    // if e is not a start event type, find it's immediate predecessor
                 et.addEdges(qid,eventTypeList.get(eventTypeList.size()-1));    // add the immediate predecessor into the edge list
             }
             return et;

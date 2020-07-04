@@ -5,8 +5,8 @@
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="leima.com.HamletDemo.main" target="1.8" />
-      <module name="leima.com.HamletDemo.test" target="1.8" />
+      <module name="leima.com.HamletDemo.main" target="1.7" />
+      <module name="leima.com.HamletDemo.test" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

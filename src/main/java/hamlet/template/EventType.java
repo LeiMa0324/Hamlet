@@ -59,19 +59,25 @@ public class EventType {
      * @param qid
      * @return
      */
+
     public EventType getPred(int qid){
         int index=0;
+
+        EventType pred = null;
+
         if (!edges.isEmpty()&&edges.keySet().contains(qid)){
+
             for (EventType p: edges.get(qid)){
-                if (!p.equals(this)){
+
+                if (!p.string.equals(this.string)){
                     index = edges.get(qid).indexOf(p);
+                    pred = edges.get(qid).get(index);
 
                 }
 
             }
-            return edges.get(qid).get(index);
         }
-        else return null;
+        return pred;
     }
 
     public void addType(int qid, String type){

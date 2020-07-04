@@ -22,7 +22,7 @@ public class Generator {
 
         //NYC Taxi workload
         for (int l=10; l<110; l+=10){
-            generateWorkload(l, 3, 2, false, false,true);
+            generateWorkload(l, 3, 0, true, false,true);
 
         }
 //        generateStream_vary_sharedNum();

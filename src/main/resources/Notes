@@ -1,52 +1,15 @@
- * Questions:
- *          1. how to compare the memory of greta and hamlet
- *          2. Trend count computation implementation is about predicates, right?
- *          3. update final count is implemented differently, now when a shared graphlet is finished, we update the final count,
- *          event type is not considered.
- *          4. no snapshot table, only one snapshot is maintained has a hashtable for different queries.
- *          5. cannot process non-shared kleenes
 
 
 
-        // TODO: add experiment of number of queries(lat, memory, throughput), compare shraon, greta, hamlet, MCEP.
-        // using synthetic data，到底用Allison的data，改hamlet，还是改sharon,MCEP, 用我的stream/workload
 
-        //TODO:  then real-dataset，compare stock dataset with physical, choose a better one, can use a subset of original data,
-        //        //  find a best stream in the data stream, NYC TAXI, at least 2. sounds large, many features
-        // TODO: 2020/2/28 events with same timestamp should have no predecessor relationship
-        // TODO: DEBS dataset
+        //finished : Memory: number of event* number of queries that this event is in
+        //finished : EACH EXPERIMENT, run 3 times, Take average
+        //finished : Event types only appear once in a query
 
-        //TODO: Memory: number of event* number of queries that this event is in
-        //TODO: EACH EXPERIMENT, run 3 times, Take average
-
-        //TODO:Memory calculation: Actual peak: monitor heap size(START WITH SAMPLE)
-
-        //todo: Event types only appear once
-
- update:
-    fix the bug of queries length more than 2
-    test case of comparing Hamlet and Greta
-    adapt Sharon to new workloads
+        //keep the current processing of NYC dataset
 
 
-    SYNTHETIC DATA
-    	LOWER:
-    		HAMELT,GRETA,SHARON, MCEP
-    		3 QUERIES
-    	HIGHER:
-    		HAMELT GRETA
-    		20-100 QUERIES(DIVERSE LENGTH)
+        1. Hamlet ran so fast on NYCTaxi/SmartHome, latency looks not stable(too few event types in the query)
+        2. memory is not growing with the number of queries. only one relevant event type for each query
 
 
-
-    NYC TAXI
-    	HIGHER:
-
-
-    DEBS DATASET
-    	HIGHER:
-
-    OPTIMIZER
-
-  update:
-    event type only appear once

@@ -1,6 +1,7 @@
 package hamlet.graph;
 
 import hamlet.event.Event;
+import hamlet.event.StreamLoader;
 import hamlet.graphlet.Graphlet;
 import hamlet.graphlet.NonSharedGraphlet;
 import hamlet.graphlet.SharedGraphlet;
@@ -33,17 +34,17 @@ import java.util.Scanner;
 public class Graph implements Observable{
 
 
-    private ArrayList<Observer> observers = new ArrayList();    //observers
-    private Snapshot SnapShot;
-    private final Template template;
-    private HashMap<String, Graphlet> Graphlets;   //a list of Graphlets
-    private SharedGraphlet lastSharedG;
-    private String activeFlag; //the current active Graphlet
-    private ArrayList<Event> events;
-    private HashMap<Integer, BigInteger> finalCount;
-    private long memory;
-    private boolean openMsg;
-    private HashMap<String, Integer> eventCounts;
+     ArrayList<Observer> observers = new ArrayList();    //observers
+     Snapshot SnapShot;
+     final Template template;
+     HashMap<String, Graphlet> Graphlets;   //a list of Graphlets
+     SharedGraphlet lastSharedG;
+     String activeFlag; //the current active Graphlet
+     ArrayList<Event> events;
+     HashMap<Integer, BigInteger> finalCount;
+     long memory;
+     boolean openMsg;
+     HashMap<String, Integer> eventCounts;
 
     /**
      * construct Hamlet.Graph by hamletTemplate
@@ -51,18 +52,17 @@ public class Graph implements Observable{
      */
     public Graph(Template template, String streamFile, int epw, boolean openMsg) {
         this.template = template;
-        this.Graphlets = new HashMap<String, Graphlet>();
+        this.Graphlets = new HashMap<>();
         this.SnapShot = new Snapshot();
         this.activeFlag = "";
-        this.events = new ArrayList<Event>();
-        this.finalCount = new HashMap<Integer, BigInteger>();
+        this.events = new ArrayList<>();
+        this.finalCount = new HashMap<>();
         this.openMsg = openMsg;
-        loadStream(streamFile, epw);    //仅load relevant events
+        this.events = new StreamLoader(streamFile,epw,template).getEvents();
         this.eventCounts = new HashMap<>();
         for (int q=1; q<= template.getQueries().size();q++){
             finalCount.put(q, new BigInteger("0"));
         }
-
 
     }
 
@@ -70,7 +70,9 @@ public class Graph implements Observable{
      * run when reading events from the stream
      */
     public void run() {
+
         for (Event e : events) {
+
             Integer c = eventCounts.keySet().contains(e.string)?eventCounts.get(e.string):0;
             eventCounts.put(e.string, c+1);
 
@@ -87,12 +89,7 @@ public class Graph implements Observable{
                 //initiate new graphlet
                 if (e.eventType.isShared) {  //create a shared G
                     updateSnapshot(e);       //update snapshot
-                    SharedGraphlet sharedG = new SharedGraphlet(e);
-                    lastSharedG = sharedG;  //maintain the last shared G
-
-                    Graphlets.put(e.string, sharedG);
-                    register(sharedG);
-                    setActiveFlag(e.string);    //set the active flag
+                    newSharedGraphlet(e);
 
                 } else {      //create a non shared G
                     NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
@@ -118,39 +115,17 @@ public class Graph implements Observable{
         }
     }
 
-    public void loadStream(String streamFile, int epw){
-        try {    //load the stream into a list of events
-            Scanner scanner = new Scanner(new File(streamFile));
-            int numofEvents = 0;
-            boolean isStarted = false;
+    void newSharedGraphlet(Event e) {
+        SharedGraphlet sharedG = new SharedGraphlet(e);
+        lastSharedG = sharedG;  //maintain the last shared G
 
-            while (scanner.hasNext()&&numofEvents<epw) {
-                String line = scanner.nextLine();
-                String[] record = line.split(",");
-                numofEvents++;
+        Graphlets.put(e.string, sharedG);
+        register(sharedG);
+        setActiveFlag(e.string);    //set the active flag
 
-                //if e is in the template, ignore all dummy events
-                if (!template.eventTypeExists(record[1])) {
-                    continue;
-                }
-                if (!isStarted){
-                    if (template.getStartEvents().contains(record[1])){
-                        isStarted = true;
-                    }
-                    else {
-                        continue;
-                    }
-                }
-                if (isStarted){
-                    Event e = new Event(line, template.getEventTypebyString(record[1]));
-                    this.events.add(e);
-                }
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
+
 
     public boolean finishingGraphlet(){
 
@@ -166,21 +141,25 @@ public class Graph implements Observable{
         }else {
             // update non shared G's count, based on the pred G's count
             NonSharedGraphlet nonsharedG = (NonSharedGraphlet)Graphlets.get(activeFlag);
-
             HashMap<Integer, BigInteger> predcounts = new HashMap<>();
 
             for (Integer qid: nonsharedG.eventType.getQids()){
+
                 EventType pred = nonsharedG.eventType.getPred(qid); //get the pred for one query
+
                 if (pred!=null){
-                    //todo: 如果predG.intercount不为0，则代表已经开始计数，如果为0，则该query还未开始计数
                     //找到predG, update non-shared G's predcounts
+                    //todo: 找到多个pred G而不是一个predG
                     Graphlet predG = Graphlets.get(nonsharedG.eventType.getPred(qid).string);
+
                     BigInteger predcount = new BigInteger("0");
+
                     // if predG appeared before
                     if (!(predG==null)&&!predG.interCounts.get(qid).equals(new BigInteger("0"))){
                         if (predG.isShared){
-                            //TODO: match 所有的kleene，即使中间有其他的数\依旧有问题，要找到5,4,1+,6，在4以后的1的个数作为power，而不是所有的1
+
                             predcount = new BigInteger("2").pow(eventCounts.get(pred.string)).add(new BigInteger("-1"));
+
                         }else {
                             predcount = new BigInteger(eventCounts.get(pred.string)+"");
                         }
@@ -198,7 +177,7 @@ public class Graph implements Observable{
             finishingNonshared();
         }
 
-        updateFinalCount();  //update final count
+        updateFinalCounts();  //update final count
         return true;
 
     }
@@ -214,16 +193,24 @@ public class Graph implements Observable{
         for (Integer qid: e.eventType.getQids()){
 
             EventType pred = e.eventType.getPred(qid); //get the pred for one query
+            if (pred == null){
+                this.SnapShot.getCounts().put(qid, new BigInteger("1"));
+                continue;
+
+            }
+
             NonSharedGraphlet predG =(NonSharedGraphlet) Graphlets.get(pred.string);   //get the Predecessor Graphlet
             //if no pred graphlet it's 0
-            if (predG==null){
-                this.SnapShot.getCounts().put(qid, new BigInteger("0"));
+            if (predG == null){
+                this.SnapShot.getCounts().put(qid, new BigInteger("1"));
 
             }
 
             if (predG!=null&&!predG.getIsCalculated().get(qid)){
+
                 if (lastSharedG==null){        // no snapshot before
                     this.SnapShot.update(predG, qid);
+
                 }else{
                     this.SnapShot.update(lastSharedG.getCoeff(),predG,qid);   //update snapshot
                 }
@@ -231,7 +218,7 @@ public class Graph implements Observable{
             }
         }
 
-//        System.out.println("snapshots: "+SnapShot);
+        System.out.println("snapshots: "+SnapShot);
     }
 
     /**
@@ -247,18 +234,19 @@ public class Graph implements Observable{
      * final count = active Graphlet's intCount
      * @return
      */
-    public boolean updateFinalCount(){
+    void updateFinalCounts(){
         Graphlet activeG = Graphlets.get(activeFlag);
 
         if (activeG.eventType.getEndQueries().isEmpty()){
-            return false;
+        }else {
+
+            for (Integer q : activeG.eventType.getEndQueries()) {
+                BigInteger previousCount = this.finalCount.keySet().contains(q) ? this.finalCount.get(q) : new BigInteger("0");
+                this.finalCount.put(q, previousCount.add(activeG.interCounts.get(q))); // pass the inter count of active G to final count
+            }
         }
 
-        for (Integer q: activeG.eventType.getEndQueries()){
-            BigInteger previousCount = this.finalCount.keySet().contains(q)?this.finalCount.get(q):new BigInteger("0");
-            this.finalCount.put(q, previousCount.add(activeG.interCounts.get(q))); // pass the inter count of active G to final count
-        }
-        return true;
+        System.out.println("final count"+ finalCount);
 
     }
 
@@ -289,7 +277,9 @@ public class Graph implements Observable{
     }
 
     public void finishingNonshared(){
-        observers.forEach(observer -> observer.finishNotify(this.activeFlag));
+        for (Observer obs: observers){
+            obs.finishNotify(this.activeFlag);
+        }
 
     }
 
@@ -307,7 +297,9 @@ public class Graph implements Observable{
      */
     @Override
     public void notifyObservers(){
-        observers.forEach(observer -> observer.activeNotify(this.activeFlag));
+        for (Observer obs: observers){
+            obs.activeNotify(this.activeFlag);
+        }
     }
 
 }

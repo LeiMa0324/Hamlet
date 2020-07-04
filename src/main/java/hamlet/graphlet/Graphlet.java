@@ -3,6 +3,7 @@ package hamlet.graphlet;
 import hamlet.template.EventType;
 import hamlet.utils.*;
 import hamlet.event.Event;
+import lombok.Data;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.HashMap;
  * abstract Graphlet class
  *
  */
-
+@Data
 public abstract class Graphlet implements Observer {
 
     ArrayList<Event> eventList;     // event list
@@ -31,5 +32,6 @@ public abstract class Graphlet implements Observer {
     public abstract void addEvent(Event e);
     public abstract boolean IsCompatibleOf(Event e);
     public abstract void activeNotify(Object object);
+
 
 }

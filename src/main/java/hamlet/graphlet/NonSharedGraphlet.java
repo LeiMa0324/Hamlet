@@ -1,6 +1,7 @@
 package hamlet.graphlet;
 
 import hamlet.event.Event;
+import hamlet.graph.Snapshot;
 import hamlet.template.EventType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,7 +56,7 @@ public class NonSharedGraphlet extends Graphlet{
     public void updateCounts(){
         //for start type, count = num of events
         for (Integer qid: eventType.getQids()){
-            if (eventType.getTypebyQid(qid).equals("START")){
+            if (eventType.getTypebyQid(qid).equals("START")||eventType.getTypebyQid(qid).equals("START|END")){
                 interCounts.put(qid, new BigInteger(eventNum+""));
 
             }else {
@@ -72,6 +73,8 @@ public class NonSharedGraphlet extends Graphlet{
     @Override
     public void addEvent(Event e){
         eventNum++;
+        this.eventList.add(e);
+
 
     }
 
