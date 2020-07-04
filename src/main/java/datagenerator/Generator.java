@@ -54,7 +54,7 @@ public class Generator {
         String dataset = isSynthetic?"Synthetic":"NYCTaxi";
         String folder = isBaseline?"BaselineQueries":"HamletGretaQueries";
 
-        queryFile = String.format("src/main/resources/"+dataset+"/Queries/"+folder+"/Workload_size_%d_len_%d_pos_%d.txt",num,length,sharedPos);
+        queryFile = String.format("src/main/resources/"+dataset+"/Queries/"+folder+"/Workload_size_%d_len_%d_pos_%d.txthaha",num,length,sharedPos);
 
         WorkloadTemplate workload = new WorkloadTemplate(num, length, isSynthetic?14:10, sharedPos,  queryFile,isSynthetic?2:1, isDiverse);
         workload.generate();
