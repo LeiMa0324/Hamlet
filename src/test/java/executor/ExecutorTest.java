@@ -19,13 +19,13 @@ import static org.junit.Assert.assertEquals;
 public class ExecutorTest {
 
     /**
-     * the test case for the example in the paper
+     * the main case for the example in the paper
      */
     @Test
     public void Hamlet_FinalCount_Test(){     //
 
-        String streamFile = "src/test/resources/Paper_TestStream.txt";
-        String queryFile = "src/test/resources/Paper_TestQueries.txt";
+        String streamFile = "src/main/resources/Paper_TestStream.txt";
+        String queryFile = "src/main/resources/Paper_TestQueries.txt";
 
         int epw = 100;
         Executor executor = new Executor(streamFile, queryFile, epw, true);
@@ -50,8 +50,8 @@ public class ExecutorTest {
         int epw = 100;
 //
         //paper exsample
-        String paper_streamFile = "src/test/resources/Paper_TestStream.txt";
-        String paper_queryFile = "src/test/resources/Paper_TestQueries.txt";
+        String paper_streamFile = "src/main/resources/Paper_TestStream.txt";
+        String paper_queryFile = "src/main/resources/Paper_TestQueries.txt";
         Executor paper_executor = new Executor(paper_streamFile, paper_queryFile, epw, true);
         paper_executor.run(false);       //run
         System.out.println(paper_executor.getGreta().finalcount);
@@ -68,8 +68,8 @@ public class ExecutorTest {
         int epw = 100;
 //
         //synthetic example
-//        String syn_queryFile = "src/test/resources/Syn_TestQuery.txt";
-//        String syn_streamFile = "src/test/resources/Syn_TestStream.txt";
+//        String syn_queryFile = "src/main/resources/Syn_TestQuery.txt";
+//        String syn_streamFile = "src/main/resources/Syn_TestStream.txt";
 
         String syn_queryFile = "src/main/java/baselines/mcep/Queries.txt";
         String syn_streamFile = "src/main/java/baselines/mcep/Stream.txt";
@@ -90,7 +90,7 @@ public class ExecutorTest {
 
         int epw = 100;
         //nyc example
-        String nyc_queryFile = "src/test/resources/NYC_TestQuery.txt";
+        String nyc_queryFile = "src/main/resources/NYC_TestQuery.txt";
         String nyc_streamFile = "src/main/resources/NYCTaxi/Streams/Taxi_stream.csv";
 
 
@@ -108,8 +108,8 @@ public class ExecutorTest {
 
         int epw = 50000;
         //nyc example
-//        String nyc_queryFile = "src/test/resources/SmartHome_TestQuery.txt";
-//        String nyc_streamFile = "src/test/resources/SmartHome_TestStream.txt";
+//        String nyc_queryFile = "src/main/resources/SmartHome_TestQuery.txt";
+//        String nyc_streamFile = "src/main/resources/SmartHome_TestStream.txt";
         String nyc_queryFile = "src/main/resources/SmartHome/Queries/HamletGretaQueries/Workload_size_70_len_3_pos_2.txt";
         String nyc_streamFile = "src/main/resources/SmartHome/Streams/Home_stream.csv";
 
@@ -128,8 +128,8 @@ public class ExecutorTest {
 //        int epw = 7;
 //        int batchsize = 4;
 //        int snapshots = 7;
-//        String queryFile = "src/test/resources/Decision_TestQuery.txt";
-//        String streamFile = "src/test/resources/Decision_TestStream.txt";
+//        String queryFile = "src/main/resources/Decision_TestQuery.txt";
+//        String streamFile = "src/main/resources/Decision_TestStream.txt";
 ////        String streamFile = "src/main/resources/NYCTaxi/Streams/Taxi_stream.csv";
 //
 //
@@ -178,8 +178,8 @@ public class ExecutorTest {
 //        int batchsize = 4;
 //        int snapshots = 7;
 //
-//        String queryFile = "src/test/resources/Decision_TestQuery.txt";
-//        String streamFile = "src/test/resources/Decision_TestStream.txt";
+//        String queryFile = "src/main/resources/Decision_TestQuery.txt";
+//        String streamFile = "src/main/resources/Decision_TestStream.txt";
 ////        String streamFile = "src/main/resources/NYCTaxi/Streams/Taxi_stream.csv";
 //
 //

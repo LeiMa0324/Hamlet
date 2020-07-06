@@ -1,14 +1,6 @@
 package baselines.mcep;
 
-import executor.Executor;
 import executor.Experiment;
-import hamlet.graph.prefixGraph;
-import hamlet.template.Template;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class testMCEP {
 
@@ -18,7 +10,6 @@ public class testMCEP {
 
 //        experiment.varyEventsPerWindow();
         experiment.varyNumofQueries();
-        experiment.varyNumOfSharedEvents();
 
 //        String queryFile = "src/main/resources/Synthetic/Queries/BaselineQueries/Workload_size_15_len_3_pos_2.txt";
 //        String streamFile = "src/main/resources/Synthetic/Streams/Stream_shared_10.txt";

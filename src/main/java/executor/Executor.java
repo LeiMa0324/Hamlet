@@ -3,53 +3,70 @@ package executor;
 import baselines.commons.event.Stream;
 import baselines.commons.event.StreamPartitioner;
 import baselines.commons.templates.SingleQueryTemplate;
-import baselines.greta.GretaMQ;
 import baselines.commons.transactions.TransactionMQ;
-//import baselines.sharon.newSharon;
+import baselines.greta.GretaMQ;
 import baselines.mcep.McepGraph;
 import baselines.sharon.Sharon;
-import hamlet.graph.*;
+import hamlet.graph.DynamicGraph;
+import hamlet.graph.Graph;
+import hamlet.graph.StaticGraph;
+import hamlet.graph.prefixGraph;
 import hamlet.template.Template;
 import lombok.Data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+//import baselines.sharon.newSharon;
+
 //import java.util.ArrayList;
 
 
 /**
- * Executor takes settings of the experiment to run hamlet and greta once
+ * Executor includes executions of all the approaches.
+ * It takes settings of the stream file, workload, epw etc. to run the corresponding models together once
+ * and store the throughput and latency, memory of each model.
+ * 
+ * It's called in the experiment.
  */
 @Data
 public class Executor {
 	/**
-	 * settings of experiment
+	 * global settings of the execution
 	 */
+	//the stream file
 	private String streamFile;
+
+	//the workload file
 	private String queryFile;
-	private String throuputFile;
-	private String latencyFile;
-	private String memoryFile;
+	
+	//the queries in the workload
 	private ArrayList<String> queries;
+	
+	//the events per window
 	private int epw;
+	
 	/**
 	 * settings of hamlet
 	 */
+	//hamlet template
 	private Template hamletTemplate;
+	
+	//hamlet graph
 	private Graph hamletG;
-
-
+	
 	/**
-	 * greta
+	 * settings of greta
 	 */
+	//greta executor
 	private GretaMQ greta;
+	
+	
 	/**
 	 * latency, memory of each model
 	 */
@@ -64,22 +81,33 @@ public class Executor {
 	private long mcepMemory;
 
 	/**
-	 * static and dynamic hamlet
+	 * settings of static and dynamic hamlet
 	 */
+	
+	//static hamlet graph
 	private StaticGraph staticHamlet;
+
+	//dynamic hamlet graph
+	private DynamicGraph dynamicHamelt;
+	
 	private long staticHamletLatency;
 	private long staticHamletMemory;
-
-	private DynamicGraph dynamicHamelt;
 	private long dynamicHamletLatency;
 	private long dynamicHamletMemory;
 
-
+	/**
+	 * the constructor of executor
+	 * @param streamFile the stream file
+	 * @param queryFile the workload file
+	 * @param epw the events per window
+	 * @param openMsg 
+	 */
 	public Executor(String streamFile, String queryFile,  int epw, boolean openMsg){
 		this.streamFile = streamFile;
 		this.queryFile = queryFile;
 		this.epw = epw;
 		this.queries = new ArrayList<>();
+
 		//read query file
 		try {
 			Scanner query_scanner = new Scanner(new File(queryFile));
@@ -90,8 +118,10 @@ public class Executor {
 		} catch(FileNotFoundException e) {e.printStackTrace();}
 
 
-		//Hamlet
+		//initiate Hamlet
 		this.hamletTemplate = new Template(queries);
+
+		// TODO: 2020-07-05 统一graph 
 		this.hamletG = new prefixGraph(hamletTemplate,streamFile, epw, openMsg);
 		this.sharonLatency = -1;
 		this.mcepLatency = -1;
@@ -101,12 +131,15 @@ public class Executor {
 	}
 
 	/**
-	 * run hamlet, greta, sharon, mcep and log
+	 * Hamlet versus state-of-the-art approaches
+	 * run hamlet, greta（sharon, mcep）once
+	 * @param isBaseline whether to run sharon and mcep
 	 */
 	public void run(boolean isBaseline){
 
 	    hamletRun();		//run hamlet
 		gretaRun();			//run greta
+
 		if (isBaseline){
 			sharonRun();	//run sharon
 			mcepRun();	//run mcep
@@ -116,39 +149,62 @@ public class Executor {
 	}
 
 	/**
-	 * run static and dynamic hamlet
-	 * @param batchsize
+	 * Dynamic versus Static Sharing Decision
+	 * run static and dynamic hamlet once
+	 * @param burstsize the burst size
+	 * @param snapshotNum the number of snapshots
 	 */
-	public void decisionRun(int batchsize, int snapshotNum){
-		staticHamletRun(batchsize, snapshotNum);
-		dynamicHamletRun(batchsize, snapshotNum);
+	public void decisionRun(int burstsize, int snapshotNum){
+		staticHamletRun(burstsize, snapshotNum);
+		dynamicHamletRun(burstsize, snapshotNum);
 	}
 
-	public void staticHamletRun( int batchsize, int snapshotNum){
-		//static and dynamic Hamlet
-		staticHamlet = new StaticGraph(this.hamletTemplate, streamFile, epw,batchsize,snapshotNum,0.6,false);
-		long start =  System.currentTimeMillis();
-		staticHamlet.staticRun();
-		staticHamlet.memoryCalculate();	//calculate the memory
+	/**
+	 * single run of the static hamlet
+	 * @param burstsize the burst size
+	 * @param snapshotNum the number of snapshots
+	 */
+	public void staticHamletRun( int burstsize, int snapshotNum){
 
+		//initiate the static hamlet graph
+		staticHamlet = new StaticGraph(this.hamletTemplate, streamFile, epw,burstsize,snapshotNum,0.6,false);
+		long start =  System.currentTimeMillis();
+
+		//run static hamlet
+		staticHamlet.staticRun();
+		staticHamlet.memoryCalculate();
 		long end = System.currentTimeMillis();
 
+		//calculate the latency
 		this.staticHamletLatency = end - start;
+
+		//calculate the memory
 		this.staticHamletMemory = staticHamlet.getMemory();
 
 		System.out.println("Static Hamlet latency: "+ staticHamletLatency);
 
 	}
 
-	public void dynamicHamletRun(int batchsize, int snapshotNum){
-		//static and dynamic Hamlet
-		dynamicHamelt = new DynamicGraph(this.hamletTemplate, streamFile, epw, batchsize, snapshotNum,0.6,false);
+	/**
+	 * single run of the dynamic hamlet
+	 * @param burstsize the burst size
+	 * @param snapshotNum the number of snapshots
+	 */
+	public void dynamicHamletRun(int burstsize, int snapshotNum){
+
+		//initiate the dynamic hamlet graph
+		dynamicHamelt = new DynamicGraph(this.hamletTemplate, streamFile, epw, burstsize, snapshotNum,0.6,false);
 
 		long start =  System.currentTimeMillis();
+
+		//run dynamic hamlet
 		dynamicHamelt.dynamicRun();
 		long end = System.currentTimeMillis();
 
+		//calculate the latency
 		this.dynamicHamletLatency = end - start;
+
+		//calculate the memory
 		this.dynamicHamletMemory = dynamicHamelt.getMemory();
 
 		System.out.println("Dynamic Hamlet latency: "+ dynamicHamletLatency);
@@ -163,10 +219,16 @@ public class Executor {
 	public void hamletRun(){
 
 		long start =  System.currentTimeMillis();
+
+		//run hamlet
 		hamletG.run();
 
 		long end =  System.currentTimeMillis();
+
+		//calculate the latency
 		hamletLatency = end - start;
+
+		//calculate the memory
 		hamletG.memoryCalculate();
 		hamletMemory = hamletG.getMemory();
 
@@ -178,7 +240,6 @@ public class Executor {
 	/**
 	 * a single run of Greta
 	 */
-
 	public void gretaRun(){
 
 		this.gretaLatency =0;
@@ -190,17 +251,26 @@ public class Executor {
 			Stream stream = sp.partition();
 			TransactionMQ TrS;
 
+			//initiate greta
 			TrS = new GretaMQ(done, latency, memory, sp);
 			this.greta = (GretaMQ)TrS;
 
-			for (int i = 0; i < queries.size(); i++) {      //
+			//add queries into greta's template
+			for (int i = 0; i < queries.size(); i++) {
 				SingleQueryTemplate query = new SingleQueryTemplate(queries.get(i));
 				((GretaMQ) TrS).addQuery(query);
 			}
+
+			// run greta
 			TrS.run();
 			done.await();
+
+			//store latency
 			this.gretaLatency = latency.get();
+
+			//store memory
 			this.gretaMemory = ((GretaMQ) TrS).memory.longValue();
+
 			System.out.println("Greta latency: "+ gretaLatency);
 			System.out.println("Greta Memory: "+ gretaMemory);
 
@@ -208,6 +278,9 @@ public class Executor {
 
 	}
 
+	/**
+	 * a single run of Sharon
+	 */
 	public void sharonRun(){
 
 		try{
@@ -216,6 +289,7 @@ public class Executor {
 			AtomicLong latency = new AtomicLong(0);
 			AtomicInteger memory = new AtomicInteger(0);
 
+			// run sharon for each query
 			for (String q:queries){
 				StreamPartitioner sp = new StreamPartitioner("gen", streamFile, epw);
 				TransactionMQ TrS;
@@ -223,7 +297,11 @@ public class Executor {
 				TrS = new Sharon(stream, done, latency, memory, q, 1);
 				TrS.run();
 				done.await();
+
+				//increment the latency
 				sharonLatency += TrS.latency.get();
+
+				//increment memory
 				sharonMemory += ((Sharon)TrS).memory.get();
 
 			}
@@ -237,18 +315,28 @@ public class Executor {
 	}
 
 
-
+	/**
+	 * a single run of MCEP
+	 */
 	public void mcepRun(){
 
+		//initiate MCEP
 		McepGraph mcepGraph = new McepGraph(this.hamletTemplate, streamFile, epw);
 
 		long start =  System.currentTimeMillis();
+
+		//run MCEP
 		mcepGraph.run();
 		long end =  System.currentTimeMillis();
 
+		//calculate the latency
 		mcepLatency = end - start;
+
+		//calculate the memory
 		mcepGraph.memoryCalculate();
 		this.mcepMemory = mcepGraph.memory;
+
+
 		System.out.println("MCEP latency: "+ mcepLatency);
 		System.out.println("MCEP Memory: "+ mcepMemory);
 

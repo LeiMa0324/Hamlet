@@ -1,61 +1,104 @@
 package executor;
 
 import com.opencsv.CSVWriter;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import sun.print.PSPrinterJob;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
+/**
+ * All the experiments in the paper. Each method is an experiment.
+ * Each experiment run the executor several times, varying the variable of interest,
+ * For each experiment, log the throughput, latency, memory for each model
+ */
+
 public class Experiment {
+
     private boolean isBaseline;
-    private int dataset;   //0: synthetic 1: NYC 2: Smart Home
+    private int dataset;   //0: Ride sharing 1: NYC 2: Smart Home
+
+    //true: running on IDE locally, false: running by jar on a server
     private boolean isLocal;
+
+    //the experiment No.
     private int expNo;
 
-    //Synthetic setting
+    /**
+     * Ride sharing datatset experiment setting
+     * hamlet, Greta, Sharon, MCEP
+     * Figure 14, 16
+     */
+
+    //default number of shared events per graphlet
     private static int SYN_NUMBER_OF_SHARED = 10;
+
+    //default stream file for Ride Sharing dataset
     private static String SYN_DEFAULT_STREAM;
-    //syn-baseline
+
+    //default events per window for Ride Sharing dataset
     private static Integer SYN_BASELINE_DEFAULT_EPW = 5000;
+
+    //default workload for Ride Sharing dataset
     private static String SYN_BASELINE_DEFAULT_WORKLOAD ;
-    //syn-hamlet and Greta
-    private static Integer SYN_DEFAULT_EPW = 50000;
-    private static String SYN_DEFAULT_WORKLOAD ;
 
 
-    //NYC Taxi setting
+    /**
+     * NYC Taxi datatset experiment setting
+     * hamlet, Greta
+     * Figure 15
+     */
+
+    //default stream file for NYC Taxi dataset
     private  String NYC_DEFAULT_STREAM;
+
+    //default events per window for NYC Taxi dataset
     private static Integer NYC_DEFAULT_EPW = 50000;
+
+    //default workload for NYC Taxi dataset
     private static String NYC_DEFAULT_WORKLOAD ;
 
-    //Smart home setting
+    /**
+     * Smart Home datatset experiment setting
+     * hamlet, Greta
+     * Figure 15
+     */
+
+    //default stream file for Smart Home dataset
     private  String SH_DEFAULT_STREAM;
+
+    //default events per window for Smart Home dataset
     private static Integer SH_DEFAULT_EPW = 50000;
+
+    //default workload for Smart Home dataset
     private static String SH_DEFAULT_WORKLOAD ;
 
-    //Dynamic home setting
+    /**
+     * Dynamic hamlet experiment setting
+     * static hamlet, dynamic hamlet
+     * Figure 17
+     */
 
-
+    // default events per window
     private static Integer DYN_DEFAULT_EPW = 10000;
+
+    //default burst size
     private static Integer DYN_DEFAULT_BATCHSIZE = 500;
+
+    //default number of snapshots representing the predicates
     private static Integer DYN_DEFAULT_SNAPSHOTS = 50;
+
+    //default workload
     private static String DYN_DEFAULT_WORKLOAD ;
-
-
 
 
     static HashMap<Integer, String> datasetHash;
     static
     {
         datasetHash = new HashMap<Integer, String>();
-        datasetHash.put(0, "Synthetic");
+        datasetHash.put(0, "RideSharing");
         datasetHash.put(1, "NYCTaxi");
         datasetHash.put(2, "SmartHome");
 
@@ -63,10 +106,10 @@ public class Experiment {
 
     /**
      *
-     * @param dataset   select the dataset //0: synthetic 1: NYC 2: smart home
-     * @param isBaseline running baselines or hamlet VS.Greta
+     * @param dataset   select the dataset //0: Ride sharing 1: NYC 2: smart home
+     * @param isBaseline running baselines(Hamlet, Greta, Sharon, MCEP) or just hamlet VS.Greta
      * @param expNo the experiment no
-     * @param isLocal   is running on IDE or by a jar
+     * @param isLocal   is running on IDE locally or by a jar on a server
      */
 
     public Experiment(int dataset, boolean isBaseline, int expNo, boolean isLocal){
@@ -74,16 +117,17 @@ public class Experiment {
         this.isBaseline = isBaseline;
         this.expNo = expNo;
         System.out.println("Dataset: "+ datasetHash.get(dataset));
-        String experiemntName = isBaseline?"Baseline":"Hamelt And Greta";
+        String experiemntName = isBaseline?"Baseline":"Hamlet And Greta";
         System.out.println(experiemntName+" Experiment started!");
         this.isLocal = isLocal;
 
-        //local running
+
+
 
         if (this.isLocal){
+            //local running
             SYN_DEFAULT_STREAM = String.format("src/main/resources/Synthetic/Streams/Stream_shared_%d.txt", SYN_NUMBER_OF_SHARED);
             SYN_BASELINE_DEFAULT_WORKLOAD = "src/main/resources/Synthetic/Queries/BASELINE_DEFAULT_WORKLOAD.txt";
-            SYN_DEFAULT_WORKLOAD = "src/main/resources/Synthetic/Queries/HAMLET_DEFAULT_WORKLOAD.txt";
 
             NYC_DEFAULT_STREAM = "src/main/resources/NYCTaxi/Streams/Taxi_stream.csv";
             NYC_DEFAULT_WORKLOAD = "src/main/resources/NYCTaxi/Queries/HAMLET_DEFAULT_WORKLOAD.txt";
@@ -94,11 +138,10 @@ public class Experiment {
             DYN_DEFAULT_WORKLOAD = "src/main/resources/NYCTaxi/Queries/HamletGretaQueries/Workload_size_50_len_3_pos_2.txt";
 
 
-        }else { //running by jar
+        }else { //running by jar on the server
 
             SYN_DEFAULT_STREAM = String.format("Synthetic/Streams/Stream_shared_%d.txt", SYN_NUMBER_OF_SHARED);
             SYN_BASELINE_DEFAULT_WORKLOAD = "Synthetic/Queries/BASELINE_DEFAULT_WORKLOAD.txt";
-            SYN_DEFAULT_WORKLOAD = "Synthetic/Queries/HAMLET_DEFAULT_WORKLOAD.txt";
 
             NYC_DEFAULT_STREAM = "NYCTaxi/Streams/Taxi_stream.csv";
             NYC_DEFAULT_WORKLOAD = "NYCTaxi/Queries/HAMLET_DEFAULT_WORKLOAD.txt";
@@ -114,45 +157,11 @@ public class Experiment {
 
     }
 
-    /**
-     * Only for synthetic data
-     * Experiment1: fix epw, vary shared events per graphlet
-     *
-     */
-
-    public void varyNumOfSharedEvents(){
-        String queryFile = "";
-        Integer epw = 0;
-
-        queryFile = isBaseline? SYN_BASELINE_DEFAULT_WORKLOAD : SYN_DEFAULT_WORKLOAD;
-        epw = isBaseline?SYN_BASELINE_DEFAULT_EPW: SYN_DEFAULT_EPW;
-
-        for (int iter =1;iter<4;iter++){
-            System.out.println("Vary Number of Shared Events.....");
-            for (int numofShared = 5; numofShared<31;numofShared+=5){
-                System.out.println("====================Iter: "+iter+" number of Bs: "+numofShared+" ====================");
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-                System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
-                String streamFile = isLocal?String.format("src/main/resources/Synthetic/Streams/Stream_shared_%d.txt",numofShared):
-                        String.format("Synthetic/Streams/Stream_shared_%d.txt",numofShared);
-
-                Executor executor = new Executor(streamFile, queryFile, epw, false);
-                executor.run(isBaseline);
-
-                //log setting
-                String file = "EXP_"+expNo+"_varyNumOfSharedEvents.csv";
-                String dataset = datasetHash.get(this.dataset);
-                String output = isBaseline?dataset+"/Baselines/"+file:dataset+"/HamletGreta/"+file;
-                //log
-                logging(executor, numofShared, iter,output);
-
-        }
-        }
-    }
 
     /**
-     * for Synthetic and NYC
-     * Experiment2: vary epw
+     * Hamlet versus State-of-the-art Approaches
+     * vary events per window(epw), fix number of shared events per graphlet, # of queries
+     * Figure 14.a, 14.c, 15.a, 15.c, 16.a
      */
     public void varyEventsPerWindow(){
 
@@ -162,22 +171,25 @@ public class Experiment {
         int end_epw = 0;
         int step_epw =0;
 
+        /**
+         * select data set and the epw setting for each datat set
+         */
         switch (this.dataset){
-            case 0: //synthetic
-                queryFile = isBaseline? SYN_BASELINE_DEFAULT_WORKLOAD : SYN_DEFAULT_WORKLOAD;
+            case 0: //Ride sharing
+                queryFile = SYN_BASELINE_DEFAULT_WORKLOAD;
                 streamFile = SYN_DEFAULT_STREAM;
                 start_epw = isBaseline?4000: 40000;
                 end_epw = isBaseline?11000: 110000;
                 step_epw = isBaseline?1000: 10000;
                 break;
-            case 1: //nyc
+            case 1: //NYC Taxi
                 queryFile = NYC_DEFAULT_WORKLOAD;
                 streamFile = NYC_DEFAULT_STREAM;
                 start_epw = 40000;
                 end_epw = 110000;
                 step_epw = 10000;
                 break;
-            case 2: //smart home
+            case 2: //Smart Home
                 queryFile = SH_DEFAULT_WORKLOAD;
                 streamFile = SH_DEFAULT_STREAM;
                 start_epw = 40000;
@@ -191,22 +203,23 @@ public class Experiment {
 
         // run three times
         for (int iter =1;iter<4;iter++) {
-
+            // iterate over the epw
             for (int epw = start_epw; epw < end_epw; epw += step_epw) {
 
                 System.out.println("====================Iter:"+iter+" Evernts per Window: " + epw + "====================");
-                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-                System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                System.out.println(df.format(new Date()));
                 System.out.println("query file:"+queryFile);
                 System.out.println("stream file"+streamFile);
 
+                // run the executor with corresponding settings
                 Executor executor = new Executor(streamFile, queryFile, epw, false);
                 executor.run(isBaseline);
 
                 //log setting
                 String file = "EXP_" + expNo + "_varyEPW.csv";
                 String dataset = datasetHash.get(this.dataset);
-                String output = isBaseline ? dataset + "/Baselines/" + file : dataset + "/HamletGreta/" + file;
+                String output = dataset + "/" + file;
                 //log
                 logging(executor, this.dataset==0 ? SYN_NUMBER_OF_SHARED : -1,iter, output);
 
@@ -216,8 +229,9 @@ public class Experiment {
     }
 
     /**
-     * for Synthetic and NYC
-     * Experiment3: fix # of shared events, number of shared events, vary num of queries
+     * Hamlet versus State-of-the-art Approaches
+     * vary num of queries, fix epw, number of shared events per graphlet
+     * Figure 14.b, 14.d, 15.b, 15.d, 16.b
      */
     public void varyNumofQueries(){
         int epw = 0;
@@ -227,10 +241,12 @@ public class Experiment {
 
         String streamFile = "";
 
-
+        /**
+         * select data set and the epw setting for each datat set
+         */
         switch (this.dataset){
-            case 0: //synthetic
-                epw = isBaseline?SYN_BASELINE_DEFAULT_EPW: SYN_DEFAULT_EPW;
+            case 0: //Ride sharing
+                epw = SYN_BASELINE_DEFAULT_EPW;
                 streamFile = SYN_DEFAULT_STREAM;
                 break;
             case 1: //nyc
@@ -249,78 +265,65 @@ public class Experiment {
         endnumofQ = isBaseline?25:100;
         stepnumofQ = isBaseline?5:10;
 
-        // run each experiment three times
+        // run three times
         for (int iter=1;iter<4;iter++){
 
-        System.out.println("Vary Number of Queries.....");
+            System.out.println("Vary Number of Queries.....");
+            // varying number of queries
+            for (int numofQ = startnumofQ; numofQ<=endnumofQ;numofQ+=stepnumofQ){
 
-        for (int numofQ = startnumofQ; numofQ<=endnumofQ;numofQ+=stepnumofQ){
+                System.out.println("====================Iter: "+iter+" Number of Queries: "+numofQ+"====================");
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                System.out.println(df.format(new Date()));
+                String folder = isBaseline?"BaselineQueries":"HamletGretaQueries";
+                String dataset = datasetHash.get(this.dataset);
+                String queryFile =isLocal?String.format("src/main/resources/"+dataset+"/Queries/"+folder+"/Workload_size_%d_len_3_pos_2.txt",numofQ):
+                        String.format(dataset+"/Queries/"+folder+"/Workload_size_%d_len_3_pos_2.txt",numofQ);
 
-            System.out.println("====================Iter: "+iter+" Number of Queries: "+numofQ+"====================");
-            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//设置日期格式
-            System.out.println(df.format(new Date()));// new Date()为获取当前系统时间
-            String folder = isBaseline?"BaselineQueries":"HamletGretaQueries";
-            String dataset = datasetHash.get(this.dataset);
-            String queryFile =isLocal?String.format("src/main/resources/"+dataset+"/Queries/"+folder+"/Workload_size_%d_len_3_pos_2.txt",numofQ):
-                    String.format(dataset+"/Queries/"+folder+"/Workload_size_%d_len_3_pos_2.txt",numofQ);
+                Executor executor = new Executor(streamFile, queryFile, epw,  false);
+                executor.run(isBaseline);
+                //log setting
+                String file = "EXP_"+expNo+"_varyNumofQueries.csv";
+                String output = dataset+"/"+file;
+                //log
+                logging(executor, this.dataset==0?SYN_NUMBER_OF_SHARED:-1,iter, output);
 
-            Executor executor = new Executor(streamFile, queryFile, epw,  false);
-            executor.run(isBaseline);
-            //log setting
-            String file = "EXP_"+expNo+"_varyNumofQueries.csv";
-            String output = isBaseline?dataset+"/Baselines/"+file:dataset+"/HamletGreta/"+file;
-            //log
-            logging(executor, this.dataset==0?SYN_NUMBER_OF_SHARED:-1,iter, output);
-
-        }
+            }
         }
     }
 
     /**
-     * dynamic hamlet experiment
+     * Dynamic versus Static Sharing Decision.
+     * vary epw, fix number of queries, number of burst size
+     * Figure 17.a, 17.c
      */
-    public void Dynamic_varyNumofSnapshots(){
-
-        int[] snapshotNums = {20,30,40,50,60,70};
-        String streamFile = NYC_DEFAULT_STREAM;
-        String queryFile = DYN_DEFAULT_WORKLOAD;
-        int epw = DYN_DEFAULT_EPW;
-
-        int batchsize = DYN_DEFAULT_BATCHSIZE;
-
-        for (int iter =1; iter<11;iter++) {
-            for (int snapshot : snapshotNums) {
-                System.out.println("====================number of snapshots:" + snapshot + " ====================");
-                Executor executor = new Executor(streamFile, queryFile, epw, false);
-                executor.decisionRun(batchsize, snapshot);
-                String output = "DynamicHamlet/EXP_" + expNo + "_Dynamic_varyNumofSnapshots.csv";
-                dynamicLogging(executor, snapshot, batchsize, epw, 1, iter, output);
-
-            }
-        }
-
-    }
 
     public void Dynamic_varyEPW(){
 
         String streamFile = NYC_DEFAULT_STREAM;
         String queryFile = DYN_DEFAULT_WORKLOAD;
-        int snapshot = DYN_DEFAULT_SNAPSHOTS;
 
+        int snapshot = DYN_DEFAULT_SNAPSHOTS;
         int start_epw = DYN_DEFAULT_EPW;
         int end_epw = DYN_DEFAULT_EPW*2;
         int step_epw = DYN_DEFAULT_EPW/5;
 
         int batchsize = DYN_DEFAULT_BATCHSIZE;
 
+        // run 10 times
         for (int iter = 1; iter<11;iter++) {
 
+            // varying epw
             for (int epw = start_epw; epw <= end_epw; epw += step_epw) {
                 System.out.println("====================EPW:" + epw + " ====================");
 
                 Executor executor = new Executor(streamFile, queryFile, epw, false);
                 executor.decisionRun(batchsize, snapshot);
+
+                //log file sub path
                 String output = "DynamicHamlet/EXP_" + expNo + "_Dynamic_varyEPW.csv";
+
+                //logging
                 dynamicLogging(executor, snapshot, batchsize, epw, 0, iter, output);
 
             }
@@ -328,27 +331,39 @@ public class Experiment {
 
     }
 
-    public void Dynamic_varyBatchSize(){
+    /**
+     * Dynamic versus Static Sharing Decision.
+     * vary number of burst size, fix epw, number of queries
+     * Figure 17.b, 17.d
+     */
+
+    public void Dynamic_varyBurstSize(){
+
         String streamFile = NYC_DEFAULT_STREAM;
         String queryFile = DYN_DEFAULT_WORKLOAD;
         int epw = DYN_DEFAULT_EPW;
-
         int snapshot = DYN_DEFAULT_SNAPSHOTS;
 
-        int start_batchsize = 300;
-        int end_batchsize = 800;
-        int step_batchsize = 100;
+        int start_burstsize = 300;
+        int end_burstsize = 800;
+        int step_burstsize = 100;
 
-
+        // run 10 times
         for (int iter =1; iter<11;iter++) {
-            for (int batchsize = start_batchsize; batchsize < end_batchsize; batchsize += step_batchsize) {
 
-                System.out.println("==================== Batchsize :" + batchsize + " ====================");
+            // varying burst size
+            for (int burstsize = start_burstsize; burstsize < end_burstsize; burstsize += step_burstsize) {
+
+                System.out.println("==================== Burst size :" + burstsize + " ====================");
 
                 Executor executor = new Executor(streamFile, queryFile, epw, false);
-                executor.decisionRun(batchsize, snapshot);
+                executor.decisionRun(burstsize, snapshot);
+
+                //log file sub path
                 String output = "DynamicHamlet/EXP_" + expNo + "_Dynamic_varyBatchSize.csv";
-                dynamicLogging(executor, snapshot, batchsize, epw, 0, iter, output);
+
+                //logging
+                dynamicLogging(executor, snapshot, burstsize, epw, 0, iter, output);
 
             }
         }
@@ -356,8 +371,17 @@ public class Experiment {
     }
 
 
-
-    public void dynamicLogging(Executor executor, int numofSnapshots, int batchsize, int epw, int window,
+    /**
+     * logging method for Dynamic versus Static Sharing Decision.
+     * @param executor the executor that run dynamic vs. static
+     * @param numofSnapshots number of snapshots
+     * @param burstsize the burst size
+     * @param epw the events per window
+     * @param window window number
+     * @param iter iteration number
+     * @param logFile the log file
+     */
+    public void dynamicLogging(Executor executor, int numofSnapshots, int burstsize, int epw, int window,
                                int iter, String logFile){
 
         String[] header = {"window", "iter", "epw","# of snapshots","batch size",
@@ -373,7 +397,7 @@ public class Experiment {
         data[i] = iter+"";        i++;
         data[i] = epw+"";        i++;
         data[i] = numofSnapshots+"";        i++;
-        data[i] = batchsize+"";        i++;
+        data[i] = burstsize+"";        i++;
 
         data[i] = ((float)(executor.getEpw()*1000)/ executor.getStaticHamletLatency()) +"";        i++;
         data[i] = ((float)(executor.getEpw()*1000)/ executor.getDynamicHamletLatency()) +"";        i++;
@@ -387,22 +411,33 @@ public class Experiment {
         data[i] = executor.getDynamicHamelt().mergeNum+"";    i++;
         data[i] = executor.getDynamicHamelt().splitNum+"";
 
+        checkFolder("output");
+        checkFolder("output/"+logFile.split("/")[0]);
+
         File file = new File("output/"+ logFile);
 
         writeCSV(file,header, data);
     }
 
+    /**
+     * logging method for Hamlet versus State-of-the-art Approaches
+     * @param executor the executor that runs all the approaches
+     * @param numofShared the number of shared events per graphlet
+     * @param iternum the interation number
+     * @param logFile the log file
+     */
     public void logging(Executor executor, int numofShared,int iternum, String logFile){
-        /**
-         * logging
-         */
 
+        // set up header for the csv
         String[] header = {"iter","epw","# of shared","workload size",
                 "Hamlet throughput","Greta throughput", "Sharon throughput","mcep throughput",
                 "Hamlet latency","Greta latency","Sharon latency","mcep latency",
                 "Hamlet memory", "Greta memory","Sharon memory","mcep,memory"};
+
+        //data
         String[] data = new String[16];
 
+        //iteration number
         data[0] = iternum+"";
 
         data[1] = executor.getEpw()+"";
@@ -427,15 +462,40 @@ public class Experiment {
         data[14] = executor.getSharonMemory() +"";
         data[15] = executor.getMcepMemory() +"";
 
+        checkFolder("output");
+        checkFolder("output/"+logFile.split("/")[0]);
 
 
         File file = new File("output/"+ logFile);
         writeCSV(file, header, data);
 
 
+    }
+
+    /**
+     * create the folder if it doesn't exist
+     * @param path path of the directory
+     */
+    void checkFolder(String path){
+
+        File folder = new File(path);
+
+        if (!folder.exists() && !folder.isDirectory()) {
+            folder.mkdirs();
+            System.out.println("directory created");
+        } else {
+            System.out.println();
+        }
 
     }
 
+
+    /**
+     * method of writing a line into a csv file
+     * @param file file name
+     * @param header header of the csv
+     * @param data a line of data
+     */
     public void writeCSV(File file, String[] header, String[] data){
         try {
             if(!file.exists()){
