@@ -1,32 +1,70 @@
-Main function: ~/src/main/java/executor/main.java
+1. PROJECT STRUCTURE
 
-Main function includes four experiments in the paper:
-- Hamlet versus state-of-the-art approaches(Ridesharing data set)
-    Figure 14, 16
-    output directory: ~/output/RideSharing
+1.1 packages
 
-- Hamlet versus state-of-the-art approaches(NY City Taxi data set)
-    Figure 15
-    output directory: ~/output/NYCTaxi
+    dataGenerator package
+        - generate the ride sharing stream
+        - generate the workload for all three data sets
 
-- Hamlet versus state-of-the-art approaches(Smart Home data set)
-    Figure 15
-    output directory: ~/output/SmartHome
+    dataProcessing package
+        -process the raw data of NYC Taxi and Smart Home data sets
 
-- Dynamic versus static sharing decision (Ridesharing data set)
-    Figure 17
-    output directory: ~/output/RideSharing
+    baselines package
+        - all baseline models including greta, sharon, mcep
+
+    hamlet package
+        - code for hamlet
+
+    executor package
+        - executor to run the experiments
+        - main function
+
+1.2 data
+    All processed data sets are stored under ~/src/main/resources/[DATASET].
+    Each dataset has a stream folder ("Streams") and a workload folder("Queries").
+    Different workload files have different number of queries.
+
+1.3 output
+    outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
+    the output stores the latency, memory, throughput for each model in an experiment.
+    the output path is generated automatically if it doesn't exist.
 
 
-For the first three experiments, we run two methods varying:
-    - the events per window
-    - the number of queries
+2. EXECUTION
 
-For the last experiment, we run two methods varying:
-    - the events per window
-    - the burst size
+2.1 main function
+
+    Main function: ~/src/main/java/executor/main.java
+    simply run the main function directly.
+
+    Main function includes four experiments in the paper:
+    - Hamlet versus state-of-the-art approaches(Ridesharing data set)
+        Figure 14, 16
+        output directory: ~/output/RideSharing
+
+    - Hamlet versus state-of-the-art approaches(NY City Taxi data set)
+        Figure 15
+        output directory: ~/output/NYCTaxi
+
+    - Hamlet versus state-of-the-art approaches(Smart Home data set)
+        Figure 15
+        output directory: ~/output/SmartHome
+
+    - Dynamic versus static sharing decision (Ridesharing data set)
+        Figure 17
+        output directory: ~/output/RideSharing
+
+2.2 experiment
+    
+    For the first three experiments, we run two methods varying:
+        - the events per window
+        - the number of queries
+
+    For the last experiment, we run two methods varying:
+        - the events per window
+        - the burst size
 
 
-In each of these methods, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
-Plots are based on the average of these results of an experiment.
-outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form
+    In each of these methods, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
+    Plots are based on the average of these results over all iterations for a single experiment.
+
