@@ -53,19 +53,19 @@ Main Function
  simply run the main function directly.
 
  Main function includes four experiments in the paper:
- * Hamlet versus state-of-the-art approaches(Ridesharing data set)
+ * Hamlet versus state-of-the-art approaches(Ridesharing data set)<br>
      Figure 14, 16<br>
      output directory: ~/output/RideSharing
 
- * Hamlet versus state-of-the-art approaches(NY City Taxi data set)
+ * Hamlet versus state-of-the-art approaches(NY City Taxi data set)<br>
      Figure 15<br>
      output directory: ~/output/NYCTaxi
 
- * Hamlet versus state-of-the-art approaches(Smart Home data set)
+ * Hamlet versus state-of-the-art approaches(Smart Home data set)<br>
      Figure 15<br>
      output directory: ~/output/SmartHome
 
- * Dynamic versus static sharing decision (Ridesharing data set)
+ * Dynamic versus static sharing decision (Ridesharing data set)<br>
      Figure 17<br>
      output directory: ~/output/RideSharing
 
