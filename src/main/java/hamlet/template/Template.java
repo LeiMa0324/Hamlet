@@ -1,10 +1,11 @@
 package hamlet.template;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import lombok.Data;
 
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Template reads the query files and
@@ -17,31 +18,59 @@ import java.util.*;
  */
 @Data
 public class Template {
+
+    //all the queries in the workload
     private ArrayList<String> queries;
-    private ArrayList<String> sharedEvents;     //the Shared event types in all queries
-    private HashMap<String, EventType> eventTypes;   //can find a Hamlet.Event Type by a string
+
+    //the Shared event types in all queries
+    private ArrayList<String> sharedEvents;
+
+    //a hashmap from a event string to an event type
+    private HashMap<String, EventType> eventTypes;
+
+    //the start events in all queries
     private ArrayList<String> startEvents;
 
+    /**
+     * read the queries, creating event types and building the connections between event types
+     * @param queries the queries in the workload
+     */
     public Template(ArrayList<String> queries) {
         this.queries = queries;
         this.eventTypes = new HashMap<>();
         this.sharedEvents = new ArrayList<>();
         this.startEvents = new ArrayList<>();
+
+        //qid starts with 1
         int qid = 1;
+
+        //find the sharable event types
         findSharedEvents();
 
+        //for each query
         for (String q:queries) {
+
+            // a sequence of event types in a query
             List<String> records = Arrays.asList(q.split(","));
-            ArrayList<EventType> eventTypeList = new ArrayList<EventType>();    //an eventType list to find the predecessor
+
+            //an temporary eventType list to find the predecessor
+            ArrayList<EventType> eventTypeList = new ArrayList<EventType>();
+
+            // iterate over all event types
             for(int i=0;i<records.size();i++){
                 String e = records.get(i).replace("+","");
                 String type="";
-                //if length is 1, stat is end
+
+                //if length is 1, it's both START and END type
                 if (i==0&&records.size()==1){
                     type = "START|END";
+
+                    // add the event type into start event list
                     startEvents.add(e);
 
                 }
+
+                //decide the type for other cases
                 else {
                     type = i == 0 ? "START" : "REGULAR";
                     if (type.equals("START")) {
@@ -51,29 +80,44 @@ public class Template {
                     type = i == records.size() - 1 ? "END" : type;
                 }
 
-                if (eventTypeExists(e)){        //if event type exists
-                    EventType et = getEventTypebyString(e);      //set its type
-                    et.addType(qid,type);       //set end queries
+                //if event type exists
+                if (eventTypeExists(e)){
+                    //set its type
+                    EventType et = getEventTypebyString(e);
+
+                    //set end queries
+                    et.addType(qid,type);
                     if (type.equals("END")||type.equals("START|END")){
                         et.addEndQuery(qid);
 
                     }
-                    et = maintainPreds(et,qid, eventTypeList);  //maintain its predecessors
-                    eventTypeList.add(et);        //maintain event type list
+
+                    //maintain its predecessors
+                    et = maintainPreds(et,qid, eventTypeList);
+
+                    //maintain event type list
+                    eventTypeList.add(et);
                     eventTypes.put(e, et);
 
-
-
-                }else {     //if not exists
-                    EventType et = new EventType(e,sharedEvents.contains(e),qid);   //new an event type
-                    et.addType(qid, type);          //set its type
-                    if (type.equals("END")||type.equals("START|END")){ //set end queries
+                //if the event type doesn not exist
+                }else {
+                    //new an event type
+                    EventType et = new EventType(e,sharedEvents.contains(e),qid);
+                    //set its type
+                    et.addType(qid, type);
+                    //set end queries
+                    if (type.equals("END")||type.equals("START|END")){
                         et.addEndQuery(qid);
 
                     }
-                    maintainPreds(et, qid, eventTypeList);   //maintain its predecessors
-                    eventTypes.put(e, et);       //put it into hash map
-                    eventTypeList.add(et);       //maintain event type list
+                    //maintain its predecessors
+                    maintainPreds(et, qid, eventTypeList);
+
+                    //put it into hash map
+                    eventTypes.put(e, et);
+
+                    //maintain event type list
+                    eventTypeList.add(et);
                 }
             }
             qid++;
@@ -85,7 +129,7 @@ public class Template {
      * find the predecessor of an event type
      * @param et a given event type
      * @param qid   a query id
-     * @param eventTypeList the event type list needed to be search
+     * @param eventTypeList the event type list needed to be searched
      */
         private EventType maintainPreds(EventType et, Integer qid, ArrayList<EventType> eventTypeList){
             if (et.isShared()){     //if et is a shared event type, add itself as a predecessor
@@ -99,13 +143,23 @@ public class Template {
 
         }
 
+    /**
+     * get the event type by an event string
+     * @param string the event string
+     * @return a event type of this string
+     */
     public EventType getEventTypebyString(String string){
         return this.eventTypes.get(string);
 
     }
 
-    public boolean eventTypeExists(String etString){
-        return eventTypes.keySet().contains(etString);
+    /**
+     * check if an event type of string exists in the template
+     * @param String the event string
+     * @return true or false
+     */
+    public boolean eventTypeExists(String String){
+        return eventTypes.keySet().contains(String);
     }
 
     /**
@@ -114,12 +168,18 @@ public class Template {
     private void findSharedEvents(){
         String firstQuery = queries.get(0);
         String[] events_firstQuery = firstQuery.split(",");
+
+        //a candidate list of shared event types
         ArrayList<String> candidates = new ArrayList<>();
-        for (String e: events_firstQuery){  //如果第一个字符串含有+，则加入candidates
+
+        //add a candidate if it has +
+        for (String e: events_firstQuery){
             if (e.contains("+")){
                 candidates.add(e);
             }
         }
+
+        //if this candidate is contained by all queries
         for (String c: candidates){
             boolean shared= true;
             for (String q: queries){

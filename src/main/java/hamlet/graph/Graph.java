@@ -11,23 +11,13 @@ import hamlet.utils.Observable;
 import hamlet.utils.Observer;
 import lombok.Data;
 
-import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  *
- * 3.19 Updates:
-            counter of number of valid events
-            final count is updated when a END event arrives
-            logger slowed down the running time by a lot, printing is better but also slows down（a lot of toString() are called）
-            query and stream template is finished.
- *
- * Notes:
- *      memory = #of relevant events *12+ 12* number of queries(a snapshot's size, but actually the count is in BigInteger which is much larger than 12)
+
  *
  */
 @Data

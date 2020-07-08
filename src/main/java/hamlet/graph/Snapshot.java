@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 
 /**
- * Snapshot only maintains a hashmap for interCounts in each query
+ * Snapshot maintains a hashmap for interCounts in each query
  * two kinds of updates:
  *      1. if this is the first snapshot this Graph has, snapshot <- unshared graphlet's interCounts
  *      2. if this is not the first snapshot, new snapshot = old snapshot*coeff + predecessors'

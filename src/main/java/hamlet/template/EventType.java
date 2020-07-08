@@ -7,24 +7,42 @@ import java.util.HashMap;
 
 
 /**
- * Event type store the information about an event type
- * edges: the edge between this event type and its predecessors, can query by qid
- * isShared: if this event type is shared
- * qids: the queries it belongs to
- * type: the types is has, for each query
+ * Event type store the following information about an event type in the template
+ * if it's shared
+ * its predecessor event types
+ * event type in each query
  */
 @Data
 public class EventType {
-    public final String string;    // the actual event type string
-    // 1: 'A', 2: 'C'
-    private HashMap<Integer, ArrayList<EventType>> edges;     //follow the edge to find the predecessors
+
+    //the actual event type string
+    public final String string;
+
+    //a hashmap from the query id to a list of predecessor event types
+    private HashMap<Integer, ArrayList<EventType>> edges;
+
+    //if this event type is shared
     public final boolean isShared;
+
+    //the queries it belongs to
     private ArrayList<Integer> qids;
-    private HashMap<Integer, String> types;    //"START", "END", "REGULAR"
+
+    //a hashmap from the query id to the event types, "START", "END", "REGULAR"
+    private HashMap<Integer, String> types;
+
+    //the queries that this event type starts
     private ArrayList<Integer> startqids;
+
+    //the queries that this event type ends
     private ArrayList<Integer> endQueries;
 
 
+    /**
+     * constructor
+     * @param string the string of the event type
+     * @param isShared if this event type is shared
+     * @param qid the query id
+     */
     public EventType(String string, boolean isShared, int qid){
         this.qids = new ArrayList<Integer>();
         qids.add(qid);
@@ -38,11 +56,12 @@ public class EventType {
     }
 
     /**
-     * pred: query id list
-     * put the query id to the list of the predecessor
-     * @param qid
+     * add an edge to this event type, link it with its predecessor
+     * @param qid the query id that this link belongs to
+     * @param pred the predecessor event type
      */
     public void addEdges( Integer qid, EventType pred){
+
         if (edges.get(qid)==null){
             ArrayList<EventType> preds = new ArrayList<EventType>();
             preds.add(pred);
@@ -56,11 +75,11 @@ public class EventType {
 
     /**
      * return the immediate predecessor for a given query
-     * @param qid
-     * @return
+     * @param qid the id of the query
+     * @return immediate predecessor
      */
 
-    public EventType getPred(int qid){
+    public EventType getPred(Integer qid){
         int index=0;
 
         EventType pred = null;
@@ -80,7 +99,12 @@ public class EventType {
         return pred;
     }
 
-    public void addType(int qid, String type){
+    /**
+     * add the type for a query
+     * @param qid
+     * @param type
+     */
+    public void addType(Integer qid, String type){
         types.put(qid, type);
         if (type.equals("START")){
             startqids.add(qid);
@@ -91,16 +115,22 @@ public class EventType {
     }
 
     /**
-     * find the queries that this event type end with
+     * add a query ending with this event type
+     * @param qid the query id
      */
-    public void addEndQuery(Integer q){
-        this.endQueries.add(q);
+    public void addEndQuery(Integer qid){
+        this.endQueries.add(qid);
 
     }
-
+    /**
+     * get the event type for a given query id
+     * @param qid the query id
+     */
     public String getTypebyQid(Integer qid){
         return types.get(qid);
     }
+
+
     @Override
     public String toString(){
         StringBuilder strbuilder = new StringBuilder( "   Event type string: "+string+"\n"+"   isShared: "+isShared+"\n");

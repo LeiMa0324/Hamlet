@@ -1,14 +1,12 @@
 package hamlet.graph;
 
 import hamlet.event.Event;
-import hamlet.event.StreamLoader;
 import hamlet.graphlet.Graphlet;
 import hamlet.graphlet.NonSharedGraphlet;
 import hamlet.graphlet.SharedGraphlet;
 import hamlet.template.EventType;
 import hamlet.template.Template;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -141,7 +139,9 @@ public class prefixGraph extends Graph {
             }
         }
 
-        // if the graphlet is END EVENT, re - update inter count
+        /**
+         * END EVENT
+         */
         if (! activeGraphlet.eventType.getEndQueries().isEmpty()){
 
             for (Integer qid: activeGraphlet.eventType.getEndQueries()){
@@ -202,15 +202,21 @@ public class prefixGraph extends Graph {
             }
 
         }
-//        System.out.println("snapshot update:"+SnapShot);
-
 
     }
 
+    /**
+     * find the predecessor events of a event type
+     * @param qid the query id
+     * @param et the given event type
+     * @return the events of the pred event type
+     */
     public ArrayList<Graphlet> findPredecessors(Integer qid, EventType et){
 
-        EventType predEt = et.getPred(qid);  //找到predecessor的类型
+        // get the predecessor event type
+        EventType predEt = et.getPred(qid);
 
+        // get the events belonging to the pred event type
         return predEt==null?null:Graphlets.get(predEt.string);
 
     }

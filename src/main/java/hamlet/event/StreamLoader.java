@@ -7,29 +7,41 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * stream loader class loads the stream into a list of events with size epw
+ */
+
 public class StreamLoader {
 
     public ArrayList<Event> events;
 
     public StreamLoader(String streamFile, int epw, Template template){
 
+        // list of relevant events
         events = new ArrayList<>();
 
 
-        try {    //load the stream into a list of events
+        try {
             Scanner scanner = new Scanner(new File(streamFile));
+
+            //keep track of the number of events
             int numofEvents = 0;
+
+            //if met any of the start events
             boolean isStarted = false;
 
-            while (scanner.hasNext()&&numofEvents<epw) {
+            //load epw relevant events
+            while (scanner.hasNext() && numofEvents< epw) {
                 String line = scanner.nextLine();
                 String[] record = line.split(",");
                 numofEvents++;
 
-                //if e is in the template, ignore all dummy events
+                //ignore irrelevant events
                 if (!template.eventTypeExists(record[1])) {
                     continue;
                 }
+
+                //ignore events before the start type
                 if (!isStarted){
                     if (template.getStartEvents().contains(record[1])){
                         isStarted = true;
@@ -38,6 +50,8 @@ public class StreamLoader {
                         continue;
                     }
                 }
+
+                //add relevant events into the list
                 if (isStarted){
                     Event e = new Event(line, template.getEventTypebyString(record[1]));
                     this.events.add(e);
@@ -45,12 +59,15 @@ public class StreamLoader {
 
             }
 
-            System.out.println("Relevant events number: "+ events.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * return all the relevant events
+     * @return all the relevant events
+     */
     public ArrayList<Event> getEvents(){
         return this.events;
     }
