@@ -93,7 +93,6 @@ public class StaticGraph extends Graph{
 
          shareG = (SharedGraphlet)Graphlets.get(activeFlag);  //将events加入Graphlet
 
-
          ExpandGraphletbyBatch(batch, shareG, isDenseBatch);   //expand graphlet
 
         Graphlets.put(activeFlag, shareG);  //add G back to Graphlets
@@ -162,7 +161,6 @@ public class StaticGraph extends Graph{
                 this.SnapShot.updatewithPredicate(g.getCoeff(), qid);
 
             }
-
         }
 
 //        System.out.println("snapshots: ");
@@ -191,11 +189,10 @@ public class StaticGraph extends Graph{
         finalcountCounter++;
 //        System.out.println("final count"+finalCount);
 
-
     }
 
     /**
-     * reload events into batches
+     * load events into batches
      */
      void loadBatches(){
 

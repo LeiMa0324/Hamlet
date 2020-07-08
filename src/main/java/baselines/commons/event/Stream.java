@@ -11,7 +11,7 @@ public class Stream {
 		substreams = new HashMap<String,ConcurrentLinkedQueue<Event>>();				
 	}
 
-	//计算stream中event k的个数
+
 	public int generateRates(int k) {
 		int rate = 0;
 		for (String ssId : substreams.keySet()) {
@@ -28,11 +28,6 @@ public class Stream {
 		return rate;
 	}
 
-	/**
-	 * 计算连续k出现的次数
-	 * @param k
-	 * @return
-	 */
 	public int generateConsecutiveRates(int k) {
 		int rate = 0;
 		OUT:

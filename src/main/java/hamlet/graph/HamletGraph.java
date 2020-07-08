@@ -73,16 +73,12 @@ public class HamletGraph extends Graph {
                     //create a nonshared graphlet
                     newNonSharedGraphlet(e);
                 }
-
             }
-
         }
 
         //update the last graphlet
         updateActiveGraphletCount();
-
 //        System.out.println("prefix graph final count"+ finalCount);
-
 
     }
 
@@ -174,11 +170,8 @@ public class HamletGraph extends Graph {
                     finalCount.put(qid, count.add(activeGraphlet.interCounts.get(qid)));
 
             }
-
         }
-
         return true;
-
     }
 
     /**
