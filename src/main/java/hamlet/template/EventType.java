@@ -74,7 +74,7 @@ public class EventType {
     }
 
     /**
-     * return the immediate predecessor for a given query
+     * return the predecessor(not including itself) for a given query
      * @param qid the id of the query
      * @return immediate predecessor
      */
@@ -98,6 +98,8 @@ public class EventType {
         }
         return pred;
     }
+
+
 
     /**
      * add the type for a query

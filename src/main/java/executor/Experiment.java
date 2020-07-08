@@ -462,7 +462,6 @@ public class Experiment {
         data[14] = executor.getSharonMemory() +"";
         data[15] = executor.getMcepMemory() +"";
 
-        checkFolder("output");
         checkFolder("output/"+logFile.split("/")[0]);
 
 

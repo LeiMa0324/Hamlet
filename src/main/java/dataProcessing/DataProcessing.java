@@ -8,6 +8,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * this class processes the raw dataset and transforms it into a stream file
+ */
 public class DataProcessing {
     public static void main(String[] args){
 

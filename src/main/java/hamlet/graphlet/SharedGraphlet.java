@@ -33,8 +33,10 @@ public class SharedGraphlet extends Graphlet{
         coeff = new BigInteger("0");
         isShared = true;
         this.calculated = false;
+
+        //initiate all the inter counts
         for (Integer q: eventType.getQids()){
-            interCounts.put(q,new BigInteger("0"));
+            interCounts.put(q,BigInteger.ZERO);
         }
         addEvent(e);
 
@@ -61,6 +63,9 @@ public class SharedGraphlet extends Graphlet{
 
     public void addEvents(ArrayList<Event> batch){
         this.eventList.addAll(batch);
+        /**
+         * coefficient of the graphlet = 2**n-1
+         */
         this.coeff = new BigInteger("2").pow(eventList.size()).subtract(new BigInteger("1"));
     }
 

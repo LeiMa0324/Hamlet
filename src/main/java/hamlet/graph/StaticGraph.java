@@ -1,23 +1,29 @@
 package hamlet.graph;
 
 import hamlet.event.Event;
-import hamlet.graphlet.Graphlet;
 import hamlet.graphlet.SharedGraphlet;
 import hamlet.template.Template;
-import org.apache.commons.io.serialization.ValidatingObjectInputStream;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
-
+/**
+ * the static hamlet graph with static sharing decision under the condition of predicates
+ * compared with dynamic graph
+ */
 public class StaticGraph extends Graph{
 
      Integer batchSize;
      ArrayList<ArrayList<Event>> batches;
      Integer finalcountCounter = 0;
      Integer snapshotCounter = 0;
-     HashMap<Integer, BigInteger> predSnapshots;  //snapshots for each queries
+
+    //snapshots for each queries
+     HashMap<Integer, BigInteger> predSnapshots;
     Integer denseBatchnum = 0;
 
 
@@ -29,8 +35,6 @@ public class StaticGraph extends Graph{
         this.batches = new ArrayList<>();
 
         this.predSnapshots = new HashMap<>();
-
-
 
         // initialize all snapshots
         for (Integer qid =1;qid<template.getQueries().size();qid++){

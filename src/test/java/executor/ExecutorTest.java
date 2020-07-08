@@ -1,18 +1,10 @@
 package executor;
 
 
-import hamlet.graph.DynamicGraph;
-import hamlet.graph.StaticGraph;
-import hamlet.template.Template;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
-
 
 import static org.junit.Assert.assertEquals;
 
@@ -50,8 +42,8 @@ public class ExecutorTest {
         int epw = 100;
 //
         //paper exsample
-        String paper_streamFile = "src/main/resources/Paper_TestStream.txt";
-        String paper_queryFile = "src/main/resources/Paper_TestQueries.txt";
+        String paper_streamFile = "src/test/resources/Paper_TestStream.txt";
+        String paper_queryFile = "src/test/resources/Paper_TestQueries.txt";
         Executor paper_executor = new Executor(paper_streamFile, paper_queryFile, epw, true);
         paper_executor.run(false);       //run
         System.out.println(paper_executor.getGreta().finalcount);
@@ -65,18 +57,18 @@ public class ExecutorTest {
 
     @Test
     public void Hamlet_Greta_FinalCount_SyntheticEx_Test(){
-        int epw = 100;
+        int epw = 500;
 //
         //synthetic example
 //        String syn_queryFile = "src/main/resources/Syn_TestQuery.txt";
 //        String syn_streamFile = "src/main/resources/Syn_TestStream.txt";
 
-        String syn_queryFile = "src/main/java/baselines/mcep/Queries.txt";
-        String syn_streamFile = "src/main/java/baselines/mcep/Stream.txt";
+        String syn_queryFile = "src/test/Resources/Syn_TestQuery.txt";
+        String syn_streamFile = "src/test/Resources/Syn_TestStream.txt";
 
         Executor syn_executor = new Executor(syn_streamFile, syn_queryFile, epw, true);
 //        syn_executor.run(false);       //run
-        syn_executor.gretaRun();
+        syn_executor.run(false);
         System.out.println(syn_executor.getGreta().finalcount);
 
         assertEquals(syn_executor.getHamletG().getFinalCount(),syn_executor.getGreta().finalcount);
@@ -90,7 +82,7 @@ public class ExecutorTest {
 
         int epw = 100;
         //nyc example
-        String nyc_queryFile = "src/main/resources/NYC_TestQuery.txt";
+        String nyc_queryFile = "src/test/resources/NYC_TestQuery.txt";
         String nyc_streamFile = "src/main/resources/NYCTaxi/Streams/Taxi_stream.csv";
 
 

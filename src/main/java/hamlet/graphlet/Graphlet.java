@@ -19,8 +19,12 @@ public abstract class Graphlet implements Observer {
     ArrayList<Event> eventList;     // event list
     public boolean isShared;
     public boolean isActive;
-    public EventType eventType;        // the event type of this graphlet
-    public HashMap<Integer, BigInteger> interCounts;    //intermediate final interCounts after this graphlet is finished
+
+    // the event type of this graphlet
+    public EventType eventType;
+
+    //intermediate aggregation interCounts after this graphlet is finished
+    public HashMap<Integer, BigInteger> interCounts;
 
 
 

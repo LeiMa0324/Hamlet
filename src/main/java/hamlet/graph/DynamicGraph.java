@@ -49,6 +49,7 @@ public class DynamicGraph extends StaticGraph{
             //k number of queries
             int k = template.getQueries().size();
             //g number of events per graphlet
+
             //the size of the shared graphlet
             int sharedg = (activeFlag.equals(shared))?Graphlets.get(activeFlag).getEventList().size()+batch.size():batch.size();
 

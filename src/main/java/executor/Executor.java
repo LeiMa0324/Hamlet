@@ -8,9 +8,8 @@ import baselines.greta.GretaMQ;
 import baselines.mcep.McepGraph;
 import baselines.sharon.Sharon;
 import hamlet.graph.DynamicGraph;
-import hamlet.graph.Graph;
 import hamlet.graph.StaticGraph;
-import hamlet.graph.prefixGraph;
+import hamlet.graph.hamletGraph;
 import hamlet.template.Template;
 import lombok.Data;
 
@@ -58,7 +57,7 @@ public class Executor {
 	private Template hamletTemplate;
 	
 	//hamlet graph
-	private Graph hamletG;
+	private hamletGraph hamletG;
 	
 	/**
 	 * settings of greta
@@ -122,7 +121,7 @@ public class Executor {
 		this.hamletTemplate = new Template(queries);
 
 		// TODO: 2020-07-05 统一graph 
-		this.hamletG = new prefixGraph(hamletTemplate,streamFile, epw, openMsg);
+		this.hamletG = new hamletGraph(hamletTemplate,streamFile, epw, openMsg);
 		this.sharonLatency = -1;
 		this.mcepLatency = -1;
 		this.sharonMemory = -1;

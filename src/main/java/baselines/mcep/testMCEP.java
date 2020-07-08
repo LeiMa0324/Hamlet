@@ -46,7 +46,7 @@ public class testMCEP {
 //        executor.gretaRun();
 //        System.out.println(executor.getGreta().finalcount);
 //
-//        prefixGraph newHamlet = new prefixGraph(template, streamFile,  epw,  false);
+//        hamletGraph newHamlet = new hamletGraph(template, streamFile,  epw,  false);
 //        long start =  System.currentTimeMillis();
 //
 //        newHamlet.run();

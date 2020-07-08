@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- *
-
+ * Super class of all graphs
+ * contains basic funtions for the sub-classes
  *
  */
 @Data
@@ -27,9 +27,15 @@ public class Graph implements Observable{
      ArrayList<Observer> observers = new ArrayList();    //observers
      Snapshot SnapShot;
      final Template template;
-     HashMap<String, Graphlet> Graphlets;   //a list of Graphlets
+
+    //a list of all Graphlets
+     HashMap<String, Graphlet> Graphlets;
+
+     //last shared graphlet
      SharedGraphlet lastSharedG;
-     String activeFlag; //the current active Graphlet
+
+    //the current active Graphlet
+     String activeFlag;
      ArrayList<Event> events;
      HashMap<Integer, BigInteger> finalCount;
      long memory;
@@ -56,54 +62,6 @@ public class Graph implements Observable{
 
     }
 
-    /**
-     * run when reading events from the stream
-     */
-    public void run() {
-
-        for (Event e : events) {
-
-            Integer c = eventCounts.keySet().contains(e.string)?eventCounts.get(e.string):0;
-            eventCounts.put(e.string, c+1);
-
-            /**
-             * Graphlet maintainance
-            */
-
-            if (Graphlets.get(e.string) == null || !Graphlets.get(e.string).isActive)   //if this Graphlet doesn't exist or is inactive
-            {
-                // update the count for the active graphlet when it's finished
-                finishingGraphlet();
-
-
-                //initiate new graphlet
-                if (e.eventType.isShared) {  //create a shared G
-                    updateSnapshot(e);       //update snapshot
-                    newSharedGraphlet(e);
-
-                } else {      //create a non shared G
-                    NonSharedGraphlet nonsharedG = new NonSharedGraphlet(e);
-
-                    Graphlets.put(e.string, nonsharedG);
-                    register(nonsharedG);
-                    setActiveFlag(e.string);
-                }
-            }
-            else {     //graphlet exists and is active
-                ExpandGraphlet(e, Graphlets.get(activeFlag));   //expand the active graphlet
-            }
-            /**
-             * Maintain e.count
-             * update final count for "END" event
-             */
-
-        }
-        finishingGraphlet();
-
-        if (openMsg){
-            System.out.println("hamlet final count: "+finalCount);
-        }
-    }
 
     void newSharedGraphlet(Event e) {
         SharedGraphlet sharedG = new SharedGraphlet(e);
@@ -215,7 +173,7 @@ public class Graph implements Observable{
      * expand the active graphlet
      * @param e the coming event
      */
-    public void ExpandGraphlet(Event e, Graphlet g) {   //expand the current graphlet
+    public void ExpandGraphlet(Event e, Graphlet g) {
         g.addEvent(e);
 
     }
