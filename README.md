@@ -71,7 +71,7 @@ Main Function
 
 Experiment
 ----
-    
+ Main function read the experiment number from the file ~/ExpNo.txt and increment it after the experiment.<br>
  For the first three experiments, we run two methods varying:
 * The events per window
 * The number of queries
