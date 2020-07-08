@@ -13,7 +13,7 @@ dataProcessing package
 baselines package
 * all baseline models including greta, sharon, mcep
 
-hamlet package
+**hamlet package**
 * code for hamlet
 
 executor package
@@ -34,9 +34,9 @@ Dataset
 Output
 ----
 
- outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
- the output stores the latency, memory, throughput for each model in an experiment.
- the output path is generated automatically if it doesn't exist.
+ Outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
+ The output stores the latency, memory, throughput for each model in an experiment.
+ The output path is generated automatically if it doesn't exist.
 
 
 EXECUTION
