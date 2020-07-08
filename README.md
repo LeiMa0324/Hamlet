@@ -1,6 +1,7 @@
-#1. PROJECT STRUCTURE#
+1. PROJECT STRUCTURE
+====
 
-##1.1 packages##
+1.1 packages
 
     dataGenerator package
         - generate the ride sharing stream
