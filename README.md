@@ -1,7 +1,7 @@
 PROJECT STRUCTURE
 ====
 
-1.1 packages
+packages
 ----
 
     dataGenerator package
@@ -21,7 +21,7 @@ PROJECT STRUCTURE
         - executor to run the experiments
         - main function
 
-1.2 dataset
+dataset
 ----
 
     NYC Taxi dataset: https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv
@@ -31,7 +31,7 @@ PROJECT STRUCTURE
     Each dataset has a stream folder ("Streams") and a workload folder("Queries").
     Different workload files have different number of queries.
 
-1.3 output
+output
 ----
 
     outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
@@ -42,7 +42,7 @@ PROJECT STRUCTURE
 EXECUTION
 ====
 
-* main function
+main function
 ----
 
 
@@ -66,7 +66,7 @@ EXECUTION
         Figure 17
         output directory: ~/output/RideSharing
 
-2.2 experiment
+experiment
 ----
     
     For the first three experiments, we run two methods varying:
