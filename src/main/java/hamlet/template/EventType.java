@@ -103,8 +103,8 @@ public class EventType {
 
     /**
      * add the type for a query
-     * @param qid
-     * @param type
+     * @param qid query id
+     * @param type the type needs to be added
      */
     public void addType(Integer qid, String type){
         types.put(qid, type);

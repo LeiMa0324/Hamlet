@@ -14,7 +14,10 @@ Packages
 * all baseline models including greta, sharon, mcep
 
 **hamlet package**
-* code for hamlet
+* Graph - super class of all hamlet graphs
+* hamletGraph - hamlet graph without predicates implementation
+* staticGraph - static hamlet with decision of sharing under situations of predicates
+* dynamicGraph - dynamic hamlet with benefit model and dynamic decisions of sharing or not sharing
 
 **executor package**
 * executor to run the experiments

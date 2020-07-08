@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * this class contains the hamlet Graph without the predicates
  */
-public class hamletGraph extends Graph {
+public class HamletGraph extends Graph {
 
     //a list of Graphlets
     private HashMap<String, ArrayList<Graphlet>> Graphlets;
@@ -22,7 +22,7 @@ public class hamletGraph extends Graph {
     //the active Graphlet
     private Graphlet activeGraphlet;
 
-    public hamletGraph(Template template, String streamFile, int epw, boolean openMsg) {
+    public HamletGraph(Template template, String streamFile, int epw, boolean openMsg) {
         super( template,  streamFile,  epw,  openMsg);
         this.Graphlets = new HashMap<>();
     }
