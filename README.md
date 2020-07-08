@@ -3,23 +3,22 @@ PROJECT STRUCTURE
 
 Packages
 ----
+dataGenerator package
+    * generate the ride sharing stream
+    * generate the workload for all three data sets
 
-    dataGenerator package
-        * generate the ride sharing stream
-        * generate the workload for all three data sets
+dataProcessing package
+    * process the raw data of NYC Taxi and Smart Home data sets
 
-    dataProcessing package
-        * process the raw data of NYC Taxi and Smart Home data sets
+baselines package
+    * all baseline models including greta, sharon, mcep
 
-    baselines package
-        * all baseline models including greta, sharon, mcep
+hamlet package
+    * code for hamlet
 
-    hamlet package
-        * code for hamlet
-
-    executor package
-        * executor to run the experiments
-        * main function
+executor package
+    * executor to run the experiments
+    * main function
 
 Dataset
 ----
