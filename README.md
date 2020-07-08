@@ -30,9 +30,9 @@ Dataset
  
  Smart Home dataset: http://www.doc.ic.ac.uk/~mweidlic/sorted.csv.gz
 
- All processed data sets are stored under ~/src/main/resources/[DATASET].
- Each dataset has a stream folder ("Streams") and a workload folder("Queries").
- Different workload files have different number of queries.
+ All processed data sets are stored under ~/src/main/resources/[DATASET].<br>
+ Each dataset has a stream folder ("Streams") and a workload folder("Queries").<br>
+ Different workload files have different number of queries.<br>
 
 Output
 ----
@@ -49,24 +49,24 @@ Main Function
 ----
 
 
- Main function: ~/src/main/java/executor/main.java
+ Main function: ~/src/main/java/executor/main.java<br>
  simply run the main function directly.
 
  Main function includes four experiments in the paper:
  * Hamlet versus state-of-the-art approaches(Ridesharing data set)
-     Figure 14, 16
+     Figure 14, 16<br>
      output directory: ~/output/RideSharing
 
  * Hamlet versus state-of-the-art approaches(NY City Taxi data set)
-     Figure 15
+     Figure 15<br>
      output directory: ~/output/NYCTaxi
 
  * Hamlet versus state-of-the-art approaches(Smart Home data set)
-     Figure 15
+     Figure 15<br>
      output directory: ~/output/SmartHome
 
  * Dynamic versus static sharing decision (Ridesharing data set)
-     Figure 17
+     Figure 17<br>
      output directory: ~/output/RideSharing
 
 Experiment
