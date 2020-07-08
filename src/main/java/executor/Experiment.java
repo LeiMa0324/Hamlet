@@ -411,7 +411,7 @@ public class Experiment {
         data[i] = executor.getDynamicHamelt().mergeNum+"";    i++;
         data[i] = executor.getDynamicHamelt().splitNum+"";
 
-        checkFolder("output");
+
         checkFolder("output/"+logFile.split("/")[0]);
 
         File file = new File("output/"+ logFile);
