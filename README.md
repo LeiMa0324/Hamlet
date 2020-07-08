@@ -42,7 +42,7 @@ PROJECT STRUCTURE
 EXECUTION
 ====
 
-*main function
+* main function
 
 
     Main function: ~/src/main/java/executor/main.java
