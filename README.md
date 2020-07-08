@@ -4,8 +4,8 @@ PROJECT STRUCTURE
 Packages
 ----
 dataGenerator package
-    * generate the ride sharing stream
-    * generate the workload for all three data sets
+* generate the ride sharing stream
+* generate the workload for all three data sets
 
 dataProcessing package
     * process the raw data of NYC Taxi and Smart Home data sets
