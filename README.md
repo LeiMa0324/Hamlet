@@ -39,11 +39,11 @@ PROJECT STRUCTURE
     the output path is generated automatically if it doesn't exist.
 
 
-2. EXECUTION
+EXECUTION
 ====
 
-2.1 main function
-----
+*main function
+
 
     Main function: ~/src/main/java/executor/main.java
     simply run the main function directly.
