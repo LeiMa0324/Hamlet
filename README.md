@@ -4,14 +4,14 @@ PROJECT STRUCTURE
 Packages
 ----
 **dataGenerator package**
-* generate the ride sharing stream
-* generate the workload for all three data sets
+* Generate the ride sharing stream
+* Generate the workload for all three data sets
 
 **dataProcessing package**
-* process the raw data of NYC Taxi and Smart Home data sets
+* Process the raw data of NYC Taxi and Smart Home data sets
 
 **baselines package**
-* all baseline models including greta, sharon, mcep
+* All baseline models including greta, sharon, mcep
 
 **hamlet package**
 * Graph - super class of all hamlet graphs
@@ -20,8 +20,8 @@ Packages
 * DynamicGraph - dynamic hamlet with benefit model and dynamic decisions of sharing or not sharing
 
 **executor package**
-* executor to run the experiments
-* main function
+* Executor to run the experiments
+* Main function
 
 Dataset
 ----
@@ -73,12 +73,12 @@ Experiment
 ----
     
  For the first three experiments, we run two methods varying:
-* the events per window
-* the number of queries
+* The events per window
+* The number of queries
 
  For the last experiment, we run two methods varying:
-* the events per window
-* the burst size
+* The events per window
+* The burst size
 
 
  In each of these methods, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
