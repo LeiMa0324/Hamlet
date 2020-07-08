@@ -1,4 +1,4 @@
-1. PROJECT STRUCTURE
+PROJECT STRUCTURE
 ====
 
 1.1 packages
