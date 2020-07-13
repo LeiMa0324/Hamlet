@@ -52,18 +52,11 @@ Main Function
  Main function: ~/src/main/java/executor/main.java<br>
  simply run the main function directly.
 
- Main function includes four experiments in the paper:
+ Main function includes two experiments in the paper:
  * Hamlet versus state-of-the-art approaches(Ridesharing data set)<br>
      Figure 14, 16<br>
      output directory: ~/output/RideSharing
 
- * Hamlet versus state-of-the-art approaches(NY City Taxi data set)<br>
-     Figure 15<br>
-     output directory: ~/output/NYCTaxi
-
- * Hamlet versus state-of-the-art approaches(Smart Home data set)<br>
-     Figure 15<br>
-     output directory: ~/output/SmartHome
 
  * Dynamic versus static sharing decision (Ridesharing data set)<br>
      Figure 17<br>
@@ -72,7 +65,7 @@ Main Function
 Experiment
 ----
  Main function read the experiment number from the file ~/ExpNo.txt and increment it after the experiment.<br>
- For the first three experiments, we run two methods varying:
+ For the first experiments, we run two methods varying:
 * The events per window
 * The number of queries
 

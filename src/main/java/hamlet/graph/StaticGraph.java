@@ -17,23 +17,42 @@ import java.util.Set;
  */
 public class StaticGraph extends Graph{
 
-     Integer batchSize;
-     ArrayList<ArrayList<Event>> batches;
+    // the burst size
+     Integer burstSize;
+
+     // the array of all bursts
+     ArrayList<ArrayList<Event>> bursts;
+
+
      Integer finalcountCounter = 0;
+
+     // the counter for snapshots
      Integer snapshotCounter = 0;
 
     //snapshots for each queries
      HashMap<Integer, BigInteger> predSnapshots;
-    Integer denseBatchnum = 0;
 
+     //the number of dense bursts
+    Integer denseBurstnum = 0;
 
-    public StaticGraph(Template template, String streamFile, int epw, Integer batchSize, int snapshotnum,
-                       double denseBatchPercent, boolean openMsg) {
+    /**
+     * the constructor of a static sharing hamlet graph
+     * @param template the hamlet template
+     * @param streamFile the stream file
+     * @param epw events per window
+     * @param burstSize the size of a burst
+     * @param snapshotnum the total number of snapshots due to predicates
+     * @param denseBurstPercent the percent of dense bursts in all the bursts.
+     *                          a dense burst: place a snapshot for each event
+     *                          a sparse burst: place a snapshot for every three events
+     * @param openMsg
+     */
+    public StaticGraph(Template template, String streamFile, int epw, Integer burstSize, int snapshotnum,
+                       double denseBurstPercent, boolean openMsg) {
 
         super(template, streamFile, epw, openMsg);
-        this.batchSize = batchSize;
-        this.batches = new ArrayList<>();
-
+        this.burstSize = burstSize;
+        this.bursts = new ArrayList<>();
         this.predSnapshots = new HashMap<>();
 
         // initialize all snapshots
@@ -41,6 +60,7 @@ public class StaticGraph extends Graph{
             predSnapshots.put(qid, new BigInteger("1"));
 
         }
+
 
         for(int i=0; i<template.getQueries().size()-snapshotnum;i++) {
 
@@ -52,89 +72,129 @@ public class StaticGraph extends Graph{
 
         System.out.println(predSnapshots);
 
-        loadBatches();      //reload the events into batches
-        denseBatchnum =new BigDecimal(denseBatchPercent+"")
-                .multiply(new BigDecimal(batches.size()+"")).intValue(); //the number of dense batches
+        //reload the events into bursts
+        loadBatches();
+
+        //the number of dense bursts
+        denseBurstnum =new BigDecimal(denseBurstPercent+"")
+                .multiply(new BigDecimal(bursts.size()+"")).intValue();
 
     }
 
     /**
-     * always share with snapshotNum of snapshots in a batch
+     * This method runs the hamlet with static decision for each burst
      */
     public void staticRun() {
 
-        //read data in batch
-        for (ArrayList<Event> batch: batches) {
-            sharedBatch(batch, batches.indexOf(batch));
+        //read data in burst
+        for (ArrayList<Event> burst: bursts) {
+
+            //run hamlet for each burst
+            sharedBurst(burst, bursts.indexOf(burst));
 
         }
 
+        // finish the graphlet and update the final counts if necessary
         finishingGraphlet();
+
         System.out.println("Static final count updates:" + finalcountCounter);
         System.out.println("Static snapshot updates:" + snapshotCounter);
-        System.out.println("Static snapshot dense batch number:" + denseBatchnum);
-        System.out.println("Static snapshot sparse batch number:" + (batches.size()- denseBatchnum));
-
-
+        System.out.println("Static snapshot dense batch number:" + denseBurstnum);
+        System.out.println("Static snapshot sparse batch number:" + (bursts.size()- denseBurstnum));
 
     }
 
-     void sharedBatch(ArrayList<Event> batch, int index){
+    /**
+     * this method runs the hamlet with static sharing decision for a burst
+     * @param burst a burst of events
+     * @param index the index of the burst
+     */
+     void sharedBurst(ArrayList<Event> burst, int index){
 
          SharedGraphlet shareG = null;
-         boolean isDenseBatch = index<denseBatchnum;
+
+         //first denseBurstnum of bursts are dense burst
+         boolean isDenseBatch = index < denseBurstnum;
 
          if (Graphlets.isEmpty()){
-             updateSnapshot(batch.get(0));       //新建snapshot
-             newSharedGraphlet(batch.get(0));   //new shared graphlet
+
+             //update the graphlet snapshot
+             updateSnapshot(burst.get(0));
+
+             //create a new shared graphlet
+             newSharedGraphlet(burst.get(0));
+
+             //update the event level snapshots
              updatePredSnapshots();
-             batch.remove(0);
+
+             //remove the event from the burst
+             burst.remove(0);
         }
 
-         shareG = (SharedGraphlet)Graphlets.get(activeFlag);  //将events加入Graphlet
+         //get the active graphlet
+         shareG = (SharedGraphlet)Graphlets.get(activeFlag);
 
-         ExpandGraphletbyBatch(batch, shareG, isDenseBatch);   //expand graphlet
+         //expand graphlet
+         ExpandGraphletbyBurst(burst, shareG, isDenseBatch);
 
-        Graphlets.put(activeFlag, shareG);  //add G back to Graphlets
-        this.memory += batch.size()*12;
+         //add G back to Graphlets
+        Graphlets.put(activeFlag, shareG);
+        this.memory += burst.size()*12;
 
     }
+
+    /**
+     * update the event level snapshots due to predicates
+     */
 
     public void updatePredSnapshots(){
 
-        SharedGraphlet shareG = (SharedGraphlet)Graphlets.get(activeFlag);  //将events加入Graphlet
+        //get the active graphlet
+        SharedGraphlet shareG = (SharedGraphlet)Graphlets.get(activeFlag);
 
+        //update the event-level predicates for each query
         for (Integer q: predSnapshots.keySet()){
             predSnapshots.put(q, shareG.getCoeff().multiply(this.SnapShot.getCounts().get(q)));
         }
     }
 
-    @Override
-    void newSharedGraphlet(Event e){
-        super.newSharedGraphlet(e);
-    }
 
+    /**
+     * expand an active graphlet by a burst of events
+     * @param burst a burst of events
+     * @param g the active graphlet
+     * @param isDenseBatch is this burst a dense one
+     */
+    void ExpandGraphletbyBurst(ArrayList<Event> burst, SharedGraphlet g, boolean isDenseBatch) {
 
-    void ExpandGraphletbyBatch(ArrayList<Event> batch, SharedGraphlet g, boolean isDenseBatch) {   //expand the current graphlet
+        // dense burst，update a snapshot for each event
+        // sparse burst，update a snapshot for every three events
+        int eventsperSnapshot = isDenseBatch?1: burstSize /3;
 
-        // dense batch，每一个event都update一次snapshots
-        // 非dense batch，一个batch update 三次snapshots
-        int eventsperSnapshot = isDenseBatch?1:batchSize/3;
+        //counter for events in a burst
         int eventCounterInBatch = 0;
 
         assert eventsperSnapshot!= 0;
 
-        for (Event e: batch) {
+        //for each event in the burst
+        for (Event e: burst) {
 
             if (eventCounterInBatch == eventsperSnapshot) {
+
+                //increment snapshot counter
                 snapshotCounter++;
-                //update predicate snapshots
+
+                //update event level snapshots
                 updatePredSnapshots();
 
+                //add event into the graphlet
                 g.addEvent(e);
+
+                //add graphlet into the graphlet list
                 Graphlets.put(activeFlag, g);
 
-                eventCounterInBatch = 0;    //reset events counter
+                //reset events counter
+                eventCounterInBatch = 0;
 
             } else {
                 g.addEvent(e);
@@ -147,6 +207,9 @@ public class StaticGraph extends Graph{
     }
 
     @Override
+    /**
+     * update the graphlet level snapshot
+     */
     public void updateSnapshot(Event e){
 
         snapshotCounter++;
@@ -167,6 +230,9 @@ public class StaticGraph extends Graph{
     }
 
     @Override
+    /**
+     * finish the graphlet and update the final count
+     */
     public boolean finishingGraphlet(){
         if (Graphlets.isEmpty()){
             return false;
@@ -176,11 +242,14 @@ public class StaticGraph extends Graph{
         return true;
     }
 
-
+    /**
+     * update the final count when the graphlet is of a end event type
+     */
     void updateFinalCounts(){
 
         SharedGraphlet activeG = (SharedGraphlet) Graphlets.get(activeFlag);
 
+        //update the final count for each query
         for (Integer q: Graphlets.get(activeFlag).eventType.getQids()){
             BigInteger previousCount = this.finalCount.get(q);
             this.finalCount.put(q,previousCount.add(this.SnapShot.getCounts().get(q).multiply(activeG.getCoeff())));
@@ -192,21 +261,21 @@ public class StaticGraph extends Graph{
     }
 
     /**
-     * load events into batches
+     * load events into bursts
      */
      void loadBatches(){
 
-        int batchnum = ((events.size()%batchSize>0)?1:0)+(events.size()/batchSize);
+        int batchnum = ((events.size()% burstSize >0)?1:0)+(events.size()/ burstSize);
 
         for (int i =0;i<batchnum; i++){
             ArrayList<Event> batch = new ArrayList<>();
-            for (int j=0;j<batchSize;j++){
-                if (i*batchSize+j==events.size()){
+            for (int j = 0; j< burstSize; j++){
+                if (i* burstSize +j==events.size()){
                     break;
                 }
-                batch.add(events.get(i*batchSize+j));
+                batch.add(events.get(i* burstSize +j));
             }
-            batches.add(batch);
+            bursts.add(batch);
 
         }
 

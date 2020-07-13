@@ -38,35 +38,19 @@ public class main {
 
 
         /**
-         * Hamlet versus state-of-the-art approaches
-         * NYC Taxi dataset
-         * Figure 15
+         * Dynamic versus static sharing decision
+         * Ride sharing dataset
+         * Figure 17
          */
-        //increment experiment Number
-        expNo++;
-        Experiment nyc_hamExp = new Experiment(1,false, expNo, true);
+
+        Experiment decision_Exp = new Experiment(0,false, expNo, true);
 
         //vary events per window
-        nyc_hamExp.varyEventsPerWindow();
+        decision_Exp.Dynamic_varyEPW();
 
-        //vary number of queries
-        nyc_hamExp.varyNumofQueries();
+        //vary burst size
+        decision_Exp.Dynamic_varyBurstSize();
 
-
-        /**
-         * Hamlet versus state-of-the-art approaches
-         * Smart Home dataset
-         * Figure 15
-         */
-        //increment experiment Number
-        expNo++;
-        Experiment sh_hamExp = new Experiment(2,false, expNo, true);
-
-        //vary events per window
-        sh_hamExp.varyEventsPerWindow();
-
-        //vary number of queries
-        sh_hamExp.varyNumofQueries();
 
         /**
          * update the experiment number in the file

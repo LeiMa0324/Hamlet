@@ -8,19 +8,43 @@ import hamlet.template.Template;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-
+/**
+ * the dynamic hamlet graph with dynamic sharing decision under the condition of predicates
+ * benefit model computes the benefit to share for each burst then give the decision to share or not
+ */
 public class DynamicGraph extends StaticGraph{
 
-    private ArrayList<SplittedGraphlet> activeSplittedGs;  // the active splitted graphlets
+
+    // the active splitted graphlets
+    private ArrayList<SplittedGraphlet> activeSplittedGs;
+
+    //if the first snapshot is created
     private boolean firstSnapshot = true;
+
+    //the number of non-share decisions
     public Integer splitNum;
+
+    //the number of share decisions
     public Integer mergeNum;
 
-    public DynamicGraph(Template template, String streamFile, int epw, Integer batchSize,int snapshotnum,
+    /**
+     * constructor of the dynamic graph
+     * @param template the hamlet template
+     * @param streamFile the stream file
+     * @param epw events per window
+     * @param burstSize the burst size
+     * @param snapshotnum the total number of snapshots due to predicates
+     * @param denseBatchPercent the percent of dense bursts in all the bursts.
+     *      *                          a dense burst: place a snapshot for each event
+     *      *                          a sparse burst: place a snapshot for every three events
+     * @param openMsg
+     */
+
+    public DynamicGraph(Template template, String streamFile, int epw, Integer burstSize,int snapshotnum,
                         double denseBatchPercent, boolean openMsg) {
 
 
-        super(template, streamFile, epw, batchSize, snapshotnum, denseBatchPercent, openMsg);
+        super(template, streamFile, epw, burstSize, snapshotnum, denseBatchPercent, openMsg);
 
         this.activeSplittedGs = new ArrayList<>();
         this.splitNum = 0;
@@ -30,50 +54,58 @@ public class DynamicGraph extends StaticGraph{
 
 
     /**
-     * dynamic decision to split or merge
+     * This method runs the hamlet with dynamic sharing decision for each burst
      */
     public void dynamicRun() {
 
         String shared = template.getSharedEvents().get(0);
 
-        //read data in batch
-        for (ArrayList<Event> batch: batches) {
+        //read data in burst
+        for (ArrayList<Event> burst: bursts) {
 
+            int actualBatchsize = burstSize <events.size()? burstSize :events.size();
 
+            // mc number of snapshots in a burst
+            //dense burst: burst size
+            // sparse burst: 3
+            int mc = bursts.indexOf(burst)< denseBurstnum ?burst.size():3;
 
-            int actualBatchsize = batchSize<events.size()?batchSize:events.size();
-
-            // mc number of snapshots in a batch
-            //dense batch: batch size, sparse batch: 3
-            int mc = batches.indexOf(batch)<denseBatchnum?batch.size():3;
             //k number of queries
             int k = template.getQueries().size();
+
             //g number of events per graphlet
 
             //the size of the shared graphlet
-            int sharedg = (activeFlag.equals(shared))?Graphlets.get(activeFlag).getEventList().size()+batch.size():batch.size();
+            int sharedg = (activeFlag.equals(shared))?Graphlets.get(activeFlag).getEventList().size()+burst.size():burst.size();
 
             // the size of the non shared graphlet
-            int nonsharedg = (activeSplittedGs.isEmpty())?batch.size():(activeSplittedGs.get(0).getEventList().size()+batch.size());
+            int nonsharedg = (activeSplittedGs.isEmpty())?burst.size():(activeSplittedGs.get(0).getEventList().size()+burst.size());
+
             // p number of preds for each event type in each query
             int p = 1;
-            //b number of events in a batch
-            int b = batch.size();
+
+            //b number of events in a burst
+            int b = burst.size();
+
             // n number of events
             int n = events.size();
 
             //mp  number of snapshots in a shared graphlet
             int mp = mc+1;
 
-            int batchindex = batches.indexOf(batch);
+            int batchindex = bursts.indexOf(burst);
+
+            //the sharing decision
             boolean toShare = isBeneficialToShare(mc,k,p,sharedg,nonsharedg,b,n,mp, batchindex);
 
 
             if (toShare){
-                sharedBatch(batch, batchindex);
+                //share the burst
+                sharedBurst(burst, batchindex);
                 mergeNum++;
             }else {
-                splittedBatch(batch);
+                // split the burst
+                splittedBatch(burst);
                 splitNum++;
             }
 
@@ -86,45 +118,74 @@ public class DynamicGraph extends StaticGraph{
     }
 
     @Override
-    void sharedBatch(ArrayList<Event> batch, int index){
+    /**
+     * this method runs the dynamic hamlet with sharing decision for a burst
+     * @param burst a burst of events
+     * @param index the index of the burst
+     */
+    void sharedBurst(ArrayList<Event> burst, int index){
 
         SharedGraphlet shareG = null;
+
+        //if the active graphlet is a shared one
         String lastshared = (activeFlag.equals(template.getSharedEvents().get(0)))?"1":activeFlag;
 
         switch (lastshared){
-            case "1":   //上一个graphlet为shared, merge shared graphlet
-                shareG = (SharedGraphlet)Graphlets.get(activeFlag);  //将events加入Graphlet
-                ExpandGraphletbyBatch(batch, shareG, index<denseBatchnum);
-                Graphlets.put(activeFlag, shareG);  //add G back to Graphlets
+
+            //merge the active graphlet with this burst if it's a shared one
+            case "1":
+
+                shareG = (SharedGraphlet)Graphlets.get(activeFlag);
+
+                //add the burst into the graphlet
+                ExpandGraphletbyBurst(burst, shareG, index< denseBurstnum);
+
+                //add the active graphlet back to Graphlets
+                Graphlets.put(activeFlag, shareG);
 
                 break;
 
-            default:  //上一个graphlet为split或者为空
+            // create a new shared graphlet if the active graphlet is not a shared one
+            default:
 
+                // finish the active graphlet and update the final count
                 updateFinalCounts();
 
-                updateSnapshot(batch.get(0), false);       //新建snapshot
-                newSharedGraphlet(batch.get(0));    //create shared Graphlet
-                updatePredSnapshots();          //create the pred snapshots for the first event
+                //create a new graphlet level snapshot
+                updateSnapshot(burst.get(0), false);
 
-                activeSplittedGs.clear();       //empty active splits
+                //create shared Graphlet
+                newSharedGraphlet(burst.get(0));
+
+                //create the pred snapshots for the first event
+                updatePredSnapshots();
+
+                //empty active splits
+                activeSplittedGs.clear();
                 shareG = (SharedGraphlet)Graphlets.get(activeFlag);
-                batch.remove(0);    //删除第一个元素
 
-                ExpandGraphletbyBatch(batch, shareG, index<denseBatchnum);  //expand the shared graphlet
+                //remove the event from the burst
+                burst.remove(0);
 
-                Graphlets.put(activeFlag, shareG);  //add G back to Graphlets
+                //expand the shared graphlet with the burst
+                ExpandGraphletbyBurst(burst, shareG, index< denseBurstnum);
+
+                //add G back to Graphlets
+                Graphlets.put(activeFlag, shareG);
 
                 break;
 
         }
 
-        this.memory += batch.size()*12;
+        this.memory += burst.size()*12;
 
     }
 
-
-    private void splittedBatch(ArrayList<Event> batch){
+    /**
+     *
+     * @param burst
+     */
+    private void splittedBatch(ArrayList<Event> burst){
 
 
         String lastshared = (activeFlag.equals(template.getSharedEvents().get(0)))?"1":activeFlag;
@@ -133,9 +194,9 @@ public class DynamicGraph extends StaticGraph{
             case "1":   //last graphlet is shared
 
                 updateFinalCounts();
-                updateSnapshot(batch.get(0),true);       //update snapshot
-                newSplittedGraphlets(batch.get(0)); //new splitted graphlets
-                batch.remove(0);
+                updateSnapshot(burst.get(0),true);       //update snapshot
+                newSplittedGraphlets(burst.get(0)); //new splitted graphlets
+                burst.remove(0);
 
                 break;
 
@@ -143,18 +204,18 @@ public class DynamicGraph extends StaticGraph{
                 break;
 
             default:   //first snapshot
-                updateSnapshot(batch.get(0),false);       //update snapshot
-                newSplittedGraphlets(batch.get(0)); //new splitted graphlets
-                batch.remove(0);
+                updateSnapshot(burst.get(0),false);       //update snapshot
+                newSplittedGraphlets(burst.get(0)); //new splitted graphlets
+                burst.remove(0);
 
 
         }
 
         // expand splitted Graphlets
 
-        ExpandSplittedGraphlets(batch);
+        ExpandSplittedGraphlets(burst);
 
-        this.memory += batch.size()*12*template.getQueries().size();
+        this.memory += burst.size()*12*template.getQueries().size();
 
     }
 
