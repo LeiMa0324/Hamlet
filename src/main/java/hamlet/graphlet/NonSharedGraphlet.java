@@ -1,8 +1,6 @@
 package hamlet.graphlet;
 
 import hamlet.event.Event;
-import hamlet.graph.Snapshot;
-import hamlet.template.EventType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,7 +21,9 @@ each unshared event type has an unshared graphlet
 public class NonSharedGraphlet extends Graphlet{
 
     private Integer eventNum;
-    private HashMap<Integer, BigInteger> predInterCounts;    //intermediate final interCounts of the pred graphlet
+
+    //intermediate final interCounts of the pred graphlet
+    private HashMap<Integer, BigInteger> predInterCounts;    
     public HashMap<Integer, Boolean> isCalculated;
 
 
@@ -54,12 +54,14 @@ public class NonSharedGraphlet extends Graphlet{
      * update the count for this graphlet when switching graphlet
      */
     public void updateCounts(){
+
         //for start type, count = num of events
         for (Integer qid: eventType.getQids()){
             if (eventType.getTypebyQid(qid).equals("START")||eventType.getTypebyQid(qid).equals("START|END")){
                 interCounts.put(qid, new BigInteger(eventNum+""));
 
             }else {
+
                 // not start type, count = pred count* event number
                 interCounts.put(qid, predInterCounts.get(qid).multiply(new BigInteger(eventNum+"")));
             }

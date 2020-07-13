@@ -72,7 +72,7 @@ public class SharedGraphlet extends Graphlet{
     /***
      * update the intermediate counts when finishing this graphlet，
      * called by finishingGraphlet
-     * @param snapshot
+     * @param snapshot the old snapshot
      */
     public void updateCounts(Snapshot snapshot){
 

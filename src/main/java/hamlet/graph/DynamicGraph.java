@@ -105,7 +105,7 @@ public class DynamicGraph extends StaticGraph{
                 mergeNum++;
             }else {
                 // split the burst
-                splittedBatch(burst);
+                splittedBurst(burst);
                 splitNum++;
             }
 
@@ -182,36 +182,53 @@ public class DynamicGraph extends StaticGraph{
     }
 
     /**
-     *
-     * @param burst
+     * this method runs the dynamic hamlet with not sharing decision for a burst
+     * the burst is splitted into graphlets for each query
+     * @param burst a burst of events
      */
-    private void splittedBatch(ArrayList<Event> burst){
+    private void splittedBurst(ArrayList<Event> burst){
 
-
+        // if the active graphlet is a shared one
         String lastshared = (activeFlag.equals(template.getSharedEvents().get(0)))?"1":activeFlag;
 
         switch (lastshared){
-            case "1":   //last graphlet is shared
 
+            //active graphlet is shared
+            case "1":
+
+                //finish the active graphlet, update the final count
                 updateFinalCounts();
-                updateSnapshot(burst.get(0),true);       //update snapshot
-                newSplittedGraphlets(burst.get(0)); //new splitted graphlets
+
+                //create a new graphlet level snapshot
+                updateSnapshot(burst.get(0),true);
+
+                //create new splitted graphlets for each query
+                newSplittedGraphlets(burst.get(0));
+
+                //remove the first event from the burst
                 burst.remove(0);
 
                 break;
 
-            case "-1":  //last graphlet is split
+                //last graphlet is split, do nothing
+            case "-1":
                 break;
 
-            default:   //first snapshot
-                updateSnapshot(burst.get(0),false);       //update snapshot
-                newSplittedGraphlets(burst.get(0)); //new splitted graphlets
+            //first burst
+            default:
+                //create a new graphlet level snapshot
+                updateSnapshot(burst.get(0),false);
+
+                //create new splitted graphlets for each query
+                newSplittedGraphlets(burst.get(0));
+
+                //remove the first event from the burst
                 burst.remove(0);
 
 
         }
 
-        // expand splitted Graphlets
+        // expand splitted Graphlets with the rest of the burst
 
         ExpandSplittedGraphlets(burst);
 
@@ -220,29 +237,39 @@ public class DynamicGraph extends StaticGraph{
     }
 
     @Override
+    /**
+     * update the final count when a graphlet is finished
+     */
     void updateFinalCounts(){
 
         finalcountCounter++;
-        switch (activeFlag){
-            case "1": //shared graphlet
 
-                //update final count
+        switch (activeFlag){
+
+            //the active graphlet is shared
+            case "1":
+
+                //use the super class's final count update method
                 super.updateFinalCounts();
 
                 break;
 
-            default:      //splitted graphlets or empty
+            //if the active graphlets are splitted or empty
+            default:
 
-                //update final counts for last splitted graphlet
+                //empty active graphlets
                 if (activeSplittedGs.isEmpty()){
                     for (Integer q=1; q<= template.getQueries().size();q++){
                         this.finalCount.put(q, new BigInteger("0"));
                     }
                 }else {
+                    //update final counts for active splitted graphlets
 
                     for (SplittedGraphlet g : activeSplittedGs) {
                         BigInteger previousCount = this.finalCount.get(g.getQid());
-                        this.finalCount.put(g.getQid(), previousCount.add(this.SnapShot.getCounts().get(g.getQid()).multiply(g.getCoeff()))); // pass the inter count of active G to final count
+
+                        // pass the inter count of active G to final count
+                        this.finalCount.put(g.getQid(), previousCount.add(this.SnapShot.getCounts().get(g.getQid()).multiply(g.getCoeff())));
                     }
                 }
                 break;
@@ -250,7 +277,10 @@ public class DynamicGraph extends StaticGraph{
     }
 
 
-
+    /**
+     * create new splitted graphlets for all the queries
+     * @param e the coming event
+     */
     private void newSplittedGraphlets(Event e){
         for (Integer qid: e.eventType.getQids()){
             SplittedGraphlet splittedG = new SplittedGraphlet(e, qid);
@@ -258,39 +288,49 @@ public class DynamicGraph extends StaticGraph{
 
         }
 
-        setActiveFlag("-1");    //set the active flag
+        //set the active flag =-1 if the active graphlets are splitted
+        setActiveFlag("-1");
     }
 
-    private void ExpandSplittedGraphlets(ArrayList<Event> batch){
+    /**
+     * expand the splitted graphlets with a burst
+     * @param burst the given burst
+     */
+    private void ExpandSplittedGraphlets(ArrayList<Event> burst){
 
+        //add the burst into each splitted graphlet
         for (SplittedGraphlet g: activeSplittedGs){
-            g.addEvents(batch);
+            g.addEvents(burst);
         }
 
     }
 
     /**
-     * update the snapshot before the shared graphlet
-     * @param e
-     * @param isLastGraphletShare
+     /**
+     * update the graphlet level snapshot
+     * @param e the coming event
+     * @param isLastGraphletShare if the last graphlet is shared
      */
     public void updateSnapshot(Event e, boolean isLastGraphletShare){
+
         //从上一个graphlet中获得coeff并update snapshot
         snapshotCounter++;
 
+        //for the first snapshot, every value is 1
         if (firstSnapshot) {
             for (Integer qid : e.eventType.getQids()) {
                 this.SnapShot.getCounts().put(qid, new BigInteger("1"));
 
             }
             firstSnapshot = false;
-        }else {
 
+        }else {
+            //if the last graphlet is shared, use the super class's update snapshot method
             if (isLastGraphletShare) {
                super.updateSnapshot(e);
 
             }else {
-
+                    //if the last graphlets are splitted, update the value of the snapshot from each splitted graphlet
                     for (SplittedGraphlet g: activeSplittedGs){
                         this.SnapShot.updatewithPredicate(activeSplittedGs.get(0).getCoeff(), g.getQid());
                     }
@@ -302,21 +342,33 @@ public class DynamicGraph extends StaticGraph{
     }
 
 
-
-    public boolean isBeneficialToShare(int mc, int k, int p, int sharedg, int nonsharedg, int b, int n, int mp, int batchindex){
+    /**
+     * this method calculate the benefit to share for each burst
+     * @param mc number of snapshots in a burst
+     * @param k number of queries
+     * @param p number of predicates for each event in each query
+     * @param sharedg the size of the shared graphlet
+     * @param nonsharedg the size of the non-shared graphlet
+     * @param b number of events in a burst
+     * @param n number of events
+     * @param mp number of snapshots in a shared graphlet
+     * @param burstindex the index of the burst
+     * @return to share or not
+     */
+    public boolean isBeneficialToShare(int mc, int k, int p, int sharedg, int nonsharedg, int b, int n, int mp, int burstindex){
 
 
         Double sharedCost = mc*k*sharedg*p+b*(Math.log(sharedg)/Math.log(2)+n*mp);
         Double nonsharedCost = k*b*(Math.log(nonsharedg)/Math.log(2)+n);
         Double benefit = nonsharedCost - sharedCost;
 
-        System.out.println((benefit>0)?"=============batch "+batchindex+", choose to share============\n":"=============batch "+batchindex+", choose to split============\n");
-//        System.out.println("mc(number of snapshots in a batch): " + mc+"\n"+
+        System.out.println((benefit>0)?"=============Burst "+burstindex+", choose to share============\n":"=============Burst "+burstindex+", choose to split============\n");
+//        System.out.println("mc(number of snapshots in a Burst): " + mc+"\n"+
 //        "k(number of querie): "+k+"\n"+
 //        "shared g(number of events per graphlet):"+sharedg +"\n"+
 //        "non shared g(number of events per graphlet):"+nonsharedg +"\n"+
 //        "p(number of preds for each event type in each query): "+p+"\n"+
-//        "b(batch size): "+b+"\n"+
+//        "b(Burst size): "+b+"\n"+
 //        "mp(number of snapshots propagated): "+mp);
 //        System.out.println("shared cost :" +sharedCost);
 //        System.out.println("non shared cost :" +nonsharedCost);

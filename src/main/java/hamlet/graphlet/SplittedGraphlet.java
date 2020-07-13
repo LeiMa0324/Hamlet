@@ -4,11 +4,8 @@ import hamlet.event.Event;
 import hamlet.graph.Snapshot;
 import lombok.Data;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-
 /**
- * a graphlet splitted from a shared one
+ * a graphlet splitted for a query
  */
 @Data
 public class SplittedGraphlet extends SharedGraphlet{
