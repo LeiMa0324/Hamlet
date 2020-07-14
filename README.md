@@ -11,7 +11,7 @@ Packages
 * Process the raw data of NYC Taxi and Smart Home data sets
 
 **baselines package**
-* All baseline models including greta, sharon, mcep
+* All baseline models including greta, sharon, etc
 
 **hamlet package**
 * Graph - super class of all hamlet graphs
@@ -52,15 +52,13 @@ Main Function
  Main function: ~/src/main/java/executor/main.java<br>
  simply run the main function directly.
 
- Main function includes two experiments in the paper:
- * Hamlet versus state-of-the-art approaches(Ridesharing data set)<br>
-     Figure 14, 16<br>
+ Main function includes two simplified demonstration experiments:
+ * Hamlet versus Greta, Sharon(Ridesharing data set)<br>
      output directory: ~/output/RideSharing
 
 
- * Dynamic versus static sharing decision (Ridesharing data set)<br>
-     Figure 17<br>
-     output directory: ~/output/RideSharing
+ * Dynamic versus static sharing decision (NYC Taxi data set)<br>
+     output directory: ~/output/DynamicHamlet
 
 Experiment
 ----

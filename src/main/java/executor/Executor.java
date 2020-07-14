@@ -5,11 +5,10 @@ import baselines.commons.event.StreamPartitioner;
 import baselines.commons.templates.SingleQueryTemplate;
 import baselines.commons.transactions.TransactionMQ;
 import baselines.greta.GretaMQ;
-import baselines.mcep.McepGraph;
 import baselines.sharon.Sharon;
 import hamlet.graph.DynamicGraph;
-import hamlet.graph.StaticGraph;
 import hamlet.graph.HamletGraph;
+import hamlet.graph.StaticGraph;
 import hamlet.template.Template;
 import lombok.Data;
 
@@ -120,7 +119,6 @@ public class Executor {
 		//initiate Hamlet
 		this.hamletTemplate = new Template(queries);
 
-		// TODO: 2020-07-05 统一graph 
 		this.hamletG = new HamletGraph(hamletTemplate,streamFile, epw, openMsg);
 		this.sharonLatency = -1;
 		this.mcepLatency = -1;
@@ -141,7 +139,6 @@ public class Executor {
 
 		if (isBaseline){
 			sharonRun();	//run sharon
-			mcepRun();	//run mcep
 
 		}
 
@@ -323,30 +320,5 @@ public class Executor {
 	}
 
 
-	/**
-	 * a single run of MCEP
-	 */
-	public void mcepRun(){
 
-		//initiate MCEP
-		McepGraph mcepGraph = new McepGraph(this.hamletTemplate, streamFile, epw);
-
-		long start =  System.currentTimeMillis();
-
-		//run MCEP
-		mcepGraph.run();
-		long end =  System.currentTimeMillis();
-
-		//calculate the latency
-		mcepLatency = end - start;
-
-		//calculate the memory
-		mcepGraph.memoryCalculate();
-		this.mcepMemory = mcepGraph.memory;
-
-
-		System.out.println("MCEP latency: "+ mcepLatency);
-		System.out.println("MCEP Memory: "+ mcepMemory);
-
-	}
 }
