@@ -23,7 +23,7 @@ public class NonSharedGraphlet extends Graphlet{
     private Integer eventNum;
 
     //intermediate final interCounts of the pred graphlet
-    private HashMap<Integer, BigInteger> predInterCounts;    
+    private HashMap<Integer, BigInteger> predInterCounts;
     public HashMap<Integer, Boolean> isCalculated;
 
 

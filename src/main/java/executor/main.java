@@ -24,9 +24,8 @@ public class main {
         }
 
         /**
-         * Hamlet versus state-of-the-art approaches
+         * Hamlet versus greta
          * Ride sharing dataset
-         * Figure 14
          */
         Experiment rideSharing_Exp = new Experiment(0,true, expNo, true);
 
@@ -39,8 +38,7 @@ public class main {
 
         /**
          * Dynamic versus static sharing decision
-         * Ride sharing dataset
-         * Figure 17
+         * New York Taxi dataset with only kleene queries
          */
 
         Experiment decision_Exp = new Experiment(0,false, expNo, true);

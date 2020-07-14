@@ -181,6 +181,10 @@ public class Executor {
 		this.staticHamletMemory = staticHamlet.getMemory();
 
 		System.out.println("Static Hamlet latency: "+ staticHamletLatency);
+		for (int qid=1; qid<= staticHamlet.getTemplate().getQueries().size(); qid++){
+			System.out.println("Static Hamlet final count: "+ staticHamlet.getFinalCount().get(qid));
+
+		}
 
 	}
 
@@ -207,6 +211,11 @@ public class Executor {
 		this.dynamicHamletMemory = dynamicHamelt.getMemory();
 
 		System.out.println("Dynamic Hamlet latency: "+ dynamicHamletLatency);
+		for (int qid=1; qid<= dynamicHamelt.getTemplate().getQueries().size(); qid++){
+			System.out.println("Dynamic Hamlet final count: "+ dynamicHamelt.getFinalCount().get(qid));
+
+		}
+
 
 
 
