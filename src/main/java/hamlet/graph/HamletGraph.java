@@ -152,7 +152,7 @@ public class HamletGraph extends Graph {
             updateNonSharedGraphletCount();
         }
 //
-//        System.out.println("graphlet "+ activeGraphlet.eventType.string);
+//        System.out.println("graphlet "+ activeGraphlet.vendorID.string);
 //        System.out.println("inter count"+activeGraphlet.interCounts);
 
         /**

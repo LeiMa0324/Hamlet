@@ -41,7 +41,7 @@ public class Experiment {
     //default events per window for Ride Sharing dataset
     private static Integer SYN_BASELINE_DEFAULT_EPW = 5000;
 
-    //default workload for Ride Sharing dataset
+    //default Workload for Ride Sharing dataset
     private static String SYN_BASELINE_DEFAULT_WORKLOAD ;
 
 
@@ -57,7 +57,7 @@ public class Experiment {
     //default events per window for NYC Taxi dataset
     private static Integer NYC_DEFAULT_EPW = 50000;
 
-    //default workload for NYC Taxi dataset
+    //default Workload for NYC Taxi dataset
     private static String NYC_DEFAULT_WORKLOAD ;
 
     /**
@@ -72,7 +72,7 @@ public class Experiment {
     //default events per window for Smart Home dataset
     private static Integer SH_DEFAULT_EPW = 50000;
 
-    //default workload for Smart Home dataset
+    //default Workload for Smart Home dataset
     private static String SH_DEFAULT_WORKLOAD ;
 
     /**
@@ -90,7 +90,7 @@ public class Experiment {
     //default number of snapshots representing the predicates
     private static Integer DYN_DEFAULT_SNAPSHOTS = 50;
 
-    //default workload
+    //default Workload
     private static String DYN_DEFAULT_WORKLOAD ;
 
 
@@ -429,7 +429,7 @@ public class Experiment {
     public void logging(Executor executor, int numofShared,int iternum, String logFile){
 
         // set up header for the csv
-        String[] header = {"iter","epw","# of shared","workload size",
+        String[] header = {"iter","epw","# of shared","Workload size",
                 "Hamlet throughput","Greta throughput", "Sharon throughput","mcep throughput",
                 "Hamlet latency","Greta latency","Sharon latency","mcep latency",
                 "Hamlet memory", "Greta memory","Sharon memory","mcep,memory"};

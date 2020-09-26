@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Executor includes executions of all the approaches.
- * It takes settings of the stream file, workload, epw etc. to run the corresponding models together once
+ * It takes settings of the stream file, Workload, epw etc. to run the corresponding models together once
  * and store the throughput and latency, memory of each model.
  * 
  * It's called in the experiment.
@@ -40,10 +40,10 @@ public class Executor {
 	//the stream file
 	private String streamFile;
 
-	//the workload file
+	//the Workload file
 	private String queryFile;
 	
-	//the queries in the workload
+	//the queries in the Workload
 	private ArrayList<String> queries;
 	
 	//the events per window
@@ -96,7 +96,7 @@ public class Executor {
 	/**
 	 * the constructor of executor
 	 * @param streamFile the stream file
-	 * @param queryFile the workload file
+	 * @param queryFile the Workload file
 	 * @param epw the events per window
 	 * @param openMsg 
 	 */

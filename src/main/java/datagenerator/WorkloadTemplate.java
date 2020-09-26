@@ -11,7 +11,7 @@ import java.util.Random;
 
 /**
  * control the number of queries, the length of queries, the position of shared events
- * all queries in the workload share the same setting
+ * all queries in the Workload share the same setting
  */
 @Data
 public class WorkloadTemplate {
@@ -24,8 +24,20 @@ public class WorkloadTemplate {
     private int eventBound;     // the largest event type
     private boolean randomLength;       //open the random length
 
+    /**
+     * create a Workload of queries
+     * @param num the number of queries
+     * @param length the default length of all queries
+     * @param eventBound the biggest event number
+     * @param sharedPos the position of the shared event type
+     * @param queryFile the query file
+     * @param sharedE the shared event type
+     * @param randomLength if use random length
+     */
     public WorkloadTemplate(int num,int length, int eventBound, int sharedPos, String queryFile, int sharedE, boolean randomLength){
         this.query = "";
+
+        //number of queries
         this.num = num;
         this.queryFile = queryFile;
         this.length = length;
@@ -38,6 +50,7 @@ public class WorkloadTemplate {
     }
 
     public void generate(){
+
         try{
             File output_file = new File(this.queryFile);
             BufferedWriter output = new BufferedWriter(new FileWriter(output_file));

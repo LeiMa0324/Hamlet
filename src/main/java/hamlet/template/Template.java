@@ -19,7 +19,7 @@ import java.util.List;
 @Data
 public class Template {
 
-    //all the queries in the workload
+    //all the queries in the Workload
     private ArrayList<String> queries;
 
     //the Shared event types in all queries
@@ -33,7 +33,7 @@ public class Template {
 
     /**
      * read the queries, creating event types and building the connections between event types
-     * @param queries the queries in the workload
+     * @param queries the queries in the Workload
      */
     public Template(ArrayList<String> queries) {
         this.queries = queries;
@@ -53,7 +53,7 @@ public class Template {
             // a sequence of event types in a query
             List<String> records = Arrays.asList(q.split(","));
 
-            //an temporary eventType list to find the predecessor
+            //an temporary vendorID list to find the predecessor
             ArrayList<EventType> eventTypeList = new ArrayList<EventType>();
 
             // iterate over all event types

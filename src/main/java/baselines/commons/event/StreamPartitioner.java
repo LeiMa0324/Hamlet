@@ -55,7 +55,7 @@ public class StreamPartitioner {
 	 		}		 			
 	 		/*** Clean-up ***/		
 			scanner.close();				
-//			System.out.println("Stream partitioner created " + stream.substreams.size() + " substreams.");	
+//			System.out.println("SubStream partitioner created " + stream.substreams.size() + " substreams.");
  		
 		} catch (FileNotFoundException e) { e.printStackTrace(); }
 		return stream;
