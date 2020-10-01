@@ -34,7 +34,7 @@ public class Template {
 			int closeP = types[i].lastIndexOf(")+");
 			String e_type = types[i];
 
-			// If event type starts a kleene sub-pattern, push into a stack
+			// If event type starts a kleene sub-Pattern, push into a stack
 			while (openP) {
 				start_kleene.push(this.clean(e_type));
 				e_type = e_type.substring(1);

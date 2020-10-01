@@ -29,7 +29,7 @@ public class newSharon extends TransactionMQ {
 	 * CHANGE CODE BELOW FOR DIFFERENT SHARED EVENT TYPE
 	 * **/
 	
-	// shared sub-pattern B+
+	// shared sub-Pattern B+
 
 	
 
@@ -57,7 +57,7 @@ public class newSharon extends TransactionMQ {
 	private String sharedEvent;
 	
 	public newSharon(Stream str, CountDownLatch d, AtomicLong time, AtomicInteger mem, ArrayList<String> queries, String shared) {
-		// given one shared pattern and number of queries
+		// given one shared Pattern and number of queries
 		super(d, time);
 		stream = str;
 		memory = mem;
@@ -107,7 +107,7 @@ public class newSharon extends TransactionMQ {
 			}
 		}
 		
-		// In newSharon, a sub-pattern of length 1 is not sharable, so we need to remove it from this list.
+		// In newSharon, a sub-Pattern of length 1 is not sharable, so we need to remove it from this list.
 		// This is definitely questionable. Would the optimizer really decide to share this way???
 		repTypes.remove(0);
 		
@@ -199,7 +199,7 @@ public class newSharon extends TransactionMQ {
 			
 			// print final counts
 			for (int i=0; i<numQueries; i++) {
-				System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
+				System.out.println("stockQuery id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
 			}
 			
 			long end =  System.currentTimeMillis();
@@ -309,7 +309,7 @@ public class newSharon extends TransactionMQ {
 									
 									snapshot_created = true;
 									
-									// create prefix counters for shared sub-pattern B+ with this event as the START
+									// create prefix counters for shared sub-Pattern B+ with this event as the START
 									for (String q : sharedPatterns) { 
 										additionalPrefixCtrs.add(generatePrefixCtrs(q, -1, snapshots.size()-1));
 										counts_per_subpattern.add(new BigInteger("0"));

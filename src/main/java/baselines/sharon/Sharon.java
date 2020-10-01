@@ -31,7 +31,7 @@ public class Sharon extends TransactionMQ {
     public AtomicInteger memory;
 
     public Sharon (Stream str, CountDownLatch d, AtomicLong time, AtomicInteger mem, String pattern, int num) {
-        // given one shared pattern and number of queries
+        // given one shared Pattern and number of queries
         super(d, time);
         stream = str;
         memory = mem;

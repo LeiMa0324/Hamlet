@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /***
- * 根据events per window，分割streamfile为substream
+ * 根据events per Window，分割streamfile为substream
  */
 public class StreamPartitioner {	
 	

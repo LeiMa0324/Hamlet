@@ -9,18 +9,18 @@ import java.util.Random;
 public class Generator {
     public static void main(String[] agrs){
 
-         //synthetic baseline Workload
+         //synthetic baseline StockWorkloadTemplate
 //        for (int l=5; l<30; l+=5){
 //            generateWorkload(l, 3,2, true, true, true);
 //
 //        }
-        //synthetic hamlet Workload
+        //synthetic hamlet StockWorkloadTemplate
 //        for (int l=10; l<110; l+=10){
 //            generateWorkload(l, 3, 2, true, false,true);
 //
 //        }
 
-        //NYC Taxi Workload
+        //NYC Taxi StockWorkloadTemplate
         for (int l=10; l<110; l+=10){
             generateWorkload(l, 3, 0, true, false,true);
 
@@ -47,7 +47,7 @@ public class Generator {
     }
 
     /**
-     * generate a Workload
+     * generate a StockWorkloadTemplate
      */
     static void generateWorkload(int num, int length, int sharedPos, boolean isSynthetic, boolean isBaseline, boolean isDiverse){
         String queryFile = "";

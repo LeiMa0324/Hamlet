@@ -15,7 +15,7 @@ public class test {
          */
         Experiment rideSharing_Exp = new Experiment(0,true, 10, true);
 
-        //vary events per window
+        //vary events per Window
         rideSharing_Exp.varyEventsPerWindow();
 
         //vary number of queries

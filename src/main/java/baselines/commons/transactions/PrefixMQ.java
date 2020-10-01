@@ -34,7 +34,7 @@ public class PrefixMQ extends TransactionMQ{
 	}
 	
 	public PrefixMQ(Stream str, CountDownLatch d, AtomicLong time, AtomicInteger mem, String pattern, int num) {
-		// given one shared pattern and number of queries
+		// given one shared Pattern and number of queries
 		super(d, time);
 		memory = mem;
 		stream = str;
@@ -65,7 +65,7 @@ public class PrefixMQ extends TransactionMQ{
 			// print final interCounts
 			for (int i=0; i<numQueries; i++) {
 				final_counts[i] = new BigInteger(graph.final_count + "");
-//				System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with interCounts " + final_counts[i]);
+//				System.out.println("stockQuery id: " + (i+1) + " Substream id: " + substream_id +" with interCounts " + final_counts[i]);
 			}
 			
 			memory.set(memory.get() + graph.nodeNumber * 12);

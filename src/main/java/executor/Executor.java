@@ -6,10 +6,10 @@ import baselines.commons.templates.SingleQueryTemplate;
 import baselines.commons.transactions.TransactionMQ;
 import baselines.greta.GretaMQ;
 import baselines.sharon.Sharon;
-import hamlet.graph.DynamicGraph;
-import hamlet.graph.HamletGraph;
-import hamlet.graph.StaticGraph;
-import hamlet.template.Template;
+import hamlet.aoldgraph.DynamicGraph;
+import hamlet.aoldgraph.HamletGraph;
+import hamlet.aoldgraph.StaticGraph;
+import hamlet.aoldtemplate.Template;
 import lombok.Data;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Executor includes executions of all the approaches.
- * It takes settings of the stream file, Workload, epw etc. to run the corresponding models together once
+ * It takes settings of the stream file, StockWorkloadTemplate, epw etc. to run the corresponding models together once
  * and store the throughput and latency, memory of each model.
  * 
  * It's called in the experiment.
@@ -40,13 +40,13 @@ public class Executor {
 	//the stream file
 	private String streamFile;
 
-	//the Workload file
+	//the StockWorkloadTemplate file
 	private String queryFile;
 	
-	//the queries in the Workload
+	//the queries in the StockWorkloadTemplate
 	private ArrayList<String> queries;
 	
-	//the events per window
+	//the events per Window
 	private int epw;
 	
 	/**
@@ -96,8 +96,8 @@ public class Executor {
 	/**
 	 * the constructor of executor
 	 * @param streamFile the stream file
-	 * @param queryFile the Workload file
-	 * @param epw the events per window
+	 * @param queryFile the StockWorkloadTemplate file
+	 * @param epw the events per Window
 	 * @param openMsg 
 	 */
 	public Executor(String streamFile, String queryFile,  int epw, boolean openMsg){

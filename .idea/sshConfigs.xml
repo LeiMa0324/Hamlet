@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="shark2.wpi.edu" id="6e0baabd-3e8e-4c51-80db-b5582e2ff65e" port="22" customName="shark2" nameFormat="CUSTOM">
+        <option name="customName" value="shark2" />
+      </sshConfig>
+    </configs>
+  </component>
+</project>

@@ -29,7 +29,7 @@ public class main {
          */
         Experiment rideSharing_Exp = new Experiment(0,true, expNo, true);
 
-        //vary events per window
+        //vary events per Window
         rideSharing_Exp.varyEventsPerWindow();
 
         //vary number of queries
@@ -43,7 +43,7 @@ public class main {
 
         Experiment decision_Exp = new Experiment(0,false, expNo, true);
 
-        //vary events per window
+        //vary events per Window
         decision_Exp.Dynamic_varyEPW();
 
         //vary burst size

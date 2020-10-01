@@ -1,86 +1,22 @@
-NYCTaxi:
-    the 1st 10k: vendorID 1 and 2
-    the 2nd 10k: vendorID 3 and 4
-    the 3rd 10k: vendorID 5 and 6
-    the 4th 10k: vendorID 7 and 8
-    the 5th 10k: vendorID 9 and 10
+DATA PROCESS:
 
+521860 records
+    50% relevant events:
+        40% kleene events (229300)
+        10% others (34200)
+    50% irrelevant events (258360)
 
-Query:
-    event type: vendorID 1-10
-    predicate: tripDistance > 0
-    groupby: payment type
-    window: 10000 min (NO WINDOW NOW)
-    aggregation: SUM(totalAmount) or COUNT(*)
-
-    Elke: the queries should be more complicated, not just x+
-    e.g.
-    like 1, 2+, 3
-    with predicate: 1.endLocation = 2.startLocation && 2.endLocation = 3.startLocation
-    trace the trips
-
-
-Workload:
-    parameters: number of queries, number of mini-workloads
-
-    eg: 50 queries, 5 mini-workloads
-        10 queries in one mini-workloads share the same setting(identical now)
-
-    Q: do we need other columns or other attribute values?
-
-    Elke: the mini-workload shouldn't be disjoint
-
-
-
-Workload Analyzer:
-    reverse of workload
-    given a workload, partition it into mini-workloads.
-
-
-StreamPartitioner
-    for each mini-workload:
-        partition the stream by GROUPBY
-        this step guarantees that the mini-stream only has relevant events, so the executor can run directly.
-        (kind of pre-processed, need to leave that to the executor?)
-
-        eg. for mini-workload 1, we have five sub-streams group by payment type
-        substream 1: payment type = 1
-        substream 2: payment type = 2
-        substream 3: payment type = 3
-        substream 4: payment type = 4
-
-
-        then we run mini-workload on each substream
-
-    Q: the substreams are not even, usually 1 has the most events, others have fewer events.
-
-    Elke: streamPartitoner should be the algebra,
-    done by the engine, not hardcoded, what if some queries have group by and some not.
-
-Template:
-    no template since every event is the same x(is that cheating?)
-
-Static Executor:
-    We inserted snapshots manually to mimic the predicate snapshots.
-
-    Q:
-        If we really create event-level snapshots in this version,
-        it requires:
-        1. leave the predicate examination to the executor instead of the stream partitioner
-        2. queries in one mini-workload cannot have the same predicate.
-        3. and we lose control of the density of the snapshots.
-
-        How to calculate sum using snapshot?? A+ sum(totalAmount) vs. A sum(totalAmount)???
-
-        A sum
-        A+ sum
-
-        A, sum
-        A,A, sum
-        A,A,A sum
-        sum()
-
-Dynamic Executor:
+    kleene:
+        2964  TVIX    473
+        226   ARDX    471
+        2410   QQQ    470
+        2916  TQQQ    461
+        522   CDTX    459
+        1963  NAKD    456
+        157    AMD    453
+        2516  ROKU    450
+        2741  SQQQ    450
+        11    ABEO    443
 
 
 TODO:

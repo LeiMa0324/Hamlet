@@ -11,7 +11,7 @@ import java.util.Random;
 
 /**
  * control the number of queries, the length of queries, the position of shared events
- * all queries in the Workload share the same setting
+ * all queries in the StockWorkloadTemplate share the same setting
  */
 @Data
 public class WorkloadTemplate {
@@ -25,7 +25,7 @@ public class WorkloadTemplate {
     private boolean randomLength;       //open the random length
 
     /**
-     * create a Workload of queries
+     * create a StockWorkloadTemplate of queries
      * @param num the number of queries
      * @param length the default length of all queries
      * @param eventBound the biggest event number

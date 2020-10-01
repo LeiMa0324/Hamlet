@@ -1,6 +1,8 @@
 package revision;
 
 
+import hamlet.users.stockUser.stockWorkload.StockWorkloadTemplate;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 public class StaticHamlet {
 
     //a mini-workload
-    private Workload miniWorkload;
+    private StockWorkloadTemplate miniStockWorkloadTemplate;
 
     //a sub-stream
     private SubStream substream;
@@ -25,10 +27,10 @@ public class StaticHamlet {
     Integer denseBurstnum = 0;
 
 
-    public StaticHamlet(Workload miniworkload, SubStream subStream, Integer burstSize, double denseBurstPercent){
+    public StaticHamlet(StockWorkloadTemplate miniworkload, SubStream subStream, Integer burstSize, double denseBurstPercent){
 
         this.substream = subStream;
-        this.miniWorkload = miniworkload;
+        this.miniStockWorkloadTemplate = miniworkload;
         this.burstSize = burstSize;
         this.bursts = new ArrayList<>();
 

@@ -29,7 +29,7 @@ public class NewSharon extends TransactionMQ {
     public AtomicInteger memory;
 
     public NewSharon(Stream str, CountDownLatch d, AtomicLong time, AtomicInteger mem, String pattern, int num) {
-        // given one shared pattern and number of queries
+        // given one shared Pattern and number of queries
         super(d, time);
         stream = str;
         memory = mem;
@@ -299,7 +299,7 @@ public class NewSharon extends TransactionMQ {
             // print final interCounts
             for (int i=0; i<numQueries; i++) {
                 final_counts[i] = new BigInteger(count + "");
-                System.out.println("Query id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
+                System.out.println("stockQuery id: " + (i+1) + " Substream id: " + substream_id +" with count " + final_counts[i]);
             }
 
             long end =  System.currentTimeMillis();

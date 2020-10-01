@@ -38,10 +38,10 @@ public class Experiment {
     //default stream file for Ride Sharing dataset
     private static String SYN_DEFAULT_STREAM;
 
-    //default events per window for Ride Sharing dataset
+    //default events per Window for Ride Sharing dataset
     private static Integer SYN_BASELINE_DEFAULT_EPW = 5000;
 
-    //default Workload for Ride Sharing dataset
+    //default StockWorkloadTemplate for Ride Sharing dataset
     private static String SYN_BASELINE_DEFAULT_WORKLOAD ;
 
 
@@ -54,10 +54,10 @@ public class Experiment {
     //default stream file for NYC Taxi dataset
     private  String NYC_DEFAULT_STREAM;
 
-    //default events per window for NYC Taxi dataset
+    //default events per Window for NYC Taxi dataset
     private static Integer NYC_DEFAULT_EPW = 50000;
 
-    //default Workload for NYC Taxi dataset
+    //default StockWorkloadTemplate for NYC Taxi dataset
     private static String NYC_DEFAULT_WORKLOAD ;
 
     /**
@@ -69,10 +69,10 @@ public class Experiment {
     //default stream file for Smart Home dataset
     private  String SH_DEFAULT_STREAM;
 
-    //default events per window for Smart Home dataset
+    //default events per Window for Smart Home dataset
     private static Integer SH_DEFAULT_EPW = 50000;
 
-    //default Workload for Smart Home dataset
+    //default StockWorkloadTemplate for Smart Home dataset
     private static String SH_DEFAULT_WORKLOAD ;
 
     /**
@@ -81,7 +81,7 @@ public class Experiment {
      * Figure 17
      */
 
-    // default events per window
+    // default events per Window
     private static Integer DYN_DEFAULT_EPW = 10000;
 
     //default burst size
@@ -90,7 +90,7 @@ public class Experiment {
     //default number of snapshots representing the predicates
     private static Integer DYN_DEFAULT_SNAPSHOTS = 50;
 
-    //default Workload
+    //default StockWorkloadTemplate
     private static String DYN_DEFAULT_WORKLOAD ;
 
 
@@ -160,7 +160,7 @@ public class Experiment {
 
     /**
      * Hamlet versus State-of-the-art Approaches
-     * vary events per window(epw), fix number of shared events per graphlet, # of queries
+     * vary events per Window(epw), fix number of shared events per graphlet, # of queries
      * Figure 14.a, 14.c, 15.a, 15.c, 16.a
      */
     public void varyEventsPerWindow(){
@@ -199,7 +199,7 @@ public class Experiment {
         }
 
 
-        System.out.println("Vary Events per window...");
+        System.out.println("Vary Events per Window...");
 
         // run three times
         for (int iter =1;iter<4;iter++) {
@@ -376,15 +376,15 @@ public class Experiment {
      * @param executor the executor that run dynamic vs. static
      * @param numofSnapshots number of snapshots
      * @param burstsize the burst size
-     * @param epw the events per window
-     * @param window window number
+     * @param epw the events per Window
+     * @param window Window number
      * @param iter iteration number
      * @param logFile the log file
      */
     public void dynamicLogging(Executor executor, int numofSnapshots, int burstsize, int epw, int window,
                                int iter, String logFile){
 
-        String[] header = {"window", "iter", "epw","# of snapshots","batch size",
+        String[] header = {"Window", "iter", "epw","# of snapshots","batch size",
                 "Static Ham throughput","Dynamic Ham throughput",
                 "Static Ham latency","Dynamic Ham latency",
                 "Static Ham memory", "Dynamic Ham memory",
@@ -429,7 +429,7 @@ public class Experiment {
     public void logging(Executor executor, int numofShared,int iternum, String logFile){
 
         // set up header for the csv
-        String[] header = {"iter","epw","# of shared","Workload size",
+        String[] header = {"iter","epw","# of shared","StockWorkloadTemplate size",
                 "Hamlet throughput","Greta throughput", "Sharon throughput","mcep throughput",
                 "Hamlet latency","Greta latency","Sharon latency","mcep latency",
                 "Hamlet memory", "Greta memory","Sharon memory","mcep,memory"};
