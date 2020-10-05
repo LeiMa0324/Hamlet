@@ -30,6 +30,7 @@ public class Pattern {
             kleeneIndex = record[i].endsWith("+")? i: kleeneIndex;
             String name = record[i].trim().split("\\+")[0];
 
+            //todo: not checking the event types in the template yet, directly create a new one
             EventType et = new EventType(name, schema, record[i].endsWith("+"));
             this.eventTypes.add(et);
 
@@ -38,6 +39,15 @@ public class Pattern {
 
     public EventType getKleeneEventType(){
         return eventTypes.get(this.kleeneIndex);
+    }
+
+    public EventType getEventTypeByName(String name){
+        for (EventType et: eventTypes){
+            if (et.getName().equals(name)){
+                return et;
+            }
+        }
+        return null;
     }
 
     @Override

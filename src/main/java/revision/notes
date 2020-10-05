@@ -1,54 +1,77 @@
 DATA PROCESS:
+    1. choose 10 most frequent ticks as the kleene event types
+    2. replicate the records *60, divide the vol/60
+    so for each timestamp we have a burst with size 60
+
+    3. choose 100 least frequent ticks as the prefix/suffix event types in the workload
+    4. replicate the record(only 1) *20, divide the vol/20
+
+    5. choose the 10-20th most frequent ticks as the irrelevant events in the stream
+    6. replicate 60, vol/60
 
 521860 records
     50% relevant events:
-        40% kleene events (229300)
-        10% others (34200)
-    50% irrelevant events (258360)
+        kleene events
+        prefix/suffix events
 
-    kleene:
-        2964  TVIX    473
-        226   ARDX    471
-        2410   QQQ    470
-        2916  TQQQ    461
-        522   CDTX    459
-        1963  NAKD    456
-        157    AMD    453
-        2516  ROKU    450
-        2741  SQQQ    450
-        11    ABEO    443
+    50% irrelevant events
+
+    7. add a column "open_level" = {low, mid, high} as the groupby column
 
 
-TODO:
+HAMLET SYSTEM
 
-DATASET: CHECK THE DATA SETS
+Attribute:
+    an column in a dataset
 
-QUERY: PREDICATES ON ADJACENT EVENTS, LOCATION
-       EVENT-LEVEL PREDICATES ON TOTALAmount >4, >5, >6
+DatasetSchema:
+    an array of attributes
 
-       mini-workload:
-        1,2+,3
-        1,2+,4...
-        2+
+Query:
+    Class of a query
+    members:
+        schema
+        pattern
+        predicate
+        aggregation function
+        groupby
+        window
 
-workload: shuffle the queries
+QueryParser:
+    Given the text of a query, parse it into a Query instance
 
-executor:
-    operator class
-    do predicates
+WorkloadTemplate:
+    parameters: query number, number of mini-workload
+
+    miniworkload rules:
+        same event type, same groupby
+        compatible aggregation
+        predicates on same event type and attribute
+        compatible windows
+
+Workload:
+    the class of workload
+    members:
+        a list of  Queries
+        schema
+
+WorkloadAnalyzer:
+    1. given a text file of workload, parse it into a workload
+    2. analyze the workload, partition the queries into mini-workloads
 
 
-put them into diff pkg
+DOING NOW:
+StreamLoader:
+    filter out the irrelevant events(almost half of it)
 
-abstract event, different event classes
-abstract query, different query classes
+StreamPartitioner:
+    parameters: mini-workloads, a stream
+    partition the stream into sub-streams for each mini-workload
 
-independent class operator
 
-    sum
-    count
-    avg
-    seq
+
+
+
 
 
 

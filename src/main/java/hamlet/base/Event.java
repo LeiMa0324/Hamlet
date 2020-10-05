@@ -34,6 +34,7 @@ public class Event {
                 return i;
             }
         }
+        System.out.printf("Cannot find the attribute "+attributeName);
         return  -1;
     }
 

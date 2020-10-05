@@ -2,6 +2,7 @@ package hamlet.workload;
 
 import hamlet.users.stockUser.KleeneEventTypeEnum;
 import hamlet.users.stockUser.NoneKleeneEventTypeEnum;
+import hamlet.users.stockUser.stockAttributeEnum;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -25,12 +26,14 @@ public class WorkloadTemplate {
     public void generate(int queryNum, int groupNum){
 
         //set predicate
-        String[] predOneColumns = {"open","close"};
-        String[] predTwoColumns = {"high","low"};
+        String[] predOneColumns = {stockAttributeEnum.open.toString(),
+                                    stockAttributeEnum.close.toString()};
+        String[] predTwoColumns = {stockAttributeEnum.high.toString(),
+                                    stockAttributeEnum.low.toString()};
 
 
         //set groupby
-        String groubyColumn = "price_level";
+        String groubyColumn = stockAttributeEnum.open_level.toString();
 
         //set aggregate column & type
         String aggreColumn = predOneColumns[0];

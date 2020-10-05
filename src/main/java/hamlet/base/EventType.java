@@ -18,6 +18,8 @@ public class EventType {
         this.isKleene = isKleene;
     }
 
-
+    public boolean equals(EventType eventType){
+        return this.name.equals(eventType.name)&&(this.schema.equals(eventType.schema));
+    }
 
 }

@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.test.iml" filepath="$PROJECT_DIR$/.idea/modules/leima.com.HamletDemo.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HamletDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/HamletDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HamletDemo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/HamletDemo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HamletDemo.test.iml" filepath="$PROJECT_DIR$/.idea/modules/HamletDemo.test.iml" />
     </modules>
   </component>
 </project>

@@ -52,7 +52,17 @@ public class WorkloadAnalyzer {
         return queries;
 }
 
-    public HashMap<String, Workload> analyze(String workloadFile){
+    /**
+     * analyze to a whole workload
+     * @param workloadFile
+     * @return
+     */
+    public Workload analyzeToWorkload(String workloadFile){
+        ArrayList<Query> queries = readQueriesFromFile(workloadFile);
+        return new Workload(schema, queries);
+    }
+
+    public HashMap<String, Workload> analyzeToMiniWorkloads(String workloadFile){
 
         ArrayList<Query> queries = readQueriesFromFile(workloadFile);
 

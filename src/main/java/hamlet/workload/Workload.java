@@ -1,6 +1,7 @@
 package hamlet.workload;
 
 import hamlet.base.DatasetSchema;
+import hamlet.base.EventType;
 import hamlet.query.Query;
 import lombok.Data;
 
@@ -23,6 +24,11 @@ public class Workload {
         this.schema = schema;
     }
 
+    public Workload(DatasetSchema schema, ArrayList<Query> queries){
+        this.queries = queries;
+        this.schema = schema;
+    }
+
 
     /**
      * add a query into the workload
@@ -31,6 +37,32 @@ public class Workload {
      */
     public void addQuery(Query query){
         this.queries.add(query);
+    }
+
+    /**
+     * get all the event types in the workload
+     * @return
+     */
+    public ArrayList<EventType> getAllEventTypes(){
+        ArrayList<EventType> eventTypes = new ArrayList<>();
+
+        for (Query q: this.queries){
+                eventTypes.addAll(q.getPattern().getEventTypes());
+        }
+
+        return eventTypes;
+    }
+
+    public EventType getEventTypeByName(String etName){
+        ArrayList<EventType> eventTypes = getAllEventTypes();
+        for (EventType et: eventTypes){
+            if (et.getName().equals(etName)){
+                return et;
+            }
+        }
+        System.out.printf("No same event type!");
+        return null;
+
     }
 
 }

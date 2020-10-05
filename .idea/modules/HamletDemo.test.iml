@@ -9,7 +9,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="leima.com.HamletDemo.main" />
+    <orderEntry type="module" module-name="HamletDemo.main" />
     <orderEntry type="library" name="Gradle: com.opencsv:opencsv:3.7" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.6" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.lucene:lucene-core:6.6.1" level="project" />
