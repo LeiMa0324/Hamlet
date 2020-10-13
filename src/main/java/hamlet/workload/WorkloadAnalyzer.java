@@ -1,6 +1,7 @@
 package hamlet.workload;
 
 import hamlet.base.DatasetSchema;
+import hamlet.base.EventType;
 import hamlet.query.GroupBy;
 import hamlet.query.Query;
 import hamlet.query.QueryParser;
@@ -9,9 +10,7 @@ import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * this workload analyzer analyzes the sharing opportunity of a multi-query workload
@@ -32,6 +31,7 @@ public class WorkloadAnalyzer {
      */
     private ArrayList<Query> readQueriesFromFile(String workloadFile) {
         ArrayList<Query> queries = new ArrayList<>();
+        Set<EventType> existedEventTypes = new HashSet<>();
 
         try {
             Scanner query_scanner = new Scanner(new File(workloadFile));
@@ -42,7 +42,9 @@ public class WorkloadAnalyzer {
                     lines.add(query_scanner.nextLine());
                 }
                 QueryParser parser = new QueryParser(this.schema);
-                queries.add(parser.parse(lines));
+                Query query = parser.parse(lines, existedEventTypes);
+                existedEventTypes.addAll(query.getPattern().getEventTypes());
+                queries.add(query);
 
             }
             query_scanner.close();

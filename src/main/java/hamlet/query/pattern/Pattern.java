@@ -5,6 +5,8 @@ import hamlet.base.EventType;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Set;
+
 @Data
 public class Pattern {
 
@@ -18,7 +20,7 @@ public class Pattern {
      * @param patternString a pattern string
      * @param schema schema of a dataset
      */
-    public Pattern(String patternString, DatasetSchema schema){
+    public Pattern(String patternString, DatasetSchema schema, Set<EventType> existedEventTypes){
         this.eventTypes = new ArrayList<>();
         this.patternString = patternString;
         this.kleeneIndex = -1;
@@ -30,11 +32,22 @@ public class Pattern {
             kleeneIndex = record[i].endsWith("+")? i: kleeneIndex;
             String name = record[i].trim().split("\\+")[0];
 
-            //todo: not checking the event types in the template yet, directly create a new one
-            EventType et = new EventType(name, schema, record[i].endsWith("+"));
+            EventType et = createEventType(name, schema, record[i].endsWith("+"), existedEventTypes);
             this.eventTypes.add(et);
 
         }
+    }
+
+    public EventType createEventType(String etName,
+                                     DatasetSchema schema,
+                                     boolean isKleene,
+                                     Set<EventType> existedEventTypes){
+        for (EventType eventType: existedEventTypes){
+            if (eventType.getName().equals(etName)){
+                return eventType;
+            }
+        }
+        return new EventType(etName, schema, isKleene);
     }
 
     public EventType getKleeneEventType(){
@@ -48,6 +61,21 @@ public class Pattern {
             }
         }
         return null;
+    }
+
+    public EventType getNoneKleenePredecessor(EventType eventType){
+        int currentIndex = this.eventTypes.indexOf(eventType);
+        return currentIndex==0?null: this.eventTypes.get(currentIndex-1);
+    }
+
+
+    public ArrayList<EventType> getAllPredecessors(EventType eventType){
+        ArrayList<EventType> preds = new ArrayList<>();
+        if (eventType.isKleene()){
+            preds.add(eventType);
+        }
+        preds.add(getNoneKleenePredecessor(eventType));
+        return preds;
     }
 
     @Override

@@ -4,6 +4,7 @@ import hamlet.query.aggregator.Aggregator;
 import hamlet.query.pattern.Pattern;
 import hamlet.query.predicate.Predicate;
 import hamlet.query.window.Window;
+import hamlet.workload.Workload;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class Query {
     protected Aggregator aggregator;
     protected GroupBy groupBy;
     protected Window window;
+    private Workload workload;
 
 
     public Query(Pattern pattern,

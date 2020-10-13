@@ -60,15 +60,87 @@ WorkloadAnalyzer:
     2. analyze the workload, partition the queries into mini-workloads
 
 
-DOING NOW:
 StreamLoader:
-    filter out the irrelevant events(almost half of it)
+    filter out the irrelevant lines of the whole workload
+    package the relevant data into an event
 
 StreamPartitioner:
-    parameters: mini-workloads, a stream
-    partition the stream into sub-streams for each mini-workload
+    parameters: a mini-workload, a stream
+    second filter of events, filter out the irrelevant events of the mini-workload
+    since we group by the kleene.open_level, the not kleene events are duplicated to every substream
+    the kleene events with the correct open_level value go to the corresponding substream
+
+Executor:
+
+    BurstLoader:
+        load the events into burst, apply the predicates to events
+
+    Event:
+        count(prefix events)
+        or
+        snapshot expression(Kleene or suffix events)
+
+    PredicateManager
+        provides the methods of filtering events by predicates
+
+    PredecessorManager
+        find the predecessors of an event
+
+    WindowManager
+        init, slide, expire windows
+
+    CountManager
+        provides the methods of count calculation of a single event.
+        including sum counts or sum snapshots into an expression
+
+            -KleeneEventCountManager
+                same predecessors for all the queries: get the expression of snapshots for all queries
+                different predecessors for all the queries: evaluate for each query, create an event-level snapshot
+
+            -NoneKleeneEventCountManager
+                for prefix: count =1
+                for suffix: add the snapshots of the predecessors together to a new expression of snapshots
+
+    SnapshotManager:
+        manages the snapshots, update, insert, search
+
+    GraphletManager:
+        manages the graphlets, search the graphlets
+
+    Graphlet:
+        a list of events
+        total count of all events(for quick prefix event counting)
+
+        propagate the count or snapshot expressions among the events
+
+    Graph:
+        static Graph
+
+        Kleene burst:
+            if could be merged with last kleene graphlet, then merge
+                   condition: no prefix or suffix(???) graphlet after last kleene graphlet
+            if not
+                create new kleene graphlet, new g-level snapshot
+
+            propagate snapshots
+
+        None Kleene burst:
+            prefix: propagate counts = 1
+            suffix: propagate snapshots
 
 
+Q:
+    what if for a kleene event like B+ , it has different predecessors for different queries
+    which leads to summations over different snapshots
+
+    for event b_i
+    q1: predecessors: b1, b2, b5  ----> evaluate to count
+    q2: predecessors: b2, b3, b5  ----> evaluate to count
+
+        ----> create an event-level snapshot of this event
+
+    what 's the criteria of creating an event-level snapshots.
+        have different predecessors for different queries?
 
 
 

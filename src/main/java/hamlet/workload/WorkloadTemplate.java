@@ -43,7 +43,7 @@ public class WorkloadTemplate {
         ArrayList<KleeneEventTypeEnum> availableKleene = new ArrayList<>(Arrays.asList(KleeneEventTypeEnum.values()));
         ArrayList<NoneKleeneEventTypeEnum> availableNoneKleene = new ArrayList<>(Arrays.asList(NoneKleeneEventTypeEnum.values()));
 
-        //setting for query group
+        //setting for mini-workload
         for (int j =0; j < groupNum; j++){
 
             //set aggregator
@@ -52,6 +52,8 @@ public class WorkloadTemplate {
             //set shared kleene event
 
             String kleene = ((KleeneEventTypeEnum) randomEvent(availableKleene)).toString();
+
+            //todo: make it enum
             String[] windows = {"5 min", "10 min","15 min", "20 min"};
             String slide = "5 min";
 

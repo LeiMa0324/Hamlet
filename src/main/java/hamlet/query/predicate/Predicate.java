@@ -37,19 +37,21 @@ public abstract class Predicate {
      */
 
     public boolean verify(ArrayList<Event> events){
+
+        boolean res = false;
         switch (operator){
             case ">":
-                greater(events);
+                res = greater(events);
                 break;
             case "=":
-                equal(events);
+                res = equal(events);
                 break;
             case "<":
-                less(events);
+                res =less(events);
                 break;
         }
 
-        return false;
+        return res;
     };
     protected abstract boolean greater(ArrayList<Event> events);
     protected abstract boolean equal(ArrayList<Event> events);

@@ -7,6 +7,7 @@ import hamlet.workload.Workload;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -16,19 +17,19 @@ import java.util.Scanner;
 public class streamLoader {
     protected String streamFile;
     protected DatasetSchema schema;
-    protected Workload workload;
+    protected Workload wholeWorkload;
     protected ArrayList<Event> events;
 
-    public streamLoader(String streamFile, DatasetSchema schema, Workload workload) {
+    public streamLoader(String streamFile, DatasetSchema schema, Workload wholeWorkload) {
         this.streamFile = streamFile;
         this.schema = schema;
-        this.workload = workload;
+        this.wholeWorkload = wholeWorkload;
         this.events = new ArrayList<>();
 
     }
 
     public ArrayList<Event> stream() {
-        ArrayList<EventType> eventTypes = workload.getAllEventTypes();
+        ArrayList<EventType> eventTypes = wholeWorkload.getAllEventTypes();
         ArrayList<String> eventTypeNames = new ArrayList<>();
         for (EventType et : eventTypes) {
             eventTypeNames.add(et.getName());
@@ -47,7 +48,7 @@ public class streamLoader {
 
             }
 
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
 
         }
@@ -71,8 +72,8 @@ public class streamLoader {
 
     }
 
-    private void dataToEvent(String[] data, ArrayList<EventType> eventTypes){
-        Event event = new Event(workload.getEventTypeByName(data[0]), data);
+    private void dataToEvent(String[] data, ArrayList<EventType> eventTypes) throws ParseException {
+        Event event = new Event(wholeWorkload.getEventTypeByName(data[0]), data);
         events.add(event);
     }
 }

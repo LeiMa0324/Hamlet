@@ -46,10 +46,13 @@ public class streamPartitioner {
             //if e is a relevant event but not group-by event
             if (!e.getType().equals(groupBy.getEventType())){
                 addCommonEventIntoAllSubStreams(e);
+                e.setType(this.miniWorkload.getEventTypeByName(e.getType().getName()));
 
             }else {
                 //if it's a group-by event
                 addGroupByEventIntoSubStream(e);
+                e.setType(this.miniWorkload.getEventTypeByName(e.getType().getName()));
+
             }
         }
         return this.subStreams;

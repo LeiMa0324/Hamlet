@@ -3,6 +3,10 @@ package hamlet.base;
 import lombok.Data;
 
 import java.math.BigInteger;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * the event class
@@ -13,13 +17,29 @@ public class Event {
     private EventType type;
     private Object[] tuple;
     private long timeStamp;
-    private BigInteger count;
+    private ArrayList<Integer> validQueries;
 
-    public Event(EventType type, Object[] tuple){
+    // each query could have different list of snapshots
+    // <snapshotId1, snapshotId2...>
+    private ArrayList<Integer> snapshotIds;
+    //<qid: <snapshot id, coeff>>
+
+    private  HashMap<Integer, BigInteger> snapIdTocoeffs;
+    private HashMap<Integer, BigInteger> counts;
+    private Metric metric;
+    private Integer eventIndex;
+
+    public Event(EventType type, Object[] tuple) throws ParseException {
+
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyyMMddhhmm");//如2016-08-10 20:40
+
         this.type = type;
         this.tuple = tuple;
-        this.timeStamp = System.currentTimeMillis();
-        this.count =  BigInteger.ZERO;
+        this.timeStamp = simpleFormat.parse((String)tuple[1]).getTime();
+        this.validQueries = new ArrayList<>();
+        this.snapshotIds =  new ArrayList<>();
+        this.snapIdTocoeffs = new HashMap<>();
+        this.counts = new HashMap<>();
 
     }
 
@@ -48,5 +68,24 @@ public class Event {
 
         return index == -1? null: this.tuple[index];
 
+    }
+
+
+    /**
+     * after evaluation, set the event into a independent event-level snapshot
+     * @param snapshotId
+     */
+    public void setSingleSnapshot(Integer snapshotId){
+        this.snapshotIds.clear();
+        this.snapIdTocoeffs.clear();
+
+        this.snapshotIds.add(snapshotId);
+        this.snapIdTocoeffs.put(snapshotId, BigInteger.ONE);
+    }
+
+
+    public enum Metric{
+        SNAPSHOT,
+        COUNT
     }
 }

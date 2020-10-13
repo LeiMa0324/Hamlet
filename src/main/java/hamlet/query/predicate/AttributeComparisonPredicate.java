@@ -23,30 +23,34 @@ public class AttributeComparisonPredicate extends Predicate{
 
 
     protected boolean greater(ArrayList<Event> events){
-        int[] indices = getAttributeIndices();
-        return (Float)events.get(0).getAttributeValueByName(predAttributes.get(indices[0]).getName()) >
-                (Float) events.get(1).getAttributeValueByName(predAttributes.get(indices[1]).getName());
+        int[] attrIndices = getAttributeIndices();
+        int[] eventIndices = getEventIndices(events);
+        Float x = Float.parseFloat((String )events.get(eventIndices[0]).getAttributeValueByName(predAttributes.get(attrIndices[0]).getName()));
+        Float y = Float.parseFloat((String)events.get(eventIndices[1]).getAttributeValueByName(predAttributes.get(attrIndices[1]).getName()));
+        return x>y;
     }
 
     protected boolean less(ArrayList<Event> events){
-        int[] indices = getAttributeIndices();
+        int[] attrIndices = getAttributeIndices();
+        int[] eventIndices = getEventIndices(events);
 
-        return (Float)events.get(0).getAttributeValueByName(predAttributes.get(indices[0]).getName()) <
-                (Float) events.get(1).getAttributeValueByName(predAttributes.get(indices[1]).getName());
+        return Float.parseFloat((String )events.get(eventIndices[0]).getAttributeValueByName(predAttributes.get(attrIndices[0]).getName())) <
+                Float.parseFloat((String)events.get(eventIndices[1]).getAttributeValueByName(predAttributes.get(attrIndices[1]).getName()));
     }
 
     protected boolean equal(ArrayList<Event> events){
-        int[] indices = getAttributeIndices();
+        int[] attrIndices = getAttributeIndices();
+        int[] eventIndices = getEventIndices(events);
+
         //String comparison
-        if (events.get(0).getAttributeValueByName(predAttributes.get(indices[0]).getName()).getClass()==String.class){
-            return events.get(0).getAttributeValueByName(predAttributes.get(indices[0]).getName()).equals(
-                    events.get(1).getAttributeValueByName(predAttributes.get(indices[1]).getName()));
+        if (events.get(eventIndices[0]).getAttributeValueByName(predAttributes.get(attrIndices[0]).getName()).getClass()==String.class){
+            return events.get(eventIndices[0]).getAttributeValueByName(predAttributes.get(attrIndices[0]).getName()).equals(
+                    events.get(eventIndices[1]).getAttributeValueByName(predAttributes.get(attrIndices[1]).getName()));
 
             //value comparision
-        }else {
-            return  ((Float)events.get(0).getAttributeValueByName(predAttributes.get(indices[0]).getName())).equals(
-                    (Float)events.get(1).getAttributeValueByName(predAttributes.get(indices[1]).getName()))
-                    ;
+        }else{
+            return Float.parseFloat((String )events.get(eventIndices[0]).getAttributeValueByName(predAttributes.get(attrIndices[0]).getName())) ==
+                    Float.parseFloat((String)events.get(eventIndices[1]).getAttributeValueByName(predAttributes.get(attrIndices[1]).getName()));
         }
     }
 
@@ -63,6 +67,12 @@ public class AttributeComparisonPredicate extends Predicate{
     private int[] getEventtypeIndices(){
         int i = 0;
         int j = eventTypes.size()>1 ? 1:0;
+        return new int[]{i, j};
+    }
+
+    private int[] getEventIndices(ArrayList<Event> events){
+        int i = 0;
+        int j = events.size()>1 ? 1:0;
         return new int[]{i, j};
     }
 

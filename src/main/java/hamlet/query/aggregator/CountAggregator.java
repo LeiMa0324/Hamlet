@@ -26,9 +26,9 @@ public class CountAggregator extends Aggregator {
     public void aggregate(ArrayList<Event> events){
 
         BigInteger count = this.values.isEmpty()?BigInteger.ZERO: (BigInteger) this.values.get(0);
-
+        //todo
         for (Event e: events){
-            count = count.add(e.getCount());
+            count = count.add(e.getCounts().get(0));
         }
 
         this.values.set(0, count);

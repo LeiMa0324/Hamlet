@@ -47,7 +47,12 @@ public class Workload {
         ArrayList<EventType> eventTypes = new ArrayList<>();
 
         for (Query q: this.queries){
-                eventTypes.addAll(q.getPattern().getEventTypes());
+                for (EventType et: q.getPattern().getEventTypes()){
+                    if (eventTypes.contains(et)){
+                        continue;
+                    }
+                    eventTypes.add(et);
+                }
         }
 
         return eventTypes;
@@ -60,10 +65,11 @@ public class Workload {
                 return et;
             }
         }
-        System.out.printf("No same event type!");
         return null;
 
     }
+
+
 
 }
 

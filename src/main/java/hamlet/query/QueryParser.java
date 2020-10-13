@@ -11,6 +11,7 @@ import hamlet.query.predicate.Predicate;
 import hamlet.query.window.Window;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 public class QueryParser {
@@ -35,10 +36,10 @@ public class QueryParser {
      * take in a few lines and parse them into a Query instance
      * @return a query instance
      */
-    public Query parse(ArrayList<String> lines){
+    public Query parse(ArrayList<String> lines, Set<EventType> existedEventTypes){
         //parse order matters!
         //parse the patten first!
-        parsePatternLine(lines.get(2));
+        parsePatternLine(lines.get(2), existedEventTypes);
         parseReturnLine(lines.get(1));
         parseWhereLine(lines.get(3));
         parseWindowLine(lines.get(5));
@@ -65,10 +66,10 @@ public class QueryParser {
                 new AvgAndSumAggregator(aggFunc, aggColumn);
     }
 
-    private void parsePatternLine(String patternLine){
+    private void parsePatternLine(String patternLine, Set<EventType> existedEventTypes){
         String line = patternLine.split("PATTERN ")[1];
         String patternString = line.startsWith("SEQ")? line.split("SEQ\\(")[1].split("\\)")[0] :line;
-        this.pattern = new Pattern(patternString, this.schema);
+        this.pattern = new Pattern(patternString, this.schema, existedEventTypes);
     }
 
     private void parseWhereLine(String whereLine){
@@ -84,7 +85,7 @@ public class QueryParser {
     private Predicate parseSingleWhere(String singleWhereString){
         ArrayList<EventType> predEventTypes = new ArrayList<>();
         /**
-         * hardcoded here, event type = grouby event type = kleene event type
+         * hardcoded here, event type = group-by event type = kleene event type
          */
         predEventTypes.add(this.pattern.getEventTypes().get(this.pattern.getKleeneIndex()));
         String operator = "";
@@ -113,9 +114,9 @@ public class QueryParser {
         java.util.regex.Pattern p1 = java.util.regex.Pattern.compile(pa1);
         Matcher a1 = p1.matcher(windowLine);
         if (a1.find()){
-            long window = Integer.parseInt(a1.group(2))*60;
-            long silide = Integer.parseInt(a1.group(4))*60;
-            this.window = new Window(window, silide);
+            long window = Integer.parseInt(a1.group(2));  //minutes
+            long slide = Integer.parseInt(a1.group(4));   //minutes
+            this.window = new Window(window, slide);
         }
     }
 }
