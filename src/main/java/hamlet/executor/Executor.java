@@ -84,8 +84,8 @@ public class Executor {
     }
 
     public void singleRun(){
-        String et = (String )this.stringMiniWorkloadHashMap.keySet().toArray()[0];
-        ArrayList<Event> substream = (ArrayList<Event>)substreams.get(this.stringMiniWorkloadHashMap.get(et)).values().toArray()[0];
+        String et = (String )this.stringMiniWorkloadHashMap.keySet().toArray()[1];
+        ArrayList<Event> substream = (ArrayList<Event>)substreams.get(this.stringMiniWorkloadHashMap.get(et)).values().toArray()[1];
         staticGraph staticGraph = new staticGraph(this.stringTemplateHashMap.get(et),  substream);
         staticGraph.run();
 

@@ -129,18 +129,28 @@ Executor:
             suffix: propagate snapshots
 
 
-Q:
-    what if for a kleene event like B+ , it has different predecessors for different queries
-    which leads to summations over different snapshots
+STATIC GRAPHLET:
+    AGGREGATOR: COUNT, SUM, AVG
+    WINDOWS:
+        TIME BASED, 5 MIN, 10 MIN, 15 MIN, 20 MIN
+        BUT ONLY CHECK EXPIRED AFTER A WHOLE GRAPHLET
 
-    for event b_i
-    q1: predecessors: b1, b2, b5  ----> evaluate to count
-    q2: predecessors: b2, b3, b5  ----> evaluate to count
 
-        ----> create an event-level snapshot of this event
 
-    what 's the criteria of creating an event-level snapshots.
-        have different predecessors for different queries?
+todo:
+ 1. analyzer overhead(just value)
+ 2. dynamic decision(chart)
+ 	average over burst size
+ 3. snapshot maintenance overhead(chart)
+
+ outputs: 1. actual values
+          2. system performance
+
+
+
+new exp:
+ show overhead of different components of greta vs. dynamic hamlet
+ break cost into different components
 
 
 

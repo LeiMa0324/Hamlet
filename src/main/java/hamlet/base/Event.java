@@ -1,5 +1,6 @@
 package hamlet.base;
 
+import hamlet.query.aggregator.Value;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -25,7 +26,7 @@ public class Event {
     //<qid: <snapshot id, coeff>>
 
     private  HashMap<Integer, BigInteger> snapIdTocoeffs;
-    private HashMap<Integer, BigInteger> counts;
+    private HashMap<Integer, Value> values;
     private Metric metric;
     private Integer eventIndex;
 
@@ -39,7 +40,7 @@ public class Event {
         this.validQueries = new ArrayList<>();
         this.snapshotIds =  new ArrayList<>();
         this.snapIdTocoeffs = new HashMap<>();
-        this.counts = new HashMap<>();
+        this.values = new HashMap<>();
 
     }
 
@@ -86,6 +87,6 @@ public class Event {
 
     public enum Metric{
         SNAPSHOT,
-        COUNT
+        VAL
     }
 }

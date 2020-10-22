@@ -1,7 +1,9 @@
-package hamlet.executor;
+package hamlet.executor.tools;
 
 import hamlet.base.Event;
+import hamlet.query.aggregator.Aggregator;
 import lombok.Data;
+import hamlet.users.stockUser.stockAttributeEnum;
 
 import java.util.ArrayList;
 
@@ -10,9 +12,11 @@ public class BurstLoader {
 
     private ArrayList<Event> events;
     private final PredicateManager predicateManager;
+    private Aggregator aggregator;
 
     public BurstLoader(PredicateManager predicateManager){
         this.predicateManager = predicateManager;
+        this.aggregator = aggregator;
 
     }
 
@@ -22,8 +26,8 @@ public class BurstLoader {
         ArrayList<Event> validEvents = new ArrayList<>();
 
         String latestEvent = "";
+        String lastTimeStamp = "";
         ArrayList<Event> tempBurst = new ArrayList<>();
-
 
         for (int i =0; i<events.size(); i++) {
 
@@ -34,13 +38,21 @@ public class BurstLoader {
                 continue;
             }
 
+            //get the last event
             latestEvent =latestEvent.equals("")? events.get(i).getType().getName():latestEvent;
+
+            //get the last time stamp
+            lastTimeStamp = lastTimeStamp.equals("")?(String) events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString()):lastTimeStamp;
+
             events.get(i).setEventIndex(validEvents.size());
 
-            if (events.get(i).getType().getName().equals(latestEvent)) {
+            //if the event has the same name and time stamp, add it into the burst
+            if (events.get(i).getType().getName().equals(latestEvent)&&
+                    ((String) events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString())).equals(lastTimeStamp)) {
                 tempBurst.add(events.get(i));
             } else {
                 latestEvent = events.get(i).getType().getName();
+                lastTimeStamp = (String)events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString());
                 ArrayList<Event> burst = (ArrayList<Event>) tempBurst.clone();
 
                 bursts.add(burst);
@@ -54,6 +66,7 @@ public class BurstLoader {
         bursts.add(tempBurst);
         this.events = validEvents;
         return bursts;
+
     }
 
     /**
@@ -73,4 +86,6 @@ public class BurstLoader {
             event.setValidQueries(event.getType().getQueries());
         }
     }
+
+
 }

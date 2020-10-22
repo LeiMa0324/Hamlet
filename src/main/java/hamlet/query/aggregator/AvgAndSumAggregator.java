@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 /**
  * the aggregator of avg and sum
- * todo: split avg, sum
  */
 public class AvgAndSumAggregator extends Aggregator {
 

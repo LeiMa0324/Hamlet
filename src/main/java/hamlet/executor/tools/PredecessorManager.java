@@ -1,29 +1,18 @@
-package hamlet.executor;
+package hamlet.executor.tools;
 
 import hamlet.base.Event;
 import hamlet.base.EventType;
-import hamlet.base.Template;
+import hamlet.executor.Graphlet.Graphlet;
+import hamlet.query.aggregator.Value;
 import lombok.Data;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
 public class PredecessorManager {
 
-    private ArrayList<Event> events;
-    private Template template;
-    private SnapshotManager snapshotManager;
-
-    public PredecessorManager(ArrayList<Event> events,
-                              Template template,
-                              SnapshotManager snapshotManager){
-        this.events = events;
-        this.template = template;
-        this.snapshotManager = snapshotManager;
-
-    }
+    public PredecessorManager(){}
 
     /**
      * check if one event have different predecessors for different queries
@@ -53,16 +42,16 @@ public class PredecessorManager {
     public ArrayList<Event> getPredecessorsAfterLastGraphletSnapshotForQuery(Event event,
                                                                              int qid){
 
-        int lastGraphletSnapshotEventIndex = this.getSnapshotManager().getLastGraphletSnapshot()==null?
+        int lastGraphletSnapshotEventIndex = Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot()==null?
                 -1:
-                this.getSnapshotManager().getLastGraphletSnapshot().getEventIndex();
+                Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot().getEventIndex();
 
-        ArrayList<Event> eventsBetweenSnapshots = lastGraphletSnapshotEventIndex+1>this.events.indexOf(event)?
+        ArrayList<Event> eventsBetweenSnapshots = lastGraphletSnapshotEventIndex>Utils.getInstance().getEvents().indexOf(event)?
                 new ArrayList<Event>():
-                new ArrayList<>(this.events.subList(lastGraphletSnapshotEventIndex+1, this.events.indexOf(event)));
+                new ArrayList<>(Utils.getInstance().getEvents().subList(lastGraphletSnapshotEventIndex, Utils.getInstance().getEvents().indexOf(event)));
 
         //preceding event types
-        ArrayList<EventType> predETs = this.template.getAllPredecessorsByEventTypeAndQueryId(event.getType(), qid);
+        ArrayList<EventType> predETs = Utils.getInstance().getTemplate().getAllPredecessorsByEventTypeAndQueryId(event.getType(), qid);
 
         ArrayList<Event> preds = new ArrayList<>();
 
@@ -94,35 +83,30 @@ public class PredecessorManager {
      * count all the prefix predecessors between two shared graphlets, add with the old snapshot to create a new graphlet snapshot
      * @return
      */
-    public HashMap<Integer, BigInteger> sumPrefixEventCountsForKleeneEventTypeForAllQueries(EventType eventType,
-                                                                                               HashMap<EventType,ArrayList<Graphlet>> noneKleeneGraphlets){
+    public HashMap<Integer, Value> sumPrefixEventValuesForKleeneEventTypeForAllQueries(EventType eventType,
+                                                                                       HashMap<EventType,ArrayList<Graphlet>> noneKleeneGraphlets){
         //counts
-        HashMap<Integer, BigInteger> prefixCounts = new HashMap<>();
+        HashMap<Integer, Value> prefixValues = new HashMap<>();
         //all the queries
         ArrayList<Integer> queries = eventType.getQueries();
 
 
         //find and sum the prefix after last shared graphlet
         for (Integer qid: queries){
-            EventType predET = this.template.getNoneKleenePredecessorByEventTypeAndQueryId(eventType, qid);
-            BigInteger countForQuery = BigInteger.ZERO;
+            EventType predET = Utils.getInstance().getTemplate().getNoneKleenePredecessorByEventTypeAndQueryId(eventType, qid);
+            Value countForQuery = Value.ZERO;
             if (predET!=null){
                 if (noneKleeneGraphlets.containsKey(predET)){
                     for (Graphlet g: noneKleeneGraphlets.get(predET)){
-                        countForQuery = countForQuery.add(g.getTotalCount().get(qid));
+                        countForQuery = countForQuery.add(g.getGraphletValues().get(qid));
                     }
                 }
             }
-
-
-            prefixCounts.put(qid, countForQuery);
-
+            prefixValues.put(qid, countForQuery);
         }
 
-        return prefixCounts;
+        return prefixValues;
     }
-
-
 }
 
 

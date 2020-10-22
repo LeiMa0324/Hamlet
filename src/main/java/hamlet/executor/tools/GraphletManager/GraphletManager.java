@@ -1,24 +1,30 @@
-package hamlet.executor;
+package hamlet.executor.tools.GraphletManager;
 
 import hamlet.base.EventType;
-import lombok.Data;
+import hamlet.executor.Graphlet.Graphlet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@Data
-public class GraphletManager {
-    private ArrayList<Graphlet> graphlets;
-    private int lastKleeneGraphletIndex;
+public abstract class GraphletManager {
+    protected ArrayList<Graphlet> graphlets;
+    protected ArrayList<Graphlet> kleeneGraphlets;
+
+    protected int lastKleeneGraphletIndex;
 
     public GraphletManager(){
         this.graphlets = new ArrayList<>();
+        this.kleeneGraphlets = new ArrayList<>();
     }
 
-    public void addGraphlet(Graphlet graphlet){
-        this.graphlets.add(graphlet);
-    }
-
+    public abstract void addGraphlet(Graphlet graphlet);
+    public abstract Graphlet getLastKleeneGraphlet();
+    /**
+     * find graphlets in certain range
+     * @param startIndex
+     * @param endIndex
+     * @return a hashmap of event type to graphlets
+     */
     public HashMap<EventType,ArrayList<Graphlet>> getGraphletsInRange(int startIndex, int endIndex){
         ArrayList<Graphlet> gs =  new ArrayList<>(this.graphlets.subList(startIndex, endIndex));
 

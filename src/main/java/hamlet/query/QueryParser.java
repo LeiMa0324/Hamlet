@@ -61,7 +61,7 @@ public class QueryParser {
 
         //the aggregator
         String aggFunc = aggString.trim().split("\\(")[0];
-        String aggColumn = aggFunc.equals("COUNT")? "" : aggString.trim().split("\\(")[1].split("\\)")[0];
+        String aggColumn = aggFunc.equals("COUNT")? "" : aggString.trim().split("\\(")[1].split("\\)")[0].split("\\.")[1];
         this.aggregator = aggFunc.equals("COUNT")? new CountAggregator(aggFunc, aggColumn):
                 new AvgAndSumAggregator(aggFunc, aggColumn);
     }

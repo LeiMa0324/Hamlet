@@ -97,7 +97,6 @@ public class Graph implements Observable{
 
                 if (pred!=null){
                     //找到predG, update non-shared G's predcounts
-                    //todo: 找到多个pred G而不是一个predG
                     Graphlet predG = Graphlets.get(nonsharedG.eventType.getPred(qid).string);
 
                     BigInteger predcount = new BigInteger("0");

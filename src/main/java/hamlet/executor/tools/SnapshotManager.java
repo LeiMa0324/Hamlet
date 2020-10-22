@@ -1,6 +1,9 @@
-package hamlet.executor;
+package hamlet.executor.tools;
 
 import hamlet.base.Event;
+import hamlet.executor.Graphlet.Graphlet;
+import hamlet.executor.Snapshot;
+import hamlet.query.aggregator.Value;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -14,10 +17,10 @@ public class SnapshotManager {
     private ArrayList<Snapshot> graphletSnapshots;
     private ArrayList<Integer> allqids;
 
-    public SnapshotManager(ArrayList<Integer> allqids){
+    public SnapshotManager(){
         this.snapshots = new ArrayList<>();
         this.graphletSnapshots = new ArrayList<>();
-        this.allqids = allqids;
+        this.allqids = Utils.getInstance().getQueryIds();
     }
 
 
@@ -30,10 +33,10 @@ public class SnapshotManager {
      * create a new event-level snapshot
      * @param event an event
      */
-    public void createEventSnapshot(Event event,HashMap<Integer, BigInteger> counts){
+    public void createEventSnapshot(Event event,HashMap<Integer, Value> counts){
 
         //create event snapshot
-        Snapshot eventSnapshot = new Snapshot(event, counts, this.allqids);
+        Snapshot eventSnapshot = new Snapshot(event, counts);
 
         //set event metric
         event.setMetric(Event.Metric.SNAPSHOT);
@@ -52,9 +55,9 @@ public class SnapshotManager {
     /**
      * create a new graphlet-level snapshot
      */
-    public void createGraphletSnapshot(Graphlet lastKleeneGraphlet, int eventIndex, HashMap<Integer, BigInteger> prefixCounts){
+    public void createGraphletSnapshot(Graphlet lastKleeneGraphlet, int eventIndex, HashMap<Integer, Value> prefixCounts){
 
-        Snapshot newGraphletSnapshot = new Snapshot(lastKleeneGraphlet,eventIndex, prefixCounts, this.allqids);
+        Snapshot newGraphletSnapshot = new Snapshot(lastKleeneGraphlet,eventIndex, prefixCounts);
         this.snapshots.add(newGraphletSnapshot);
         this.graphletSnapshots.add(newGraphletSnapshot);
 
@@ -66,19 +69,19 @@ public class SnapshotManager {
      * @param coeffsum
      * @return
      */
-    public BigInteger evaluateSnapshotExpressionForQuery(HashMap<Integer, BigInteger> coeffsum, int qid){
+    public Value evaluateSnapshotExpressionForQuery(HashMap<Integer, BigInteger> coeffsum, int qid){
 
-        BigInteger sum = BigInteger.ZERO;
+        Value evaluatedValue = new Value();
+
         for (Integer snapshotid: coeffsum.keySet()){
-            BigInteger count = this.snapshots.get(snapshotid).getCounts().get(qid);
-            if (count==null){
-                System.out.printf("find it");
-            }
-            //snap.count.qid * snap.coeff
-            sum = sum.add(count.multiply(coeffsum.get(snapshotid)));
+            Value value = this.snapshots.get(snapshotid).getValues().get(qid);
+
+            //newcount = snap.count.qid * snap.coeff
+            //newsum = snap.sum.qid * snap.coeff + event.attr* newcount
+            evaluatedValue = evaluatedValue.add(value.multiply(coeffsum.get(snapshotid)));
         }
 
-        return sum;
+        return evaluatedValue;
     }
 
     /**
@@ -87,8 +90,7 @@ public class SnapshotManager {
      */
     public void resetCountForExpiredQuery(int qid){
         for (Snapshot snapshot: this.snapshots){
-            snapshot.getCounts().put(qid, BigInteger.ZERO);
-
+            snapshot.getValues().put(qid, Value.ZERO);
         }
     }
 }

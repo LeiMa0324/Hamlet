@@ -1,7 +1,6 @@
-package hamlet.executor.countManager;
+package hamlet.executor.tools.countManager;
 
 import hamlet.base.Event;
-import hamlet.executor.PredecessorManager;
 import lombok.Data;
 
 import java.math.BigInteger;
@@ -13,15 +12,9 @@ import java.util.Set;
 @Data
 public abstract class EventCountManager {
 
-    protected PredecessorManager predecessorManager;
-
     public EventCountManager(){}
-    public EventCountManager(PredecessorManager predecessorManager){
-        this.predecessorManager = predecessorManager;
-    }
 
-    public abstract void update(Event event);
-    public abstract void updateStartEventForQuery(Event event, Integer qid);
+    public abstract void updateSnapshotForStartEventPerQuery(Event event, Integer qid);
     /**
      * only when an event has same predecessors for different queries, call this method
      * get the unique set of snapshots for all queries, and the coeff
