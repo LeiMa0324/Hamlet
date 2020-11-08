@@ -19,12 +19,14 @@ public class streamLoader {
     protected DatasetSchema schema;
     protected Workload wholeWorkload;
     protected ArrayList<Event> events;
+    protected int epw;
 
-    public streamLoader(String streamFile, DatasetSchema schema, Workload wholeWorkload) {
+    public streamLoader(String streamFile, DatasetSchema schema, Workload wholeWorkload, int epw) {
         this.streamFile = streamFile;
         this.schema = schema;
         this.wholeWorkload = wholeWorkload;
         this.events = new ArrayList<>();
+        this.epw = epw;
 
     }
 
@@ -39,7 +41,13 @@ public class streamLoader {
             Scanner scanner = new Scanner(new File(streamFile));
             scanner.nextLine();
 
+            int eventNum =0;
+
             while (scanner.hasNext()) {
+                if (eventNum > this.epw){
+                    break;
+                }
+                eventNum ++;
                 String line = scanner.nextLine();
                 String[] data = line.split(",");
                 if (checkEventType(data, eventTypeNames)) {

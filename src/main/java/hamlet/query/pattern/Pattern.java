@@ -65,6 +65,9 @@ public class Pattern {
 
     public EventType getNoneKleenePredecessor(EventType eventType){
         int currentIndex = this.eventTypes.indexOf(eventType);
+        if (currentIndex==-1){
+            System.out.printf("hh");
+        }
         return currentIndex==0?null: this.eventTypes.get(currentIndex-1);
     }
 

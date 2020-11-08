@@ -1,16 +1,14 @@
-package hamlet.executor.tools.GraphletManager;
+package hamlet.Graph.tools.GraphletManager;
 
-import hamlet.executor.Graphlet.Graphlet;
-import hamlet.executor.Graphlet.KleeneGraphlet;
+import hamlet.Graph.Graphlet.Graphlet;
+import hamlet.Graph.Graphlet.Static.KleeneGraphlet;
 import lombok.Data;
 
 import java.util.ArrayList;
 
 @Data
 public class GraphletManager_StaticHamlet extends GraphletManager{
-    private ArrayList<Graphlet> graphlets;
-    private int lastKleeneGraphletIndex;
-    private ArrayList<Graphlet> kleeneGraphlets;
+
 
     public GraphletManager_StaticHamlet(){
         this.graphlets = new ArrayList<>();
@@ -29,7 +27,7 @@ public class GraphletManager_StaticHamlet extends GraphletManager{
 
 
     public KleeneGraphlet getLastKleeneGraphlet(){
-        int gid = this.lastKleeneGraphletIndex;
-        return (KleeneGraphlet) this.graphlets.get(gid);
+
+        return this.lastKleeneGraphletIndex==-1?null: (KleeneGraphlet) this.graphlets.get(this.lastKleeneGraphletIndex);
     }
 }

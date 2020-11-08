@@ -1,10 +1,10 @@
-package hamlet.executor.Graphlet;
+package hamlet.Graph.Graphlet;
 
 import hamlet.base.Event;
 import hamlet.base.EventType;
-import hamlet.executor.tools.Utils;
-import hamlet.executor.tools.countManager.KleeneEventCountManager;
-import hamlet.executor.tools.countManager.NoneKleeneEventCountManager;
+import hamlet.Graph.tools.Utils;
+import hamlet.Graph.tools.countManager.KleeneEventCountManager;
+import hamlet.Graph.tools.countManager.NoneKleeneEventCountManager;
 import hamlet.query.aggregator.Value;
 import lombok.Data;
 
@@ -62,13 +62,18 @@ public abstract class Graphlet {
     public abstract void propagate();
 
 
-    protected void printGraphletInfo(){
+    public void printGraphletInfo(ArrayList<Event> burst){
+
+        if (burst.get(0).getValidQueries().contains(4)){
+            System.out.printf("find it");
+        }
+
         System.out.printf("\n\n=========Graphlet Info=======\n");
 
         System.out.printf("Graphlet finished!\n");
         System.out.printf("Event type: "+this.eventType.getName()+"\n");
         System.out.printf("number of events:" +this.events.size()+"\n");
-        System.out.printf("valid queries :"+this.events.get(0).getValidQueries());
+        System.out.printf("valid queries for this burst :"+burst.get(0).getValidQueries()+"\n");
         for (int qid: this.graphletValues.keySet()){
             System.out.printf("query "+qid);
             System.out.printf("     count: "+ graphletValues.get(qid)+"\n");

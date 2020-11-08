@@ -1,4 +1,4 @@
-package hamlet.executor.tools;
+package hamlet.Graph.tools;
 
 import hamlet.base.Event;
 import hamlet.query.aggregator.Aggregator;
@@ -31,41 +31,42 @@ public class BurstLoader {
 
         for (int i =0; i<events.size(); i++) {
 
-            setValidQueries(events.get(i));
+            Event event = setValidQueries(events.get(i));
 
             //skip the events that satisfy no predicates
-            if (events.get(i).getValidQueries().isEmpty()) {
+            if (event.getValidQueries().isEmpty()) {
                 continue;
             }
 
             //get the last event
-            latestEvent =latestEvent.equals("")? events.get(i).getType().getName():latestEvent;
+            latestEvent =latestEvent.equals("")? event.getType().getName():latestEvent;
 
             //get the last time stamp
-            lastTimeStamp = lastTimeStamp.equals("")?(String) events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString()):lastTimeStamp;
+            lastTimeStamp = lastTimeStamp.equals("")?(String) event.getAttributeValueByName(stockAttributeEnum.date.toString()):lastTimeStamp;
 
-            events.get(i).setEventIndex(validEvents.size());
+            event.setEventIndex(validEvents.size());
 
             //if the event has the same name and time stamp, add it into the burst
-            if (events.get(i).getType().getName().equals(latestEvent)&&
-                    ((String) events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString())).equals(lastTimeStamp)) {
-                tempBurst.add(events.get(i));
+            if (event.getType().getName().equals(latestEvent)&&
+                    ((String) event.getAttributeValueByName(stockAttributeEnum.date.toString())).equals(lastTimeStamp)) {
+                tempBurst.add(event);
             } else {
-                latestEvent = events.get(i).getType().getName();
-                lastTimeStamp = (String)events.get(i).getAttributeValueByName(stockAttributeEnum.date.toString());
+                latestEvent = event.getType().getName();
+                lastTimeStamp = (String)event.getAttributeValueByName(stockAttributeEnum.date.toString());
                 ArrayList<Event> burst = (ArrayList<Event>) tempBurst.clone();
 
                 bursts.add(burst);
                 tempBurst.clear();
-                tempBurst.add(events.get(i));
+                tempBurst.add(event);
             }
 
-            validEvents.add(events.get(i));
+            validEvents.add(event);
 
         }
         bursts.add(tempBurst);
-        this.events = validEvents;
-        return bursts;
+        ArrayList<ArrayList<Event>> newBursts = setFlag(bursts);
+        this.events = allEventsFromBursts(newBursts);
+        return newBursts;
 
     }
 
@@ -73,7 +74,7 @@ public class BurstLoader {
      * set the valid queries for event
      * @param event
      */
-    private void setValidQueries(Event event){
+    private Event setValidQueries(Event event){
 
         //kleene events, check the predicates
         if (event.getType().isKleene()){
@@ -85,7 +86,30 @@ public class BurstLoader {
             //get the qid for this event
             event.setValidQueries(event.getType().getQueries());
         }
+        return event;
     }
 
+    private ArrayList<ArrayList<Event>> setFlag(ArrayList<ArrayList<Event>> bursts){
 
+        ArrayList<ArrayList<Event>> newBursts = new ArrayList<>();
+        for (ArrayList<Event> burst: bursts){
+
+            if (Math.random()<0.3){
+                for (Event event: burst){
+                    event.setHasSnapshot(true);
+                }
+            }
+            newBursts.add(burst);
+        }
+        return newBursts;
+    }
+
+    private ArrayList<Event> allEventsFromBursts(ArrayList<ArrayList<Event>> bursts){
+        ArrayList<Event> events = new ArrayList<>();
+
+        for (ArrayList<Event> burst: bursts){
+            events.addAll(burst);
+        }
+        return events;
+    }
 }

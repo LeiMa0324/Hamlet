@@ -8,9 +8,9 @@ import java.io.FileNotFoundException;
 
 public class main {
 
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 
-        String workloadFile = "src/main/resources/Revision/Workload_Original.txt";
+        String workloadFile = "src/main/resources/Revision/Workload_50.txt";
         String streamFile = "src/main/resources/Revision/Nasdaq.csv";
 
 
@@ -23,7 +23,7 @@ public class main {
             stockSchema.addAttribute(new Attribute(a.toString()));
         }
 
-        Executor executor = new Executor(stockSchema);
+        Executor executor = new Executor(stockSchema, 50000, workloadFile, streamFile);
 
         //        /**
 //         * generate the workload
@@ -43,7 +43,8 @@ public class main {
         /**
          * run for each pair of <mini-workload, sub stream>
          */
-        executor.singleRun();
+        executor.run();
+
 
 
     }

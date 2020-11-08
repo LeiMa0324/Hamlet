@@ -1,16 +1,19 @@
-package hamlet.executor.tools.GraphletManager;
+package hamlet.Graph.tools.GraphletManager;
 
 import hamlet.base.EventType;
-import hamlet.executor.Graphlet.Graphlet;
+import hamlet.Graph.Graphlet.Graphlet;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@Data
 public abstract class GraphletManager {
     protected ArrayList<Graphlet> graphlets;
     protected ArrayList<Graphlet> kleeneGraphlets;
 
-    protected int lastKleeneGraphletIndex;
+    //todo: set last index to -1
+    protected int lastKleeneGraphletIndex = -1;
 
     public GraphletManager(){
         this.graphlets = new ArrayList<>();

@@ -146,17 +146,78 @@ todo:
  outputs: 1. actual values
           2. system performance
 
-
-
 new exp:
  show overhead of different components of greta vs. dynamic hamlet
  break cost into different components
 
 
+double check rebuttal
+
+Figure 17:
+    x-axis
+
+    epw
+    # of queries
+
+
+Latency: same execution time
+Throughput: avg #events per second
+peak memory: maximal memory to store snapshots
 
 
 
+29. Oct
+Dynamic is done, count is the same with static, sum is slightly different
+expand dataset from 50k to 100k
+generate workload size from 50-100
+
+Experiment setup:
+    vary #queries 50-100
+            50, 60, 70, 80 ,90, 100
+
+    vary epw 50-100k
+            50k, 60k, 70k, 80k, 90k, 100k
+
+    calculate memory, latency, throughput, logging
 
 
+
+logging:
+statistics of size of merged graphlets
+avg size of merged graphlets
+max, min
+
+# of graphlets
+# of merged graphlets
+
+
+PART1 : STATIC VS. DYNAMIC
+Execution stack bar chart: vertically
+dynamic: optimizer, and executor
+static: executor
+
+manipulate the event snapshots in a burst
+for 30% probability, a burst will have event snapshot for every event in it.
+
+    exp1 vary epw 50k -100k
+    exp2 vary workload size 50 - 100
+
+    add patterns, dynamic opt darker line above exe
+
+ how to increase workload(20-100) increase, stable, drop
+ predicates
+
+
+
+PART2 : OVERHEAD ANALYSIS
+Overhead(over # queries)
+    Static OVERHEAD
+    1. static workload analyzer AND template generation
+
+
+    For dynamic execution:
+    3. sum of dynamic optimizer
+    4. sum of execution
+    check the sum of these two
 
 

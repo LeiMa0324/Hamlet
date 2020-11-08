@@ -1,10 +1,10 @@
-package hamlet.executor.tools;
+package hamlet.Graph.tools;
 
 import hamlet.base.Event;
 import hamlet.base.Template;
-import hamlet.executor.tools.GraphletManager.GraphletManager_StaticHamlet;
-import hamlet.executor.tools.countManager.KleeneEventCountManager;
-import hamlet.executor.tools.countManager.NoneKleeneEventCountManager;
+import hamlet.Graph.tools.GraphletManager.GraphletManager;
+import hamlet.Graph.tools.countManager.KleeneEventCountManager;
+import hamlet.Graph.tools.countManager.NoneKleeneEventCountManager;
 import hamlet.query.aggregator.Aggregator;
 import lombok.Data;
 
@@ -19,10 +19,11 @@ public class Utils {
     private  Aggregator aggregator;
     private  PredecessorManager predecessorManager;
     private  SnapshotManager snapshotManager;
-    private GraphletManager_StaticHamlet graphletManagerStaticHamlet;
+    private GraphletManager graphletManager;
     private  ArrayList<Integer> queryIds;
     private  NoneKleeneEventCountManager noneKleeneEventCountManager;
     private  KleeneEventCountManager kleeneEventCountManager;
+    private GraphType graphType;
 
     private Utils(ArrayList<Event> events,
                   Template template,
@@ -51,4 +52,14 @@ public class Utils {
     public static Utils getInstance(){
         return instance;
     }
+
+    public enum GraphType{
+        STATIC,
+        DYNAMIC
+    }
+
+    public static void reset(){
+        instance = null;
+    }
+
 }

@@ -1,7 +1,7 @@
 package hamlet.base;
 
-import hamlet.executor.tools.PredicateManager;
-import hamlet.executor.tools.WindowManager;
+import hamlet.Graph.tools.PredicateManager;
+import hamlet.Graph.tools.WindowManager;
 import hamlet.query.Query;
 import hamlet.query.aggregator.Aggregator;
 import hamlet.query.predicate.Predicate;

@@ -1,7 +1,8 @@
-package hamlet.executor.tools.countManager;
+package hamlet.Graph.tools.countManager;
 
 import hamlet.base.Event;
-import hamlet.executor.tools.Utils;
+import hamlet.base.Snapshot;
+import hamlet.Graph.tools.Utils;
 import hamlet.query.aggregator.Aggregator;
 import hamlet.query.aggregator.Value;
 
@@ -21,15 +22,11 @@ public class KleeneEventCountManager extends EventCountManager {
         ArrayList<Integer> startQueries = event.getType().getQueriesStartWith();
         ArrayList<Integer> endQueries = event.getType().getQueriesEndWith();
 
-        //update start events
 
-        for (int qid: startQueries){
-            //B+ with start type process
-            updateSnapshotForStartEventPerQuery(event, qid);
-        }
 
         // have the same predecessors for all queries
-        if (Utils.getInstance().getPredecessorManager().hasSamePredecessorsForValidQueries(event)){
+        if (Utils.getInstance().getPredecessorManager().hasSamePredecessorsForValidQueries(event)&&
+        !event.isHasSnapshot()){
             ArrayList<Event> preds = Utils.getInstance().getPredecessorManager().getPredecessorsAfterLastGraphletSnapshotForQuery(event, event.getValidQueries().get(0));
             HashMap<Integer, BigInteger> coeffsum = new HashMap<>();
 
@@ -59,6 +56,9 @@ public class KleeneEventCountManager extends EventCountManager {
         }else {
             HashMap<Integer, Value> values = new HashMap<>();
 
+            ArrayList<Integer> validStartQueries = event.getValidQueries();
+            validStartQueries.retainAll(event.getType().getQueriesStartWith());
+
             // get the actual count for each query
             for (Integer qid: event.getValidQueries()){
 
@@ -68,6 +68,17 @@ public class KleeneEventCountManager extends EventCountManager {
 
                 //evaluate the expression of snapshots
                 Value countForQuery = Utils.getInstance().getSnapshotManager().evaluateSnapshotExpressionForQuery(coeffsum, qid);
+
+
+                //increment the graphlet snapshot to the value for start queries
+                if (validStartQueries.contains(qid)){
+                    Snapshot lastGraphletSnapshot = Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot();
+                    BigInteger newCount = countForQuery.getCount().add(lastGraphletSnapshot.getValues().get(qid).getCount());
+                    BigDecimal newSum = countForQuery.getSum().add(lastGraphletSnapshot.getValues().get(qid).getSum());
+
+                    countForQuery.setCount(newCount);
+                    countForQuery.setSum(newSum);
+                }
 
                 values.put(qid, countForQuery);
             }
@@ -91,13 +102,18 @@ public class KleeneEventCountManager extends EventCountManager {
 
         Value added = new Value(BigInteger.ONE);
         Aggregator aggregator = Utils.getInstance().getAggregator();
-        String attrValueStr = (String)event.getAttributeValueByName(aggregator.getAttributeName());
-        added.setSum(new BigDecimal(attrValueStr));
+        if (aggregator.getFunc()== Aggregator.Aggregfunctions.COUNT){
+            added.setSum(BigDecimal.ZERO);
+
+        }else {
+            String attrValueStr = (String) event.getAttributeValueByName(aggregator.getAttributeName());
+            added.setSum(new BigDecimal(attrValueStr));
+        }
 
         // count +=1, sum += attribute value
         Value newValue = oldValue.add(added);
 
-        Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot().getValues().put(qid, oldValue.add(newValue));
+        Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot().getValues().put(qid, newValue);
 
     }
 

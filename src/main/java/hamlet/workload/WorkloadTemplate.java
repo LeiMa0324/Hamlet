@@ -12,18 +12,17 @@ import java.util.*;
 
 public class WorkloadTemplate {
 
-    private ArrayList<String> queries;
+    private HashMap<String, ArrayList<String>> candidateQueries;
 
     public WorkloadTemplate(){
-        this.queries = new ArrayList<>();
+        this.candidateQueries = new HashMap<>();
     }
 
     /**
      * generate a workload
-     * @param queryNum the number of queries
      * @param groupNum the number of mini-workloads
      */
-    public void generate(int queryNum, int groupNum){
+    public void generateCandidateQueries( int groupNum){
 
         //set predicate
         String[] predOneColumns = {stockAttributeEnum.open.toString(),
@@ -38,7 +37,6 @@ public class WorkloadTemplate {
         //set aggregate column & type
         String aggreColumn = predOneColumns[0];
 
-        int groupSize = queryNum/groupNum;
 
         ArrayList<KleeneEventTypeEnum> availableKleene = new ArrayList<>(Arrays.asList(KleeneEventTypeEnum.values()));
         ArrayList<NoneKleeneEventTypeEnum> availableNoneKleene = new ArrayList<>(Arrays.asList(NoneKleeneEventTypeEnum.values()));
@@ -57,7 +55,9 @@ public class WorkloadTemplate {
             String[] windows = {"5 min", "10 min","15 min", "20 min"};
             String slide = "5 min";
 
-            for (int i =0; i < groupSize ; i++){
+            ArrayList<String> queries = new ArrayList<>();
+
+            for (int i =0; i < 20 ; i++){
 
                 String prefix = randomPrefix(availableNoneKleene);
                 String suffix = randomSuffix(availableNoneKleene);
@@ -83,10 +83,31 @@ public class WorkloadTemplate {
                         whereString+"\n"+
                         windowString;
 
-                this.queries.add(query);
+                queries.add(query);
+            }
+            this.candidateQueries.put(kleene, queries);
+        }
+    }
 
+    public void generateWorkload(int workloadSize, String WorkloadFile){
+        int queryPerGroup = workloadSize/5;
+        ArrayList<String> queries = new ArrayList<>();
+
+        for (String kleene: this.candidateQueries.keySet()){
+
+            for (int i=0; i<queryPerGroup; i++){
+
+                Random random = new Random();
+                int randomIndex = random.nextInt(this.candidateQueries.get(kleene).size());
+                while (queries.contains(this.candidateQueries.get(kleene).get(randomIndex))){
+                    randomIndex = random.nextInt(this.candidateQueries.get(kleene).size());
+                }
+                queries.add(this.candidateQueries.get(kleene).get(randomIndex));
             }
         }
+
+        ArrayList<String> shuffledQueries = shuffle(queries);
+        toFile(WorkloadFile, shuffledQueries);
 
     }
 
@@ -150,14 +171,15 @@ public class WorkloadTemplate {
 
     }
 
-    public void shuffle(){
-        Collections.shuffle(this.queries);
+    public ArrayList<String> shuffle(ArrayList<String> queries){
+        Collections.shuffle(queries);
+        return queries;
     }
 
     /**
      * write the queries into a workload file
      */
-    public void toFile(String workloadFile){
+    public void toFile(String workloadFile, ArrayList<String> queries){
 
         try{
             File output_file = new File(workloadFile);
@@ -166,7 +188,7 @@ public class WorkloadTemplate {
             }
             BufferedWriter output = new BufferedWriter(new FileWriter(output_file));
             int i = 0;
-            for(String q: this.queries){
+            for(String q: queries){
                 output.append("q"+i+"\n");
                 output.append(q+"\n\n");
                 i++;

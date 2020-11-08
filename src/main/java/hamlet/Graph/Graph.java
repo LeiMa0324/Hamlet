@@ -2,13 +2,12 @@ package hamlet.Graph;
 
 import hamlet.base.Event;
 import hamlet.base.Template;
-import hamlet.executor.Graphlet.Graphlet;
-import hamlet.executor.Graphlet.NoneKleeneGraphlet;
-import hamlet.executor.Snapshot;
-import hamlet.executor.tools.*;
-import hamlet.executor.tools.GraphletManager.GraphletManager_StaticHamlet;
-import hamlet.executor.tools.countManager.KleeneEventCountManager;
-import hamlet.executor.tools.countManager.NoneKleeneEventCountManager;
+import hamlet.Graph.Graphlet.Static.NoneKleeneGraphlet;
+import hamlet.base.Snapshot;
+import hamlet.Graph.tools.*;
+import hamlet.Graph.tools.GraphletManager.GraphletManager_StaticHamlet;
+import hamlet.Graph.tools.countManager.KleeneEventCountManager;
+import hamlet.Graph.tools.countManager.NoneKleeneEventCountManager;
 import hamlet.query.Query;
 import hamlet.query.aggregator.Aggregator;
 import hamlet.query.aggregator.Value;
@@ -23,34 +22,40 @@ public abstract class Graph {
 
     protected WindowManager windowManager;
     protected PredicateManager predicateManager;
-
-
     protected Template template;
     protected ArrayList<Event> events;
-    protected ArrayList<ArrayList<Event>> bursts;
+    protected final ArrayList<ArrayList<Event>> bursts;
     protected HashMap<Integer, Value> finalValues;
     protected Utils utils;
+    protected long latency;
+    protected long memory;
 
-    public Graph(Template template, ArrayList<Event> events){
+
+
+    public Graph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> bursts){
         this.predicateManager = template.getPredicateManager();
         this.template = template;
-        this.bursts = new ArrayList<>();
+        this.bursts = bursts;
         this.finalValues = new HashMap<>();
         this.windowManager = template.getWindowManager();
+        this.events = events;
 
-        loadBursts(events);
+
         setUtils();
         this.utils = Utils.getInstance();
+
+        for (int qid: Utils.getInstance().getQueryIds()){
+            this.finalValues.put(qid, Value.ZERO);
+        }
 
     }
 
     public abstract void run();
-    public abstract void updateFinalValues(Graphlet graphlet);
 
 
     public NoneKleeneGraphlet createNoneSharedGraphlet(ArrayList<Event> burst){
         NoneKleeneGraphlet graphlet = new NoneKleeneGraphlet(burst);
-        Utils.getInstance().getGraphletManagerStaticHamlet().addGraphlet(graphlet);
+        Utils.getInstance().getGraphletManager().addGraphlet(graphlet);
         return graphlet;
 
     }
@@ -62,6 +67,9 @@ public abstract class Graph {
         }
 
         Aggregator aggregator = this.template.getAggregator();
+
+        //reset utils
+        Utils.reset();
         Utils.newInstance(events, template, aggregator,queryIds);
 
         SnapshotManager snapshotManager = new SnapshotManager();
@@ -77,14 +85,10 @@ public abstract class Graph {
         Utils.getInstance().setKleeneEventCountManager(kleeneEventCountManager);
 
         GraphletManager_StaticHamlet graphletManagerStaticHamlet = new GraphletManager_StaticHamlet();
-        Utils.getInstance().setGraphletManagerStaticHamlet(graphletManagerStaticHamlet);
+        Utils.getInstance().setGraphletManager(graphletManagerStaticHamlet);
     }
 
-    public void loadBursts(ArrayList<Event> events){
-        BurstLoader burstLoader = new BurstLoader(predicateManager);
-        this.bursts = burstLoader.load(events);
-        this.events = burstLoader.getEvents();
-    }
+
 
     public void printGraphletSnapshot(){
         System.out.printf("\n=====graphlet snapshot=====\n");

@@ -29,6 +29,7 @@ public class Event {
     private HashMap<Integer, Value> values;
     private Metric metric;
     private Integer eventIndex;
+    private boolean hasSnapshot= false;
 
     public Event(EventType type, Object[] tuple) throws ParseException {
 

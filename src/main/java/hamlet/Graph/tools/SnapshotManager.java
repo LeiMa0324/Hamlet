@@ -1,8 +1,8 @@
-package hamlet.executor.tools;
+package hamlet.Graph.tools;
 
 import hamlet.base.Event;
-import hamlet.executor.Graphlet.Graphlet;
-import hamlet.executor.Snapshot;
+import hamlet.Graph.Graphlet.Graphlet;
+import hamlet.base.Snapshot;
 import hamlet.query.aggregator.Value;
 import lombok.Data;
 
@@ -55,11 +55,22 @@ public class SnapshotManager {
     /**
      * create a new graphlet-level snapshot
      */
-    public void createGraphletSnapshot(Graphlet lastKleeneGraphlet, int eventIndex, HashMap<Integer, Value> prefixCounts){
+    public void createGraphletSnapshot(Graphlet lastKleeneGraphlet, int eventIndex, HashMap<Integer, Value> prefixCounts, ArrayList<Event> burst){
 
         Snapshot newGraphletSnapshot = new Snapshot(lastKleeneGraphlet,eventIndex, prefixCounts);
         this.snapshots.add(newGraphletSnapshot);
         this.graphletSnapshots.add(newGraphletSnapshot);
+
+        //update start events
+        ArrayList<Integer> validStartQueries = (ArrayList<Integer>) burst.get(0).getValidQueries().clone();
+        validStartQueries.retainAll(burst.get(0).getType().getQueriesStartWith());
+
+        for (int qid: validStartQueries){
+            //B+ with start type process
+            Utils.getInstance().getKleeneEventCountManager().updateSnapshotForStartEventPerQuery(burst.get(0), qid);
+        }
+
+
 
     }
 

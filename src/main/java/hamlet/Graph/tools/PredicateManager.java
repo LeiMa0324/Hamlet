@@ -1,4 +1,4 @@
-package hamlet.executor.tools;
+package hamlet.Graph.tools;
 
 import hamlet.base.Event;
 import hamlet.query.predicate.Predicate;

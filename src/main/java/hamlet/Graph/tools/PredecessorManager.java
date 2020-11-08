@@ -1,8 +1,8 @@
-package hamlet.executor.tools;
+package hamlet.Graph.tools;
 
 import hamlet.base.Event;
 import hamlet.base.EventType;
-import hamlet.executor.Graphlet.Graphlet;
+import hamlet.Graph.Graphlet.Graphlet;
 import hamlet.query.aggregator.Value;
 import lombok.Data;
 
@@ -43,10 +43,10 @@ public class PredecessorManager {
                                                                              int qid){
 
         int lastGraphletSnapshotEventIndex = Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot()==null?
-                -1:
+                0:
                 Utils.getInstance().getSnapshotManager().getLastGraphletSnapshot().getEventIndex();
 
-        ArrayList<Event> eventsBetweenSnapshots = lastGraphletSnapshotEventIndex>Utils.getInstance().getEvents().indexOf(event)?
+        ArrayList<Event> eventsAfterSnapshot = lastGraphletSnapshotEventIndex>Utils.getInstance().getEvents().indexOf(event)?
                 new ArrayList<Event>():
                 new ArrayList<>(Utils.getInstance().getEvents().subList(lastGraphletSnapshotEventIndex, Utils.getInstance().getEvents().indexOf(event)));
 
@@ -55,9 +55,9 @@ public class PredecessorManager {
 
         ArrayList<Event> preds = new ArrayList<>();
 
-        if (!eventsBetweenSnapshots.isEmpty()) {
-            Event.Metric metric = eventsBetweenSnapshots.get(0).getMetric();
-            for (Event e : eventsBetweenSnapshots) {
+        if (!eventsAfterSnapshot.isEmpty()) {
+            Event.Metric metric = eventsAfterSnapshot.get(0).getMetric();
+            for (Event e : eventsAfterSnapshot) {
                 //find the events that are:
                 //1. the preceding type
                 //2. valid for this query

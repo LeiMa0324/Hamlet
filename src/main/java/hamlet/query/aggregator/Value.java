@@ -45,6 +45,14 @@ public class Value {
         return newValue;
     }
 
+    public Value substract(Value value){
+        Value newValue = new Value();
+        newValue.setCount(this.count.subtract(value.getCount()));
+        newValue.setSum(this.sum.subtract(value.getSum()));
+
+        return newValue;
+    }
+
     //evaluate an expression of snapshots
     public Value multiply(BigInteger multiplier){
         Value newValue = new Value();
@@ -79,7 +87,9 @@ public class Value {
 
 
     public BigDecimal avg(){
-        return this.getSum().divide(new BigDecimal(this.count),2,BigDecimal.ROUND_HALF_UP);
+        return this.count.equals(BigInteger.ZERO)?
+                BigDecimal.ZERO:
+                this.getSum().divide(new BigDecimal(this.count),2,BigDecimal.ROUND_HALF_UP);
     }
 
 }

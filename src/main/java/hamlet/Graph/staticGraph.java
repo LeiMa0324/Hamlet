@@ -3,9 +3,10 @@ package hamlet.Graph;
 import hamlet.base.Event;
 import hamlet.base.EventType;
 import hamlet.base.Template;
-import hamlet.executor.Graphlet.Graphlet;
-import hamlet.executor.Graphlet.KleeneGraphlet;
-import hamlet.executor.tools.Utils;
+import hamlet.Graph.Graphlet.Graphlet;
+import hamlet.Graph.Graphlet.Static.KleeneGraphlet;
+import hamlet.Graph.tools.GraphletManager.GraphletManager_StaticHamlet;
+import hamlet.Graph.tools.Utils;
 import hamlet.query.aggregator.Value;
 
 import java.util.ArrayList;
@@ -14,9 +15,9 @@ import java.util.HashMap;
 public class staticGraph extends Graph {
 
 
-
-    public staticGraph(Template template, ArrayList<Event> events){
-        super(template, events);
+    public staticGraph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> bursts){
+        super(template, events, bursts);
+        this.utils.setGraphType(Utils.GraphType.STATIC);
         printWorkload();
 
     }
@@ -25,10 +26,14 @@ public class staticGraph extends Graph {
 
         this.windowManager.initAllWindows(this.events.get(0).getTimeStamp());
 
-        for (ArrayList<Event> burst: this.bursts){
+        for (int i =0; i< this.bursts.size(); i++){
+            ArrayList<Event> burst = this.bursts.get(i);
+            System.out.printf("Burst number: "+i+"\n");
             burstProcess(burst);
         }
 
+
+        this.memory = this.events.size()*12+ this.utils.getSnapshotManager().getSnapshots().size()*this.utils.getQueryIds().size()*12;
     }
 
     public void burstProcess(ArrayList<Event> burst){
@@ -73,10 +78,13 @@ public class staticGraph extends Graph {
     }
 
     public HashMap<Integer, Value> getPrefixValuesAfterLastKleeneGraphlet(ArrayList<Event> burst){
+        GraphletManager_StaticHamlet graphletManagerStaticHamlet = (GraphletManager_StaticHamlet)Utils.getInstance().getGraphletManager();
+
+
         //get candidate graphlets
-        HashMap<EventType, ArrayList<Graphlet>> candidateGraphlets = Utils.getInstance().getGraphletManagerStaticHamlet().getGraphletsInRange(
-                Utils.getInstance().getGraphletManagerStaticHamlet().getLastKleeneGraphletIndex(),
-                Utils.getInstance().getGraphletManagerStaticHamlet().getGraphlets().size());
+        HashMap<EventType, ArrayList<Graphlet>> candidateGraphlets = Utils.getInstance().getGraphletManager().getGraphletsInRange(
+                graphletManagerStaticHamlet.getLastKleeneGraphletIndex()==-1?0:graphletManagerStaticHamlet.getLastKleeneGraphletIndex(),
+                graphletManagerStaticHamlet.getGraphlets().size());
 
         //get prefix counts for all queries
         return Utils.getInstance().getPredecessorManager().sumPrefixEventValuesForKleeneEventTypeForAllQueries(burst.get(0).getType(), candidateGraphlets);
@@ -86,19 +94,21 @@ public class staticGraph extends Graph {
     public Graphlet createKleeneGraphlet(ArrayList<Event> burst, HashMap<Integer, Value> prefixCounts){
         Graphlet graphlet = new KleeneGraphlet(burst);
 
+        GraphletManager_StaticHamlet graphletManagerStaticHamlet = (GraphletManager_StaticHamlet)Utils.getInstance().getGraphletManager();
+
         //add the last graphlet's total count with prefix counts to create a new snapshot
-        Graphlet lastKleeneG = Utils.getInstance().getGraphletManagerStaticHamlet().getGraphlets().isEmpty()?
+        Graphlet lastKleeneG = (graphletManagerStaticHamlet.getGraphlets().isEmpty()||graphletManagerStaticHamlet.getLastKleeneGraphletIndex()==-1)?
                 null:
-                Utils.getInstance().getGraphletManagerStaticHamlet().getGraphlets().get(Utils.getInstance().getGraphletManagerStaticHamlet().getLastKleeneGraphletIndex());
+                graphletManagerStaticHamlet.getGraphlets().get(graphletManagerStaticHamlet.getLastKleeneGraphletIndex());
 
         //create graphlet snapshot
-        Utils.getInstance().getSnapshotManager().createGraphletSnapshot(lastKleeneG, burst.get(0).getEventIndex(), prefixCounts);
+        Utils.getInstance().getSnapshotManager().createGraphletSnapshot(lastKleeneG, burst.get(0).getEventIndex(), prefixCounts, burst);
 
         //add the new graphlet into the graphlet list
-        Utils.getInstance().getGraphletManagerStaticHamlet().addGraphlet(graphlet);
+        Utils.getInstance().getGraphletManager().addGraphlet(graphlet);
 
         //print the graphlet snapshot
-        printGraphletSnapshot();
+//        printGraphletSnapshot();
 
         return graphlet;
 
@@ -125,7 +135,7 @@ public class staticGraph extends Graph {
 
         }
 
-        printFinalCount();
+//        printFinalCount();
     }
 
 

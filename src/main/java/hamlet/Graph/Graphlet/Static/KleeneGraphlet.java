@@ -1,17 +1,17 @@
-package hamlet.executor.Graphlet;
+package hamlet.Graph.Graphlet.Static;
 
 import hamlet.base.Event;
-import hamlet.executor.Snapshot;
-import hamlet.executor.tools.SnapshotManager;
-import hamlet.executor.tools.Utils;
-import hamlet.query.aggregator.Aggregator;
+import hamlet.Graph.Graphlet.Graphlet;
+import hamlet.base.Snapshot;
+import hamlet.Graph.tools.SnapshotManager;
+import hamlet.Graph.tools.Utils;
 import hamlet.query.aggregator.Value;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-public class KleeneGraphlet extends Graphlet{
+public class KleeneGraphlet extends Graphlet {
 
     public KleeneGraphlet(ArrayList<Event> events){
         super(events);
@@ -23,16 +23,16 @@ public class KleeneGraphlet extends Graphlet{
             kleeneEventCountManager.update(event);
             updateKleeneGraphletValuesBySnapshots(event);
         }
-
-        printGraphletInfo();
+        VanishingSnapshotProcess();
+        printGraphletInfo(this.events);
     }
 
-    private void updateKleeneGraphletValuesBySnapshots(Event event){
+    protected void updateKleeneGraphletValuesBySnapshots(Event event){
 
-        Aggregator aggregator = Utils.getInstance().getAggregator();
 
 
         for (int qid: event.getValidQueries()) {
+
             SnapshotManager snapshotManager = Utils.getInstance().getSnapshotManager();
 
             //the actual values of an event after evaluation
@@ -42,18 +42,17 @@ public class KleeneGraphlet extends Graphlet{
             if (eventValuesForQuery.getSum().equals(BigDecimal.ZERO)&& !eventValuesForQuery.getCount().equals(BigInteger.ZERO)){
 
                 String attrValueStr = (String) event.getAttributeValueByName(Utils.getInstance().getAggregator().getAttributeName());
-                eventValuesForQuery.setSum(new BigDecimal(attrValueStr).multiply(new BigDecimal(eventValuesForQuery.getCount())));
+                BigDecimal arrtValue = attrValueStr==null? BigDecimal.ZERO: new BigDecimal(attrValueStr);
+                eventValuesForQuery.setSum(arrtValue.multiply(new BigDecimal(eventValuesForQuery.getCount())));
             }
 
-            Value newGpraghletValuesForQuery = this.graphletValues.containsKey(qid) ? this.graphletValues.get(qid) : Value.ZERO;
-            newGpraghletValuesForQuery = newGpraghletValuesForQuery.add(eventValuesForQuery);
+            Value oldGpraghletValuesForQuery = this.graphletValues.containsKey(qid) ? this.graphletValues.get(qid) : Value.ZERO;
+            Value newGpraghletValuesForQuery = oldGpraghletValuesForQuery.add(eventValuesForQuery);
 
             // add the event's values to the graphlt values
             this.graphletValues.put(qid, newGpraghletValuesForQuery);
 
-
         }
-        VanishingSnapshotProcess();
 
     }
 
@@ -62,8 +61,8 @@ public class KleeneGraphlet extends Graphlet{
      * for a query qi: if the currrent graphlet has no valid events for that, after the propagation, the graphlet's count for qi = =0
      * when adding to the final, the previous snapshot vanishes
      */
-    public void VanishingSnapshotProcess(){
-        //todo: snapshot carries both count and sum, when passing an empty graphlet, the values shouldn't vanish
+    protected void VanishingSnapshotProcess(){
+        //snapshot carries both count and sum, when passing an empty graphlet, the values shouldn't vanish
         //if all events are invalid for some query,
         // but the g-snapshot has the count for the query, keep it in the graphlet's count
         //also, add the sum of last kleene to this one
@@ -79,11 +78,4 @@ public class KleeneGraphlet extends Graphlet{
         }
     }
 
-    /**
-     * extend the graphlet by a burst
-     * @param burst
-     */
-    public void extend(ArrayList<Event> burst){
-
-    }
 }
