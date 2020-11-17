@@ -36,6 +36,12 @@ This is the jar of the original submission, including all the experiments Figure
   > workloadTemplate and generator produce the workload file. The generated workloads are under src/main/resources/Nasdaq
     
   > WorklaodAnalyzer parses a workload file into a workload object and analyzes the sharing opportunity.
+
+**graph**
+
+  > tools: including all the managers of graphlets, snapshots, predecessors, windows.
+  > graphlet: the abstractions of graphlet
+  > static and dynamic graphs
     
 **optimizer:**
 
