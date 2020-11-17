@@ -16,37 +16,37 @@ This is the jar of the original submission, including all the experiments Figure
 
 base:
 
-    classes of basic data structures including dataset schema, attribute of the schema, stream event, event type, snapshot and template.
+classes of basic data structures including dataset schema, attribute of the schema, stream event, event type, snapshot and template.
 
 query:
 
-    classes of components of a query, including aggregator, pattern, predicate, window and groupby. QueryParser parses a query string into a Query object.
+classes of components of a query, including aggregator, pattern, predicate, window and groupby. QueryParser parses a query string into a Query object.
 
 stream:
 
-    stream related classes, including stream loader and partitioner.
+stream related classes, including stream loader and partitioner.
     
 users:
 
-    the dataset specifications. 
+the dataset specifications. 
 
 workload:
 
-    workloadTemplate and generator produce the workload file. The generated workloads are under src/main/resources/Nasdaq
+workloadTemplate and generator produce the workload file. The generated workloads are under src/main/resources/Nasdaq
     
-    WorklaodAnalyzer parses a workload file into a workload object and analyzes the sharing opportunity.
+WorklaodAnalyzer parses a workload file into a workload object and analyzes the sharing opportunity.
     
 optimizer:
 
-    the dynmaic optimizer of dynamic hamlet.
+the dynmaic optimizer of dynamic hamlet.
     
 executor:
 
-    executor class has the methods of a single run of static and dynamic hamlet. Experiment provides the actual setting and methods of the whole experiment.
+executor class has the methods of a single run of static and dynamic hamlet. Experiment provides the actual setting and methods of the whole experiment.
     
-    LocalMain is the main class of local running on an IDE. 
+LocalMain is the main class of local running on an IDE. 
     
-    serverMain is the main class for the jar that could be run on a server.
+serverMain is the main class for the jar that could be run on a server.
 
 
 ### 2.Dataset
@@ -76,9 +76,8 @@ src/main/resources/Nasdaq/Nasdaq.csv
 
  Main function compares static VS. dynamic in two settings:
  
-    vary query number
-    
-    vary events per window
+vary query number
+vary events per window
 
 
  In each of these settings, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
