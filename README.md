@@ -1,14 +1,16 @@
-#PROJECT STRUCTURE
+PROJECT STRUCTURE
+====
 
-
-##Original Submission
+Original Submission
+----
 
 out/artifacts/HamletOriginalSubmission.jar
 
 This is the jar of the original submission, including all the experiments Figure 14-16
 
 
-##Revision Submission
+Revision Submission
+----
 
 ###Packages
 
