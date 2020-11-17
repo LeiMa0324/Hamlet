@@ -40,7 +40,9 @@ This is the jar of the original submission, including all the experiments Figure
 **graph**
 
   > tools: including all the managers of graphlets, snapshots, predecessors, windows.
+  
   > graphlet: the abstractions of graphlet
+  
   > static and dynamic graphs
     
 **optimizer:**
