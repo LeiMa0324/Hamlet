@@ -1,0 +1,350 @@
+q0
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN SEQ(PACQU, TQQQ+)
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 15 min SLIDE 5 min
+
+q1
+RETURN QQQ.open_level, COUNT(*)
+PATTERN QQQ+
+WHERE QQQ.vol > 30
+GROUP-BY QQQ.open_level
+WITHIN 15 min SLIDE 5 min
+
+q2
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(QQQ+, CREXW)
+WHERE QQQ.vol > 30
+GROUP-BY QQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q3
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN AMD+
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 10 min SLIDE 5 min
+
+q4
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN SEQ(UONEK, TQQQ+, ACT)
+WHERE TQQQ.vol > 30
+GROUP-BY TQQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q5
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN SEQ(BMLP, ROKU+)
+WHERE ROKU.vol > 30
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q6
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN SEQ(CTAC, TQQQ+, PNRG)
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q7
+RETURN TQQQ.open_level, AVG(TQQQ.open)
+PATTERN SEQ(TQQQ+, FCA)
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q8
+RETURN NAKD.open_level, COUNT(*)
+PATTERN NAKD+
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 20 min SLIDE 5 min
+
+q9
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN AMD+
+WHERE AMD.vol > 30
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q10
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN TQQQ+
+WHERE TQQQ.vol > 30
+GROUP-BY TQQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q11
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(NAKD+, TDACW)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 10 min SLIDE 5 min
+
+q12
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(QQQ+, LANDP)
+WHERE QQQ.vol > 100
+GROUP-BY QQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q13
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN AMD+
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q14
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN SEQ(GFED, AMD+)
+WHERE AMD.vol > 30
+GROUP-BY AMD.open_level
+WITHIN 20 min SLIDE 5 min
+
+q15
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN SEQ(OTLKW, AMD+, GIGE)
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q16
+RETURN QQQ.open_level, COUNT(*)
+PATTERN QQQ+
+WHERE QQQ.vol > 30
+GROUP-BY QQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q17
+RETURN QQQ.open_level, COUNT(*)
+PATTERN QQQ+
+WHERE QQQ.vol > 100
+GROUP-BY QQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q18
+RETURN ROKU.open_level, AVG(ROKU.open)
+PATTERN SEQ(ROKU+, DMTKW)
+WHERE ROKU.vol > 30
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q19
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(BSVN, QQQ+, GLAC)
+WHERE QQQ.vol > 100
+GROUP-BY QQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q20
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(WTREP, NAKD+)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q21
+RETURN TQQQ.open_level, AVG(TQQQ.open)
+PATTERN SEQ(TDACU, TQQQ+, BNTC)
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q22
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN SEQ(TQQQ+, HCCHW)
+WHERE TQQQ.vol > 30
+GROUP-BY TQQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q23
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN SEQ(ROKU+, FTXR)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 5 min SLIDE 5 min
+
+q24
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN SEQ(ISNS, ROKU+, FTRI)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q25
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(NAKD+, FTXD)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q26
+RETURN AMD.open_level, SUM(AMD.open)
+PATTERN SEQ(FTAG, AMD+)
+WHERE AMD.vol > 30
+GROUP-BY AMD.open_level
+WITHIN 5 min SLIDE 5 min
+
+q27
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(FPAYW, QQQ+, ENTXW)
+WHERE QQQ.vol > 30
+GROUP-BY QQQ.open_level
+WITHIN 20 min SLIDE 5 min
+
+q28
+RETURN TQQQ.open_level, SUM(TQQQ.open)
+PATTERN TQQQ+
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q29
+RETURN NAKD.open_level, COUNT(*)
+PATTERN NAKD+
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 20 min SLIDE 5 min
+
+q30
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN SEQ(EMCF, AMD+, FTXL)
+WHERE AMD.vol > 30
+GROUP-BY AMD.open_level
+WITHIN 10 min SLIDE 5 min
+
+q31
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN SEQ(DWMC, AMD+)
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q32
+RETURN QQQ.open_level, COUNT(*)
+PATTERN QQQ+
+WHERE QQQ.vol > 30
+GROUP-BY QQQ.open_level
+WITHIN 15 min SLIDE 5 min
+
+q33
+RETURN ROKU.open_level, AVG(ROKU.open)
+PATTERN SEQ(HCCHU, ROKU+, BCNA)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q34
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN ROKU+
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 15 min SLIDE 5 min
+
+q35
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN SEQ(ROKU+, FDUSZ)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 5 min SLIDE 5 min
+
+q36
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(QQQ+, SMCP)
+WHERE QQQ.vol > 100
+GROUP-BY QQQ.open_level
+WITHIN 15 min SLIDE 5 min
+
+q37
+RETURN AMD.open_level, SUM(AMD.open)
+PATTERN AMD+
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q38
+RETURN ROKU.open_level, AVG(ROKU.open)
+PATTERN SEQ(SDVY, ROKU+, EPSN)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 20 min SLIDE 5 min
+
+q39
+RETURN QQQ.open_level, COUNT(*)
+PATTERN SEQ(CTIB, QQQ+)
+WHERE QQQ.vol > 100
+GROUP-BY QQQ.open_level
+WITHIN 5 min SLIDE 5 min
+
+q40
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(NAKD+, CHEKZ)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 20 min SLIDE 5 min
+
+q41
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(NAKD+, MBINP)
+WHERE NAKD.vol > 30
+GROUP-BY NAKD.open_level
+WITHIN 5 min SLIDE 5 min
+
+q42
+RETURN AMD.open_level, AVG(AMD.open)
+PATTERN SEQ(AMD+, HCAPZ)
+WHERE AMD.vol > 100
+GROUP-BY AMD.open_level
+WITHIN 15 min SLIDE 5 min
+
+q43
+RETURN ROKU.open_level, AVG(ROKU.open)
+PATTERN SEQ(BANFP, ROKU+, ROSEW)
+WHERE ROKU.vol > 30
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q44
+RETURN TQQQ.open_level, AVG(TQQQ.open)
+PATTERN TQQQ+
+WHERE TQQQ.vol > 100
+GROUP-BY TQQQ.open_level
+WITHIN 10 min SLIDE 5 min
+
+q45
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(VALU, NAKD+)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 5 min SLIDE 5 min
+
+q46
+RETURN NAKD.open_level, COUNT(*)
+PATTERN NAKD+
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 10 min SLIDE 5 min
+
+q47
+RETURN NAKD.open_level, COUNT(*)
+PATTERN SEQ(TLC, NAKD+, BCDAW)
+WHERE NAKD.vol > 100
+GROUP-BY NAKD.open_level
+WITHIN 20 min SLIDE 5 min
+
+q48
+RETURN ROKU.open_level, SUM(ROKU.open)
+PATTERN SEQ(ROKU+, CETXW)
+WHERE ROKU.vol > 100
+GROUP-BY ROKU.open_level
+WITHIN 10 min SLIDE 5 min
+
+q49
+RETURN TQQQ.open_level, AVG(TQQQ.open)
+PATTERN TQQQ+
+WHERE TQQQ.vol > 30
+GROUP-BY TQQQ.open_level
+WITHIN 20 min SLIDE 5 min
+
