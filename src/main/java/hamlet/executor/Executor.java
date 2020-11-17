@@ -52,6 +52,10 @@ public class Executor {
     private int staticRelevantEvents;
     private int dynamicRelevantEvents;
 
+    //# snapshots
+    private int staticSnapshotNum;
+    private int dynamicSnapshotNum;
+
 
     public Executor(DatasetSchema schema, int epw, String workloadFile, String streamFile){
         this.schema = schema;
@@ -127,7 +131,6 @@ public class Executor {
 
     public void staticRun() {
 
-        int eventSnapshots = 0;
         //for each mini workload
         for (String kleeneEt: this.stringMiniWorkloadHashMap.keySet()){
 
@@ -150,10 +153,10 @@ public class Executor {
                     this.staticLatency += (end-start);
                     this.staticMemory += staticGraph.getMemory();
 
-                    eventSnapshots += staticGraph.getUtils().getSnapshotManager().getSnapshots().size();
+                    this.staticSnapshotNum += staticGraph.getUtils().getSnapshotManager().getSnapshots().size();
                 }
 
-
+//                break;
             }
         }
 
@@ -170,7 +173,6 @@ public class Executor {
 
     public void dynamicRun() {
 
-        int snapshotNum = 0;
 
 
         //for each mini workload
@@ -205,10 +207,10 @@ public class Executor {
                         }
                     }
 
-                    snapshotNum += dynamicGraph.getUtils().getSnapshotManager().getSnapshots().size();
+                    this.dynamicSnapshotNum += dynamicGraph.getUtils().getSnapshotManager().getSnapshots().size();
                 }
 
-
+            break;
             }
         }
 //

@@ -14,7 +14,7 @@ public class SingleValuePredicate extends Predicate{
 
     //the condition value
     //could be a number or a string
-    private Object value;
+    private Float value;
     private Attribute singleAttribute;
 
     public SingleValuePredicate(ArrayList<EventType> eventTypes,
@@ -31,7 +31,7 @@ public class SingleValuePredicate extends Predicate{
     protected boolean greater(ArrayList<Event> events){
         Event event = events.get(0);
 
-        return (Float)event.getAttributeValueByName(singleAttribute.getName())>(Float) value;
+        return Float.parseFloat((String)event.getAttributeValueByName(singleAttribute.getName()))>value ;
 
     }
 
@@ -45,11 +45,9 @@ public class SingleValuePredicate extends Predicate{
     protected boolean equal(ArrayList<Event> events){
         Event event = events.get(0);
 
-        if (value.getClass()==String.class){
-            return event.getAttributeValueByName(singleAttribute.getName()).equals(value);
-        }else {
-            return event.getAttributeValueByName(singleAttribute.getName())==value;
-        }
+
+        return event.getAttributeValueByName(singleAttribute.getName())==value;
+
     }
 
     public String toString(){

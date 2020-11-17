@@ -276,8 +276,10 @@ public class GraphletManager_DynamicHamlet extends GraphletManager{
         int sc;
         //if one event has different predecessors, then an event-level snapshot is created
         sc = 0;
+        ArrayList<Integer> validQ = burst.get(0).getValidQueries();
         for (Event event: burst){
-            if (event.isHasSnapshot()){
+
+            if (! event.getValidQueries().equals(validQ)){
                 sc+=1;
             }
         }
@@ -321,6 +323,8 @@ public class GraphletManager_DynamicHamlet extends GraphletManager{
         //n number of existing events
         int n = burst.get(0).getEventIndex();
         params.put("n",n);
+
+        System.out.printf("params:"+params.toString());
 
         return params;
 

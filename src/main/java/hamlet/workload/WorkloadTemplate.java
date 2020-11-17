@@ -35,7 +35,7 @@ public class WorkloadTemplate {
         String groubyColumn = stockAttributeEnum.open_level.toString();
 
         //set aggregate column & type
-        String aggreColumn = predOneColumns[0];
+        String aggreColumn = stockAttributeEnum.open.toString();
 
 
         ArrayList<KleeneEventTypeEnum> availableKleene = new ArrayList<>(Arrays.asList(KleeneEventTypeEnum.values()));
@@ -68,11 +68,12 @@ public class WorkloadTemplate {
                 String returnString = returnString(kleene, groubyColumn, aggreColumn, aggregator);
                 String patternString = patternString(pattern);
 
-                String operator = Math.random()>0.5? ">" :"<";
-                String pred1 = Math.random()>0.5? predOneColumns[0]: predOneColumns[1];
-                String pred2 = Math.random()>0.5? predTwoColumns[0]: predTwoColumns[1];
+                String operator = ">";
+                String predCol = "vol";
 
-                String predicate = kleene+"."+pred1+" "+operator+" "+kleene+"."+pred2;
+                int threshold = Math.random()>0.5?100:30;
+
+                String predicate = kleene+"."+predCol+" "+operator+" "+threshold;
 
                 String whereString = whereString(kleene, predicate, operator, groubyColumn);
 
@@ -93,16 +94,18 @@ public class WorkloadTemplate {
         int queryPerGroup = workloadSize/5;
         ArrayList<String> queries = new ArrayList<>();
 
+
+
         for (String kleene: this.candidateQueries.keySet()){
+
+            ArrayList<String> availableQueries = (ArrayList<String>) this.candidateQueries.get(kleene).clone();
 
             for (int i=0; i<queryPerGroup; i++){
 
                 Random random = new Random();
-                int randomIndex = random.nextInt(this.candidateQueries.get(kleene).size());
-                while (queries.contains(this.candidateQueries.get(kleene).get(randomIndex))){
-                    randomIndex = random.nextInt(this.candidateQueries.get(kleene).size());
-                }
-                queries.add(this.candidateQueries.get(kleene).get(randomIndex));
+                int randomIndex = random.nextInt(availableQueries.size());
+                queries.add(availableQueries.get(randomIndex));
+                availableQueries.remove(randomIndex);
             }
         }
 

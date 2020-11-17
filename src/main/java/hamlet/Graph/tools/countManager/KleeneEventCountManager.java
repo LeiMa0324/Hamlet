@@ -25,8 +25,7 @@ public class KleeneEventCountManager extends EventCountManager {
 
 
         // have the same predecessors for all queries
-        if (Utils.getInstance().getPredecessorManager().hasSamePredecessorsForValidQueries(event)&&
-        !event.isHasSnapshot()){
+        if (Utils.getInstance().getPredecessorManager().hasSamePredecessorsForValidQueries(event)){
             ArrayList<Event> preds = Utils.getInstance().getPredecessorManager().getPredecessorsAfterLastGraphletSnapshotForQuery(event, event.getValidQueries().get(0));
             HashMap<Integer, BigInteger> coeffsum = new HashMap<>();
 

@@ -1,15 +1,20 @@
+static memory:
+    eventNum*12
+    snapshotNum*queryNum*12
+
+dynamic memeroy:
+    merged:
+        eventNum*12
+    split:
+        eventNum*queryNum*12
+    Snapshot:
+        snapshotNum*queryNum*12
 
 
+Project structure
+    旧版本jar，新版本code
 
-
-        //finished : Memory: number of event* number of queries that this event is in
-        //finished : EACH EXPERIMENT, run 3 times, Take average
-        //finished : Event types only appear once in a query
-
-        //keep the current processing of NYC dataset
-
-
-        1. Hamlet ran so fast on NYCTaxi/SmartHome, latency looks not stable(too few event types in the query)
-        2. memory is not growing with the number of queries. only one relevant event type for each query
-
-
+show actual number of opt time, no amplification  CHECK
+Statistics of rate per min                        CHECK
+Read rebuttal r3, section experiment
+Translate old workload into new ones

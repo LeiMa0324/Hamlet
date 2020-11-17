@@ -8,6 +8,7 @@ import hamlet.query.aggregator.CountAggregator;
 import hamlet.query.pattern.Pattern;
 import hamlet.query.predicate.AttributeComparisonPredicate;
 import hamlet.query.predicate.Predicate;
+import hamlet.query.predicate.SingleValuePredicate;
 import hamlet.query.window.Window;
 
 import java.util.ArrayList;
@@ -84,9 +85,7 @@ public class QueryParser {
 
     private Predicate parseSingleWhere(String singleWhereString){
         ArrayList<EventType> predEventTypes = new ArrayList<>();
-        /**
-         * hardcoded here, event type = group-by event type = kleene event type
-         */
+
         predEventTypes.add(this.pattern.getEventTypes().get(this.pattern.getKleeneIndex()));
         String operator = "";
         ArrayList<String> attributes  = new ArrayList<>();
@@ -97,16 +96,29 @@ public class QueryParser {
 
         if (a.find()){
             String attr1 = a.group(1).trim().split("\\.")[1];
-            operator = a.group(2);
-            String attr2 = a.group(3).trim().split("\\.")[1];
             attributes.add(attr1);
 
-            if (!attr1.equals(attr2)){
-                attributes.add(attr2);
+            operator = a.group(2);
+
+            String[] right = a.group(3).trim().split("\\.");
+
+            if (right.length==1){
+                //single value
+                Float value = Float.parseFloat(right[0]);
+                return new SingleValuePredicate(predEventTypes, operator, attributes, schema, value);
+
+            }else {//attribute comparison
+                String attr2 = a.group(3).trim().split("\\.")[1];
+
+                if (!attr1.equals(attr2)){
+                    attributes.add(attr2);
+                }
+                return new AttributeComparisonPredicate(predEventTypes, operator, attributes, schema);
+
             }
         }
-        return new AttributeComparisonPredicate(predEventTypes, operator, attributes, schema);
-
+        System.out.printf("No valid predicates detected!");
+        return null;
     }
 
     private void parseWindowLine(String windowLine){

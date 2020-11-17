@@ -1,8 +1,8 @@
 package hamlet.Graph.Graphlet.Dynamic;
 
-import hamlet.base.Event;
 import hamlet.Graph.Graphlet.Graphlet;
 import hamlet.Graph.tools.Utils;
+import hamlet.base.Event;
 import hamlet.query.aggregator.Value;
 import lombok.Data;
 
@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * an array of split graphlets,
@@ -28,9 +27,20 @@ public class SplittedGraphlets extends Graphlet {
         super(events);
         eventListForQuery = new HashMap<>();
 
-        for (int qid: events.get(0).getValidQueries()){
-            eventListForQuery.put(qid, events);
+
+        //get all the valid queries
+        for (Event e: events){
+            for (int qid: e.getValidQueries()){
+
+                //if eventListForQuery has it, add directly
+                //if not, create a new event list
+                ArrayList<Event> eventList = eventListForQuery.containsKey(qid)?eventListForQuery.get(qid):
+                        new ArrayList<Event>();
+                eventList.add(e);
+                eventListForQuery.put(qid, eventList);
+            }
         }
+
         this.type = GraphletType.splits;
     }
 
@@ -40,16 +50,16 @@ public class SplittedGraphlets extends Graphlet {
 
     public void extend(ArrayList<Event> burst){
 
-        //new valid queries = old valid queries UNION burst valid queries
-        Set<Integer> validQueries = eventListForQuery.keySet();
-        validQueries.addAll(burst.get(0).getValidQueries());
+        for (Event e: burst){
+            for (int qid: e.getValidQueries()){
 
-        for (int qid: validQueries){
-            ArrayList<Event> eventsForQ = eventListForQuery.get(qid);
-            if (burst.get(0).getValidQueries().contains(qid)){
-                eventsForQ.addAll(burst);
+                //if eventListForQuery has it, add directly
+                //if not, create a new event list
+                ArrayList<Event> eventList = eventListForQuery.containsKey(qid)?eventListForQuery.get(qid):
+                        new ArrayList<Event>();
+                eventList.add(e);
+                eventListForQuery.put(qid, eventList);
             }
-            eventListForQuery.put(qid, eventsForQ);
         }
 
     }

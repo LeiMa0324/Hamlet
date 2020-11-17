@@ -52,30 +52,11 @@ public class staticGraph extends Graph {
         graphlet.propagate();
         updateFinalValues(graphlet);
 
-//        windowProcess(burst);
+        windowProcess(burst);
 
     }
 
-    public void windowProcess(ArrayList<Event> burst){
-        //check expired queries
-        ArrayList<Integer> expiredQueries = windowManager.getExpiredQueries(burst.get(burst.size()-1).getTimeStamp());
-        for (Integer qid: expiredQueries){
-            System.out.printf("Query "+qid+" has expired!\n");
 
-            //output final counts
-            System.out.printf("Count: "+ this.finalValues.get(qid)+"\n");
-
-            //reset final counts
-            this.finalValues.put(qid, Value.ZERO);
-
-            //reset all snapshots
-            Utils.getInstance().getSnapshotManager().resetCountForExpiredQuery(qid);
-
-        }
-
-        windowManager.slideWindows(expiredQueries);
-
-    }
 
     public HashMap<Integer, Value> getPrefixValuesAfterLastKleeneGraphlet(ArrayList<Event> burst){
         GraphletManager_StaticHamlet graphletManagerStaticHamlet = (GraphletManager_StaticHamlet)Utils.getInstance().getGraphletManager();

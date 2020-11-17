@@ -29,7 +29,6 @@ public class Event {
     private HashMap<Integer, Value> values;
     private Metric metric;
     private Integer eventIndex;
-    private boolean hasSnapshot= false;
 
     public Event(EventType type, Object[] tuple) throws ParseException {
 
@@ -56,7 +55,6 @@ public class Event {
                 return i;
             }
         }
-        System.out.printf("Cannot find the attribute "+attributeName);
         return  -1;
     }
 

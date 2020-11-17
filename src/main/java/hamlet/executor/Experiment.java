@@ -4,33 +4,41 @@ import com.opencsv.CSVWriter;
 import hamlet.base.Attribute;
 import hamlet.base.DatasetSchema;
 import hamlet.users.stockUser.stockAttributeEnum;
+import lombok.Data;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+@Data
 public class Experiment {
 
     private DatasetSchema schema;
     private int defaultEPW = 50000;
     private int defaultWorkloadSize = 50;
+    private String streamFile;
+    private boolean isLocal = true;
+    private String workloadPath;
 
-    public Experiment(){
+    public Experiment(boolean isLocal){
         this.schema = new DatasetSchema();
         for (stockAttributeEnum a: stockAttributeEnum.values()){
             this.schema.addAttribute(new Attribute(a.toString()));
         }
+        this.isLocal = isLocal;
+        this.workloadPath = this.isLocal?"src/main/resources/Revision/":"Workload/";
+        this.streamFile = this.isLocal?"src/main/resources/Revision/Nasdaq.csv": "Stream/Nasdaq.csv";
+
     }
 
     public void varyEpw(){
-        String workloadFile = "src/main/resources/Revision/Workload_"+this.defaultWorkloadSize+".txt";
-        String streamFile = "src/main/resources/Revision/Nasdaq.csv";
+        String workloadFile = workloadPath+"Workload_"+this.defaultWorkloadSize+".txt";
         String logFile = "output/varyEpw.csv";
 
         for (int epw = 50000; epw < 110000; epw +=10000){
 
             for (int iter = 1;iter < 4; iter++) {
-                Executor executor = new Executor(this.schema, defaultEPW, workloadFile, streamFile);
+                Executor executor = new Executor(this.schema, epw, workloadFile, streamFile);
                 executor.workloadAnalysis(workloadFile);
                 executor.streamPartitioning(streamFile);
 
@@ -44,17 +52,16 @@ public class Experiment {
 
     public void varyQueryNum(){
         String logFile = "output/varyQueryNum.csv";
-        String streamFile = "src/main/resources/Revision/Nasdaq.csv";
 
 
         for (int workloadSize = 20; workloadSize < 110; workloadSize +=10){
-            String workloadFile = "src/main/resources/Revision/Workload_"+workloadSize+".txt";
+            String workloadFile = this.workloadPath+"Workload_"+workloadSize+".txt";
 
             for (int iter = 1;iter < 4; iter++) {
                 int epw = defaultEPW;
-                Executor executor = new Executor(this.schema, epw, workloadFile, streamFile);
+                Executor executor = new Executor(this.schema, epw, workloadFile, this.streamFile);
                 executor.workloadAnalysis(workloadFile);
-                executor.streamPartitioning(streamFile);
+                executor.streamPartitioning(this.streamFile);
 
                 executor.run();
 
@@ -65,9 +72,6 @@ public class Experiment {
         }
     }
 
-    public void overheadExp(){
-
-    }
 
 
     /**
@@ -86,7 +90,8 @@ public class Experiment {
                 "Static Ham execution time","Dynamic Ham optimizer time", "Dynamic Ham execution time",
                 "Static Ham memory", "Dynamic Ham memory",
                 "Merge num","Split num",
-                "Graphlet Num", "Merged Graphlet Num"
+                "Graphlet Num", "Merged Graphlet Num",
+                "Static Snapshot Num","Dynamic Snapshot Num"
         };
         String[] data = new String[header.length];
         int i =0;
@@ -122,7 +127,11 @@ public class Experiment {
 
         //graphlet number
         data[i] = executor.getGraphletNum()+"";     i++;
-        data[i] = executor.getMergedGraphletNum()+"";
+        data[i] = executor.getMergedGraphletNum()+"";   i++;
+
+        //snapshot numbers
+        data[i] = executor.getStaticSnapshotNum()+"";   i++;
+        data[i] = executor.getDynamicSnapshotNum()+"";
 
 
 

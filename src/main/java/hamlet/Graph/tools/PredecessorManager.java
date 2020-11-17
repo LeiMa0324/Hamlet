@@ -20,9 +20,7 @@ public class PredecessorManager {
      * @return
      */
     public boolean hasSamePredecessorsForValidQueries(Event event){
-        if (event.getValidQueries().isEmpty()){
-            System.out.printf("");
-        }
+
         ArrayList<Event> predsForFirstQuery = getPredecessorsAfterLastGraphletSnapshotForQuery(event, event.getValidQueries().get(0));
 
         for (Integer qid: event.getValidQueries()){

@@ -1,30 +1,24 @@
-PROJECT STRUCTURE
-====
+#PROJECT STRUCTURE
 
-Packages
-----
-**dataGenerator package**
-* Generate the ride sharing stream
-* Generate the workload for all three data sets
 
-**dataProcessing package**
-* Process the raw data of NYC Taxi and Smart Home data sets
+##Original Submission
 
-**baselines package**
-* All baseline models including greta, sharon, etc
+out/artifacts/HamletOriginalSubmission.jar
 
-**hamlet package**
-* Graph - super class of all hamlet graphs
-* HamletGraph - hamlet graph without predicates implementation
-* StaticGraph - static hamlet with decision of sharing under situations of predicates
-* DynamicGraph - dynamic hamlet with benefit model and dynamic decisions of sharing or not sharing
+This is the jar of the original submission, including all the experiments Figure 14-16
 
-**executor package**
-* Executor to run the experiments
-* Main function
 
-Dataset
-----
+##Revision Submission
+
+###Packages
+
+base:
+    
+
+
+
+###Dataset
+
 
  NYC Taxi dataset: https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv
  
@@ -34,19 +28,19 @@ Dataset
  Each dataset has a stream folder ("Streams") and a workload folder("Queries").<br>
  Different workload files have different number of queries.<br>
 
-Output
-----
+###Output
+
 
  Outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
  The output stores the latency, memory, throughput for each model in an experiment.
  The output path is generated automatically if it doesn't exist.
 
 
-EXECUTION
-====
+###EXECUTION
 
-Main Function
-----
+
+####Main Function
+
 
 
  Main function: ~/src/main/java/executor/main.java<br>
@@ -60,7 +54,7 @@ Main Function
  * Dynamic versus static sharing decision (NYC Taxi data set)<br>
      output directory: ~/output/DynamicHamlet
 
-Experiment
+####Experiment
 ----
  Main function read the experiment number from the file ~/ExpNo.txt and increment it after the experiment.<br>
  For the first experiments, we run two methods varying:

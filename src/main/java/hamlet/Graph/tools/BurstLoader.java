@@ -64,9 +64,8 @@ public class BurstLoader {
 
         }
         bursts.add(tempBurst);
-        ArrayList<ArrayList<Event>> newBursts = setFlag(bursts);
-        this.events = allEventsFromBursts(newBursts);
-        return newBursts;
+        this.events = validEvents;
+        return bursts;
 
     }
 
@@ -89,27 +88,5 @@ public class BurstLoader {
         return event;
     }
 
-    private ArrayList<ArrayList<Event>> setFlag(ArrayList<ArrayList<Event>> bursts){
 
-        ArrayList<ArrayList<Event>> newBursts = new ArrayList<>();
-        for (ArrayList<Event> burst: bursts){
-
-            if (Math.random()<0.3){
-                for (Event event: burst){
-                    event.setHasSnapshot(true);
-                }
-            }
-            newBursts.add(burst);
-        }
-        return newBursts;
-    }
-
-    private ArrayList<Event> allEventsFromBursts(ArrayList<ArrayList<Event>> bursts){
-        ArrayList<Event> events = new ArrayList<>();
-
-        for (ArrayList<Event> burst: bursts){
-            events.addAll(burst);
-        }
-        return events;
-    }
 }

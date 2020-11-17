@@ -7,10 +7,19 @@ group 'leima.com'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.7
-mainClassName ='Executor.Executor'
+mainClassName ='hamlet.executor.serverMain'
 
 repositories {
     mavenCentral()
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "hamlet.executor.serverMain"
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }
 
 dependencies {
@@ -26,6 +35,7 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
 }
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }

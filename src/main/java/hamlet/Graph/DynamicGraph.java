@@ -35,6 +35,9 @@ public class DynamicGraph extends Graph{
 
     public void run() {
 
+        this.windowManager.initAllWindows(this.events.get(0).getTimeStamp());
+
+
         for (int i =0;i< this.bursts.size(); i++){
             ArrayList<Event> burst = bursts.get(i);
             System.out.printf("Burst number: "+i+"\n");
@@ -49,6 +52,7 @@ public class DynamicGraph extends Graph{
 
                 HashMap<String, Integer> params = this.graphletManagerDynamicHamlet.getParams(burst);
                 boolean shareDecision = this.optimizer.isToShare(params);
+                System.out.printf("share?" + shareDecision);
 
                 long optimizerEnd = System.currentTimeMillis();
 
@@ -90,6 +94,9 @@ public class DynamicGraph extends Graph{
 
             long afterFinal = System.currentTimeMillis();
             this.executionTime +=(afterFinal - beforeFinal);
+
+            windowProcess(burst);
+
         }
 
         this.memory += this.utils.getSnapshotManager().getSnapshots().size()*this.utils.getQueryIds().size()*12;
