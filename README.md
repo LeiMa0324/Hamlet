@@ -16,7 +16,7 @@ This is the jar of the original submission, including all the experiments Figure
 
 **base:**
 
-  classes of basic data structures including dataset schema, attribute of the schema, stream event, event type, snapshot and template.
+  > classes of basic data structures including dataset schema, attribute of the schema, stream event, event type, snapshot and template.
 
 **query:**
 
