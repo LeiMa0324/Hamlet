@@ -1,25 +1,25 @@
-PROJECT STRUCTURE
-====
+# PROJECT STRUCTURE
 
-Original Submission
-----
+
+## Original Submission
+
 
 out/artifacts/HamletOriginalSubmission.jar
 
 This is the jar of the original submission, including all the experiments Figure 14-16
 
 
-Revision Submission
-----
+## Revision Submission
 
-###Packages
+
+### Packages
 
 base:
     
 
 
 
-###Dataset
+### Dataset
 
 
  NYC Taxi dataset: https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv
@@ -30,7 +30,7 @@ base:
  Each dataset has a stream folder ("Streams") and a workload folder("Queries").<br>
  Different workload files have different number of queries.<br>
 
-###Output
+### Output
 
 
  Outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
@@ -38,10 +38,10 @@ base:
  The output path is generated automatically if it doesn't exist.
 
 
-###EXECUTION
+### EXECUTION
 
 
-####Main Function
+#### Main Function
 
 
 
@@ -56,7 +56,7 @@ base:
  * Dynamic versus static sharing decision (NYC Taxi data set)<br>
      output directory: ~/output/DynamicHamlet
 
-####Experiment
+#### Experiment
 ----
  Main function read the experiment number from the file ~/ExpNo.txt and increment it after the experiment.<br>
  For the first experiments, we run two methods varying:
