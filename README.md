@@ -1,95 +1,71 @@
-# PROJECT STRUCTURE
+#PROJECT STRUCTURE
 
 
-## Original Submission
-
+##Original Submission
 
 out/artifacts/HamletOriginalSubmission.jar
 
 This is the jar of the original submission, including all the experiments Figure 14-16
 
 
-## Revision Submission
+##Revision Submission
 
+###Packages
 
-### 1.Packages
-
-**base:**
-
-  > classes of basic data structures including dataset schema, attribute of the schema, stream event, event type, snapshot and template.
-
-**query:**
-
-  > classes of components of a query, including aggregator, pattern, predicate, window and groupby. 
-  > QueryParser parses a query string into a Query object.
-
-**stream:**
-
-  > stream related classes, including stream loader and partitioner.
+base:
     
-**users:**
-
-  > the dataset specifications. 
-
-**workload:**
-
-  > workloadTemplate and generator produce the workload file. The generated workloads are under src/main/resources/Nasdaq
-    
-  > WorklaodAnalyzer parses a workload file into a workload object and analyzes the sharing opportunity.
-
-**graph**
-
-  > tools: including all the managers of graphlets, snapshots, predecessors, windows.
-  
-  > graphlet: the abstractions of graphlet
-  
-  > static and dynamic graphs
-    
-**optimizer:**
-
-  > the dynmaic optimizer of dynamic hamlet.
-    
-**executor:**
-
-  > executor class has the methods of a single run of static and dynamic hamlet. Experiment provides the actual setting and methods of the whole experiment.
-    
-  > LocalMain is the main class of local running on an IDE. 
-    
-  > serverMain is the main class for the jar that could be run on a server.
 
 
-### 2.Dataset
 
-  > src/main/resources/Nasdaq/Nasdaq.csv
-
-
-### 3.Output
+###Dataset
 
 
- > Outputs are under ~/output/output
+ NYC Taxi dataset: https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2019-01.csv
  
- > The output stores the details of each experiment including latency, memory, throughput, overhead and decisions of the dynamic optimizer.
- 
- > The output path is generated automatically if it doesn't exist.
+ Smart Home dataset: http://www.doc.ic.ac.uk/~mweidlic/sorted.csv.gz
+
+ All processed data sets are stored under ~/src/main/resources/[DATASET].<br>
+ Each dataset has a stream folder ("Streams") and a workload folder("Queries").<br>
+ Different workload files have different number of queries.<br>
+
+###Output
 
 
-### 4.Execution
+ Outputs are under ~/output/"dataset", file name is in EXP_[X]_[method].csv form.
+ The output stores the latency, memory, throughput for each model in an experiment.
+ The output path is generated automatically if it doesn't exist.
 
 
-#### 4.1 Main Function
+###EXECUTION
 
 
- > Main function: src/main/java/hamlet/executor/LocalMain.java<br>
- 
- > simply run the main function directly.
-
- > Main function compares static VS. dynamic in two settings:
- 
- > vary query number
- > vary events per window
+####Main Function
 
 
- > In each of these settings, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
- 
- > Plots are based on the average of these results over all iterations for a single experiment.
+
+ Main function: ~/src/main/java/executor/main.java<br>
+ simply run the main function directly.
+
+ Main function includes two simplified demonstration experiments:
+ * Hamlet versus Greta, Sharon(Ridesharing data set)<br>
+     output directory: ~/output/RideSharing
+
+
+ * Dynamic versus static sharing decision (NYC Taxi data set)<br>
+     output directory: ~/output/DynamicHamlet
+
+####Experiment
+----
+ Main function read the experiment number from the file ~/ExpNo.txt and increment it after the experiment.<br>
+ For the first experiments, we run two methods varying:
+* The events per window
+* The number of queries
+
+ For the last experiment, we run two methods varying:
+* The events per window
+* The burst size
+
+
+ In each of these methods, we run the models several iterations and log the results of latency, throughput and memory for each model in each iteration.
+ Plots are based on the average of these results over all iterations for a single experiment.
 
