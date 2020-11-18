@@ -1,6 +1,6 @@
 package hamlet.executor;
 
-public class ExpMain {
+public class LocalMain {
 
     public static void main(String[] args){
         Experiment epw_exp = new Experiment(true);

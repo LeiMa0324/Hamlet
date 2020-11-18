@@ -174,7 +174,6 @@ public class Executor {
     public void dynamicRun() {
 
 
-
         //for each mini workload
         for (String kleeneEt: this.stringMiniWorkloadHashMap.keySet()){
 
