@@ -60,7 +60,7 @@ This is the jar of the original submission, including all the experiments Figure
 
 ### 2.Dataset
 
-  > src/main/resources/Nasdaq/Nasdaq.csv
+  > src/main/resources/Nasdaq/Nasdaq_sample.csv is a sample of the dataset, it has 50k events.
 
 
 ### 3.Output
