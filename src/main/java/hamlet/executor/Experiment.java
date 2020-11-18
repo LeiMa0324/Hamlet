@@ -26,8 +26,8 @@ public class Experiment {
             this.schema.addAttribute(new Attribute(a.toString()));
         }
         this.isLocal = isLocal;
-        this.workloadPath = this.isLocal?"src/main/resources/Revision/":"Workload/";
-        this.streamFile = this.isLocal?"src/main/resources/Revision/Nasdaq.csv": "Stream/Nasdaq.csv";
+        this.workloadPath = this.isLocal?"src/main/resources/Nasdaq/":"Workload/";
+        this.streamFile = this.isLocal?"src/main/resources/Nasdaq/Nasdaq.csv": "Stream/Nasdaq.csv";
 
     }
 
