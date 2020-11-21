@@ -6,7 +6,7 @@
 
 out/artifacts/HamletOriginalSubmission.jar
 
-This is the jar of the original submission, including all the experiments Figure 14-16
+This is the jar of the original submission, including all the experiments Figure 8-10
 
 
 ## Revision Submission
@@ -20,7 +20,7 @@ This is the jar of the original submission, including all the experiments Figure
 
 **query:**
 
-  > classes of components of a query, including aggregator, pattern, predicate, window and groupby. 
+  > classes of clauses of a query, including aggregator, pattern, predicate, window and groupby. 
   > QueryParser parses a query string into a Query object.
 
 **stream:**
@@ -86,6 +86,7 @@ This is the jar of the original submission, including all the experiments Figure
  > Main function compares static VS. dynamic in two settings:
  
  > vary query number
+
  > vary events per window
 
 
