@@ -59,13 +59,12 @@ public class DynamicGraph extends Graph{
                 optimizerTime += (optimizerEnd - optimizerStart);
 
                 if (shareDecision){
-                    //返回一个burst values，加到final上
+
                     burstValues = this.graphletManagerDynamicHamlet.share(burst);
                     this.memory += burst.size()*12;
                     this.mergeNum +=1;
                 }
                 if (!shareDecision){
-                    //返回一个burst values，加到final上
 
                     burstValues = this.graphletManagerDynamicHamlet.split(burst);
                     this.memory += burst.size()*this.utils.getQueryIds().size()*12;
@@ -77,7 +76,6 @@ public class DynamicGraph extends Graph{
                 this.executionTime += (executionEnd-optimizerEnd);
 
             }else {
-                //返回一个burst values，加到final上
                 long executionStart = System.currentTimeMillis();
                 burstValues = this.graphletManagerDynamicHamlet.newNoneSharedGraphlet(burst);
                 this.memory += burst.size()*12;
@@ -89,7 +87,6 @@ public class DynamicGraph extends Graph{
 
             long beforeFinal = System.currentTimeMillis();
 
-            //如果该burst是end type， update final values
             updateFinalValues(burstValues, burst);
 
             long afterFinal = System.currentTimeMillis();

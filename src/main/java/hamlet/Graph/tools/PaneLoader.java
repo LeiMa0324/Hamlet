@@ -33,7 +33,6 @@ public class PaneLoader {
 
             Event event = setValidQueries(events.get(i));
 
-            //skip the events that satisfy no predicates
             if (event.getValidQueries().isEmpty()) {
                 continue;
             }
@@ -46,7 +45,6 @@ public class PaneLoader {
 
             event.setEventIndex(validEvents.size());
 
-            //if the event has the same name and time stamp, add it into the burst
             if (event.getType().getName().equals(latestEvent)&&
                     ((String) event.getAttributeValueByName(stockAttributeEnum.date.toString())).equals(lastTimeStamp)) {
                 tempPane.add(event);
@@ -75,7 +73,6 @@ public class PaneLoader {
      */
     private Event setValidQueries(Event event){
 
-        //kleene events, check the predicates
         if (event.getType().isKleene()){
             event.setValidQueries(this.predicateManager.getValidQueriesForPredicate(event));
 

@@ -32,7 +32,7 @@ public class Event {
 
     public Event(EventType type, Object[] tuple) throws ParseException {
 
-        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyyMMddhhmm");//如2016-08-10 20:40
+        SimpleDateFormat simpleFormat = new SimpleDateFormat("yyyyMMddhhmm");//2016-08-10 20:40
 
         this.type = type;
         this.tuple = tuple;

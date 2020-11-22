@@ -16,7 +16,7 @@ public class Generator {
             workloadtemplate.generateCandidateQueries( 5);
 
             for (int i = 20; i<110; i+=10) {
-                String workloadFile = "src/main/resources/Revision/Workload_"+i+".txt";
+                String workloadFile = "src/main/resources/Nasdaq/Workload_"+i+".txt";
                 workloadtemplate.generateWorkload(i, workloadFile);
             }
         }

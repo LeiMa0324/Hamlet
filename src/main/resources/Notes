@@ -1,9 +1,0 @@
-
-
-Project structure
-    旧版本jar，新版本code                          CHECK
-
-show actual number of opt time, no amplification  CHECK
-Statistics of rate per min                        CHECK
-Read rebuttal r3, section experiment              CHECK
-package old stream and workload into a jar file so they can run directly

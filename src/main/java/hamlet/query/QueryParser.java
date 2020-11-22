@@ -54,9 +54,6 @@ public class QueryParser {
         String aggString = strings[1];
 
         // the group by column
-        /**
-         * hardcoded here group event = kleene event
-         */
         this.groupBy = new GroupBy(returnString.split("\\s")[1].split("\\.")[1],
                 this.pattern.getEventTypes().get(this.pattern.getKleeneIndex()));
 
