@@ -6,7 +6,7 @@ import hamlet.Graph.tools.GraphletManager.GraphletManager_DynamicHamlet;
 import hamlet.base.DatasetSchema;
 import hamlet.base.Event;
 import hamlet.base.Template;
-import hamlet.Graph.tools.BurstLoader;
+import hamlet.Graph.tools.PaneLoader;
 import hamlet.stream.streamLoader;
 import hamlet.stream.streamPartitioner;
 import hamlet.workload.Workload;
@@ -138,9 +138,9 @@ public class Executor {
             for (ArrayList<Event> substream: substreams.get(kleeneEt).values()){
 
                 Template template = this.stringTemplateHashMap.get(kleeneEt);
-                BurstLoader burstLoader = new BurstLoader(template.getPredicateManager());
-                ArrayList<ArrayList<Event>> bursts = burstLoader.load(substream);
-                ArrayList<Event> events = burstLoader.getEvents();
+                PaneLoader paneLoader = new PaneLoader(template.getPredicateManager());
+                ArrayList<ArrayList<Event>> bursts = paneLoader.load(substream);
+                ArrayList<Event> events = paneLoader.getEvents();
 
                 this.staticRelevantEvents += events.size();
 
@@ -182,9 +182,9 @@ public class Executor {
             for (ArrayList<Event> substream: substreams.get(kleeneEt).values()){
 
                 Template template = this.stringTemplateHashMap.get(kleeneEt);
-                BurstLoader burstLoader = new BurstLoader(template.getPredicateManager());
-                ArrayList<ArrayList<Event>> bursts = burstLoader.load(substream);
-                ArrayList<Event> events = burstLoader.getEvents();
+                PaneLoader paneLoader = new PaneLoader(template.getPredicateManager());
+                ArrayList<ArrayList<Event>> bursts = paneLoader.load(substream);
+                ArrayList<Event> events = paneLoader.getEvents();
 
                 this.dynamicRelevantEvents += events.size();
 

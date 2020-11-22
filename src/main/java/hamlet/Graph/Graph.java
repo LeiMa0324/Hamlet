@@ -24,7 +24,7 @@ public abstract class Graph {
     protected PredicateManager predicateManager;
     protected Template template;
     protected ArrayList<Event> events;
-    protected final ArrayList<ArrayList<Event>> bursts;
+    protected final ArrayList<ArrayList<Event>> panes;
     protected HashMap<Integer, Value> finalValues;
     protected Utils utils;
     protected long latency;
@@ -32,10 +32,10 @@ public abstract class Graph {
 
 
 
-    public Graph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> bursts){
+    public Graph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> panes){
         this.predicateManager = template.getPredicateManager();
         this.template = template;
-        this.bursts = bursts;
+        this.panes = panes;
         this.finalValues = new HashMap<>();
         this.windowManager = template.getWindowManager();
         this.events = events;

@@ -15,8 +15,8 @@ import java.util.HashMap;
 public class staticGraph extends Graph {
 
 
-    public staticGraph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> bursts){
-        super(template, events, bursts);
+    public staticGraph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> panes){
+        super(template, events, panes);
         this.utils.setGraphType(Utils.GraphType.STATIC);
         printWorkload();
 
@@ -26,8 +26,8 @@ public class staticGraph extends Graph {
 
         this.windowManager.initAllWindows(this.events.get(0).getTimeStamp());
 
-        for (int i =0; i< this.bursts.size(); i++){
-            ArrayList<Event> burst = this.bursts.get(i);
+        for (int i = 0; i< this.panes.size(); i++){
+            ArrayList<Event> burst = this.panes.get(i);
             System.out.printf("Burst number: "+i+"\n");
             burstProcess(burst);
         }

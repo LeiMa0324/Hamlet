@@ -8,13 +8,13 @@ import hamlet.users.stockUser.stockAttributeEnum;
 import java.util.ArrayList;
 
 @Data
-public class BurstLoader {
+public class PaneLoader {
 
     private ArrayList<Event> events;
     private final PredicateManager predicateManager;
     private Aggregator aggregator;
 
-    public BurstLoader(PredicateManager predicateManager){
+    public PaneLoader(PredicateManager predicateManager){
         this.predicateManager = predicateManager;
         this.aggregator = aggregator;
 
@@ -22,12 +22,12 @@ public class BurstLoader {
 
     public ArrayList<ArrayList<Event>> load(ArrayList<Event> events){
 
-        ArrayList<ArrayList<Event>> bursts = new ArrayList<>();
+        ArrayList<ArrayList<Event>> panes = new ArrayList<>();
         ArrayList<Event> validEvents = new ArrayList<>();
 
         String latestEvent = "";
         String lastTimeStamp = "";
-        ArrayList<Event> tempBurst = new ArrayList<>();
+        ArrayList<Event> tempPane = new ArrayList<>();
 
         for (int i =0; i<events.size(); i++) {
 
@@ -49,23 +49,23 @@ public class BurstLoader {
             //if the event has the same name and time stamp, add it into the burst
             if (event.getType().getName().equals(latestEvent)&&
                     ((String) event.getAttributeValueByName(stockAttributeEnum.date.toString())).equals(lastTimeStamp)) {
-                tempBurst.add(event);
+                tempPane.add(event);
             } else {
                 latestEvent = event.getType().getName();
                 lastTimeStamp = (String)event.getAttributeValueByName(stockAttributeEnum.date.toString());
-                ArrayList<Event> burst = (ArrayList<Event>) tempBurst.clone();
+                ArrayList<Event> burst = (ArrayList<Event>) tempPane.clone();
 
-                bursts.add(burst);
-                tempBurst.clear();
-                tempBurst.add(event);
+                panes.add(burst);
+                tempPane.clear();
+                tempPane.add(event);
             }
 
             validEvents.add(event);
 
         }
-        bursts.add(tempBurst);
+        panes.add(tempPane);
         this.events = validEvents;
-        return bursts;
+        return panes;
 
     }
 

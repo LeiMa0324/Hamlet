@@ -22,8 +22,8 @@ public class DynamicGraph extends Graph{
     private long executionTime = 0;
 
 
-    public DynamicGraph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> bursts){
-        super(template, events, bursts);
+    public DynamicGraph(Template template, ArrayList<Event> events, ArrayList<ArrayList<Event>> panes){
+        super(template, events, panes);
         optimizer = new DynamicOptimizer();
         graphletManagerDynamicHamlet = new GraphletManager_DynamicHamlet();
         printWorkload();
@@ -38,9 +38,9 @@ public class DynamicGraph extends Graph{
         this.windowManager.initAllWindows(this.events.get(0).getTimeStamp());
 
 
-        for (int i =0;i< this.bursts.size(); i++){
-            ArrayList<Event> burst = bursts.get(i);
-            System.out.printf("Burst number: "+i+"\n");
+        for (int i = 0; i< this.panes.size(); i++){
+            ArrayList<Event> burst = panes.get(i);
+            System.out.printf("Pane number: "+i+"\n");
 
 
             boolean isKleeneBurst = burst.get(0).getType().isKleene();

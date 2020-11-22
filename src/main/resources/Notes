@@ -1,14 +1,3 @@
-static memory:
-    eventNum*12
-    snapshotNum*queryNum*12
-
-dynamic memeroy:
-    merged:
-        eventNum*12
-    split:
-        eventNum*queryNum*12
-    Snapshot:
-        snapshotNum*queryNum*12
 
 
 Project structure
@@ -16,5 +5,5 @@ Project structure
 
 show actual number of opt time, no amplification  CHECK
 Statistics of rate per min                        CHECK
-Read rebuttal r3, section experiment
-Translate old workload into new ones
+Read rebuttal r3, section experiment              CHECK
+package old stream and workload into a jar file so they can run directly
