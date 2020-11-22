@@ -51,7 +51,7 @@ public class WorkloadTemplate {
 
             String kleene = ((KleeneEventTypeEnum) randomEvent(availableKleene)).toString();
 
-            //todo: make it enum
+
             String[] windows = {"5 min", "10 min","15 min", "20 min"};
             String slide = "5 min";
 

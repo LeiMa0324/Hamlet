@@ -12,7 +12,7 @@ public abstract class GraphletManager {
     protected ArrayList<Graphlet> graphlets;
     protected ArrayList<Graphlet> kleeneGraphlets;
 
-    //todo: set last index to -1
+
     protected int lastKleeneGraphletIndex = -1;
 
     public GraphletManager(){

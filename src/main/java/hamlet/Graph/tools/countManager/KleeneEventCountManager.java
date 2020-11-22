@@ -17,7 +17,7 @@ public class KleeneEventCountManager extends EventCountManager {
         super();
     }
 
-    //todo: such a mess
+
     public void update(Event event){
         ArrayList<Integer> startQueries = event.getType().getQueriesStartWith();
         ArrayList<Integer> endQueries = event.getType().getQueriesEndWith();
