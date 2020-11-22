@@ -4,9 +4,15 @@
 ## Original Submission
 
 
-out/artifacts/HamletOriginalSubmission.jar
+oldSubmission/HamletOriginalSubmission.jar
 
 This is the jar of the original submission, including all the experiments Figure 8-10
+
+Due to the limited space, all datasets are samples.
+
+Run the jar under its directory, the system will detect the datasets folder and run the respective experiments.
+
+Some experiments with larger epw may fail since the limited length of the sample datasets.
 
 
 ## Revision Submission
