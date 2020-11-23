@@ -105,6 +105,9 @@ Some experiments with larger epw may fail since the limited length of the sample
  * vary events per window
 
 
- In each of these experiment, we run the models varying query num or events per window. For one setting, we run them several iterations and log the results of latency, throughput, memory and other details.
+ In each of these experiments, we run the models varying query num or events per window. For one setting, we run them several iterations and log the results of latency, throughput, memory and other details.
  
  All charts are plotted using the average of iterations.
+ 
+ 
+ 
