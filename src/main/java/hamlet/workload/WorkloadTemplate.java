@@ -71,7 +71,8 @@ public class WorkloadTemplate {
                 String operator = ">";
                 String predCol = "vol";
 
-                int threshold = Math.random()>0.5?100:30;
+                double dice = Math.random();
+                int threshold = dice<0.3?100:(dice<0.6? 50: 30);
 
                 String predicate = kleene+"."+predCol+" "+operator+" "+threshold;
 
