@@ -98,13 +98,16 @@ Some experiments with larger epw may fail since the limited length of the sample
  
  simply run the main function directly.
 
- Main function compares static VS. dynamic in two settings:
+ Main function compares static VS. dynamic in two experiments:
  
  * vary query number
 
  * vary events per window
 
 
- In each of these settings, we run the models several iterations with one setting and log the results of latency, throughput, memory and other details for each model in each iteration.
+ In each of these experiments, we run the models varying query num or events per window. For one setting, we run them several iterations and log the results of latency, throughput, memory and other details.
  
- All charts are plotted using the average of iterations for a unique setting of experiment.
+ All charts are plotted using the average of iterations.
+ 
+ 
+ 
